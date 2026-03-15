@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educsen | Admin — Générateur de codes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --border: #334155;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { font-size: 1.4rem; margin-bottom: 4px; }
+        .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+        .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 18px; color: #93c5fd; }
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+        .form-group { flex: 1; min-width: 160px; }
+        label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:5px; }
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--text);
+            font-size: 0.875rem;
+            font-family: inherit;
+            outline: none;
+        }
+        select:focus, input:focus { border-color: var(--primary); }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; font-size:0.75rem; padding:6px 12px; }
+
+        /* Table codes */
+        .codes-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        .codes-table th {
+            text-align: left; font-size: 0.75rem; color: var(--muted);
+            padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 500;
+        }
+        .codes-table td {
+            padding: 10px 10px; font-size: 0.82rem; border-bottom: 1px solid rgba(51,65,85,0.5);
+        }
+        .code-badge {
+            font-family: monospace; font-size: 0.9rem; font-weight: 700;
+            color: #60a5fa; letter-spacing: 0.05em;
+        }
+        .badge {
+            padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+        }
+        .badge-actif    { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-utilise  { background: rgba(148,163,184,0.15); color: var(--muted); border: 1px solid var(--border); }
+        .badge-mensuel  { background: rgba(59,130,246,0.15); color: #93c5fd; }
+        .badge-annuel   { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+        .badge-trimestriel { background: rgba(245,158,11,0.15); color: #fcd34d; }
+
+        .empty-state { text-align: center; padding: 32px; color: var(--muted); font-size: 0.85rem; }
+        .alert {
+            padding: 10px 14px; border-radius: 7px; font-size: 0.83rem; margin-top: 12px;
+            display:none; align-items:center; gap:8px;
+        }
+        .alert.show { display: flex; }
+        .alert-success { background: rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#6ee7b7; }
+        .alert-error   { background: rgba(239,68,68,0.12);  border:1px solid rgba(239,68,68,0.3);  color:#fca5a5; }
+
+        .instructions {
+            background: rgba(245,158,11,0.07);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .instructions h3 { color: #fcd34d; font-size:0.85rem; margin-bottom:8px; }
+        .instructions ol { margin-left: 18px; }
+        .instructions li { font-size: 0.8rem; color: var(--muted); margin-bottom:4px; line-height:1.5; }
+        .instructions code { background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius:3px; font-size:0.78rem; color:#93c5fd; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;">E</div>
+        <h1>Admin — Générateur de codes</h1>
+    </div>
+    <div class="subtitle">Outil réservé à l'administrateur Educsen. Ne pas partager cette page.</div>
+
+    <!-- Instructions EmailJS -->
+    <div class="instructions">
+        <h3><i class="fas fa-info-circle"></i> Configuration EmailJS (à faire une fois)</h3>
+        <ol>
+            <li>Créer un compte sur <strong>emailjs.com</strong> (gratuit jusqu'à 200 emails/mois)</li>
+            <li>Créer un <strong>Service</strong> (ex: Gmail) → noter le <code>Service ID</code></li>
+            <li>Créer un <strong>Template</strong> avec les variables : <code>from_name</code>, <code>from_email</code>, <code>ecole</code>, <code>plan</code>, <code>montant</code>, <code>reference</code>, <code>message</code>, <code>date</code></li>
+            <li>Dans <code>abonnement.html</code>, remplacer <code>EMAILJS_SERVICE_ID</code>, <code>EMAILJS_TEMPLATE_ID</code>, <code>EMAILJS_PUBLIC_KEY</code></li>
+            <li>Dans <code>subscription.js</code>, ajouter l'import dans chaque page protégée (voir commentaire en haut du fichier)</li>
+        </ol>
+    </div>
+
+    <!-- Générateur -->
+    <div class="card">
+        <h2><i class="fas fa-key"></i> Générer de nouveaux codes</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Plan</label>
+                <select id="gen-plan">
+                    <option value="mensuel">Mensuel (30 jours)</option>
+                    <option value="trimestriel">Trimestriel (90 jours)</option>
+                    <option value="annuel" selected>Annuel (365 jours)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nombre de codes</label>
+                <input type="number" id="gen-count" value="1" min="1" max="20">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="genererCodes()">
+            <i class="fas fa-magic"></i> Générer et enregistrer dans Firestore
+        </button>
+        <div class="alert" id="alert-gen"></div>
+    </div>
+
+    <!-- Liste des codes -->
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <h2 style="margin:0"><i class="fas fa-list"></i> Codes enregistrés</h2>
+            <button class="btn btn-primary" style="padding:7px 14px;font-size:0.8rem" onclick="chargerCodes()">
+                <i class="fas fa-sync-alt"></i> Rafraîchir
+            </button>
+        </div>
+        <div id="codes-container">
+            <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, orderBy, query, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+    authDomain: "real-educsen.firebaseapp.com",
+    projectId: "real-educsen",
+    storageBucket: "real-educsen.firebasestorage.app",
+    messagingSenderId: "80660233362",
+    appId: "1:80660233362:web:5edf5060254170056eba4b"
+};
+
+const DUREES = { mensuel: 30, trimestriel: 90, annuel: 365 };
+
+const app  = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+// ── Attendre que l'utilisateur soit connecté avant de charger ─────────────────
+document.getElementById("codes-container").innerHTML =
+    '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Vérification de l\'authentification…</div>';
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        // Afficher un formulaire de connexion inline
+        document.getElementById("codes-container").innerHTML = `
+            <div style="padding:24px;text-align:center">
+                <p style="color:#fca5a5;margin-bottom:16px;font-size:0.85rem">
+                    <i class="fas fa-lock"></i> Vous devez être connecté pour accéder à cet outil.
+                </p>
+                <input type="email" id="login-email" placeholder="Email admin" 
+                    style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+                    border-radius:7px;color:var(--text);font-size:0.875rem;margin-bottom:8px;outline:none;">
+                <input type="password" id="login-password" placeholder="Mot de passe" 
+                    style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+                    border-radius:7px;color:var(--text);font-size:0.875rem;margin-bottom:12px;outline:none;">
+                <button onclick="connexionAdmin()" 
+                    style="background:var(--primary);color:white;border:none;border-radius:7px;
+                    padding:10px 24px;font-size:0.875rem;font-weight:600;cursor:pointer;width:100%">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                </button>
+                <div id="login-error" style="color:#fca5a5;font-size:0.8rem;margin-top:10px;display:none"></div>
+            </div>`;
+
+        window.connexionAdmin = async function() {
+            const email    = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                const errEl = document.getElementById("login-error");
+                errEl.textContent = "Email ou mot de passe incorrect.";
+                errEl.style.display = "block";
+            }
+        };
+    } else {
+        // Connecté → charger les codes
+        chargerCodes();
+    }
+});
+
+// Génère un code du format EDU-XXXX-XXXX
+function genererCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const seg   = (n) => Array.from({length:n}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    return `EDU-${seg(4)}-${seg(4)}`;
+}
+
+window.genererCodes = async function() {
+    const plan  = document.getElementById("gen-plan").value;
+    const count = parseInt(document.getElementById("gen-count").value) || 1;
+    const codesRef = collection(db, "codes_renouvellement");
+    const codesGeneres = [];
+
+    try {
+        for (let i = 0; i < Math.min(count, 20); i++) {
+            const code = genererCode();
+            await addDoc(codesRef, {
+                code,
+                plan,
+                dureeJours: DUREES[plan],
+                utilise: false,
+                cree_le: Timestamp.fromDate(new Date()),
+                utilise_par: null,
+                utilise_le: null
+            });
+            codesGeneres.push(code);
+        }
+        afficherAlerte("alert-gen", "success", `✅ ${codesGeneres.length} code(s) créé(s) : ${codesGeneres.join(', ')}`);
+        chargerCodes();
+    } catch (err) {
+        console.error(err);
+        afficherAlerte("alert-gen", "error", "Erreur Firestore : " + err.message);
+    }
+};
+
+window.chargerCodes = async function() {
+    const container = document.getElementById("codes-container");
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>';
+    try {
+        const q    = query(collection(db, "codes_renouvellement"), orderBy("cree_le", "desc"));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+            container.innerHTML = '<div class="empty-state">Aucun code généré pour le moment.</div>';
+            return;
+        }
+
+        let html = `<table class="codes-table">
+            <thead><tr>
+                <th>Code</th><th>Plan</th><th>Durée</th><th>Statut</th><th>Créé le</th><th></th>
+            </tr></thead><tbody>`;
+
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            const date = d.cree_le?.toDate?.()?.toLocaleDateString("fr-FR") || "—";
+            const statutBadge = d.utilise
+                ? `<span class="badge badge-utilise">Utilisé</span>`
+                : `<span class="badge badge-actif">Disponible</span>`;
+            const planBadge = `<span class="badge badge-${d.plan}">${d.plan}</span>`;
+
+            html += `<tr>
+                <td><span class="code-badge">${d.code}</span></td>
+                <td>${planBadge}</td>
+                <td>${d.dureeJours} j.</td>
+                <td>${statutBadge}</td>
+                <td>${date}</td>
+                <td>${!d.utilise ? `<button class="btn btn-danger" onclick="supprimerCode('${docSnap.id}')"><i class="fas fa-trash"></i></button>` : ''}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+    } catch (err) {
+        container.innerHTML = `<div class="empty-state" style="color:#fca5a5">Erreur : ${err.message}<br>Vérifiez les règles Firestore.</div>`;
+    }
+};
+
+window.supprimerCode = async function(id) {
+    if (!confirm("Supprimer ce code ?")) return;
+    try {
+        await deleteDoc(doc(db, "codes_renouvellement", id));
+        chargerCodes();
+    } catch (err) {
+        alert("Erreur suppression : " + err.message);
+    }
+};
+
+function afficherAlerte(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = `alert alert-${type} show`;
+    el.innerHTML = msg;
+    if (type !== "info") setTimeout(() => el.classList.remove("show"), 7000);
+}
+
+// Le chargement est géré par onAuthStateChanged ci-dessus
+</script>
+</body>
+</html>

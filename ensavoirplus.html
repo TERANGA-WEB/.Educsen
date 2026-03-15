@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educsen | En savoir plus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --purple: #8b5cf6;
+            --green: #10b981;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; font-size: 1.1rem;
+        }
+
+        .nav-logo-text { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+        .nav-logo-text span { color: var(--primary); }
+
+        .nav-badge {
+            font-size: 0.7rem; font-weight: 600; color: var(--muted);
+            background: var(--bg); border: 1px solid var(--border);
+            padding: 3px 10px; border-radius: 20px;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+
+        .btn-back {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--bg); border: 1px solid var(--border);
+            color: var(--muted); padding: 7px 14px;
+            border-radius: 8px; font-size: 0.82rem; font-weight: 500;
+            text-decoration: none; transition: all .2s; cursor: pointer;
+        }
+        .btn-back:hover { background: var(--border); color: var(--text); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            color: #fff; border: none;
+            padding: 8px 18px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 600;
+            text-decoration: none; transition: all .2s; cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            padding: 80px 32px 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 20% 50%, rgba(59,130,246,0.15) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 400px at 80% 50%, rgba(139,92,246,0.12) 0%, transparent 70%);
+        }
+
+        .hero-content { position: relative; max-width: 720px; margin: 0 auto; }
+
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(59,130,246,0.15);
+            border: 1px solid rgba(59,130,246,0.3);
+            color: #93c5fd;
+            padding: 6px 16px; border-radius: 30px;
+            font-size: 0.78rem; font-weight: 600;
+            margin-bottom: 28px; letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .hero-tag i { font-size: 0.7rem; }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.1rem; color: #94a3b8;
+            max-width: 560px; margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-cta {
+            display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+        }
+
+        .cta-main {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff; border: none;
+            padding: 14px 28px; border-radius: 10px;
+            font-size: 0.95rem; font-weight: 600;
+            text-decoration: none; transition: all .2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cta-main:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.4); }
+
+        .cta-secondary {
+            background: rgba(255,255,255,0.08);
+            color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15);
+            padding: 14px 28px; border-radius: 10px;
+            font-size: 0.95rem; font-weight: 500;
+            text-decoration: none; transition: all .2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cta-secondary:hover { background: rgba(255,255,255,0.14); }
+
+        /* ── SECTION GÉNÉRIQUE ── */
+        .section {
+            padding: 80px 32px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--primary);
+            background: #eff6ff; border: 1px solid #bfdbfe;
+            padding: 4px 12px; border-radius: 20px;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 700; color: #0f172a;
+            margin-bottom: 12px; line-height: 1.25;
+        }
+
+        .section-sub {
+            font-size: 1rem; color: var(--muted);
+            max-width: 560px; line-height: 1.7;
+            margin-bottom: 48px;
+        }
+
+        /* ── GALSEN UP ── */
+        .galsen-section {
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 80px 32px;
+        }
+
+        .galsen-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 64px; align-items: center;
+        }
+
+        .galsen-visual {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid #334155;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .galsen-visual::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at center, rgba(59,130,246,0.1) 0%, transparent 70%);
+        }
+
+        .galsen-logo-big {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 800; color: #fff;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .galsen-visual h3 {
+            font-size: 1.5rem; font-weight: 700; color: #fff;
+            margin-bottom: 6px; position: relative;
+        }
+
+        .galsen-visual p {
+            font-size: 0.85rem; color: #94a3b8; position: relative;
+        }
+
+        .made-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.3);
+            color: #6ee7b7;
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600;
+            margin-top: 20px; position: relative;
+        }
+
+        .galsen-text .section-tag { margin-bottom: 14px; }
+
+        .galsen-text p {
+            font-size: 0.95rem; color: var(--muted);
+            line-height: 1.8; margin-bottom: 16px;
+        }
+
+        .galsen-text strong { color: var(--text); }
+
+        .values-list {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 24px;
+        }
+
+        .value-item {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.88rem; color: var(--text); font-weight: 500;
+        }
+
+        .value-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            flex-shrink: 0;
+        }
+
+        /* ── FEATURES ── */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            transition: all .2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
+        }
+
+        .feature-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: 16px;
+        }
+
+        .feature-icon.blue   { background: #eff6ff; color: #3b82f6; }
+        .feature-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+        .feature-icon.green  { background: #f0fdf4; color: #10b981; }
+        .feature-icon.orange { background: #fff7ed; color: #f97316; }
+        .feature-icon.red    { background: #fef2f2; color: #ef4444; }
+        .feature-icon.teal   { background: #f0fdfa; color: #0d9488; }
+
+        .feature-card h3 { font-size: 1rem; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+        .feature-card p  { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+        /* ── STATS ── */
+        .stats-section {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            padding: 64px 32px;
+            text-align: center;
+        }
+
+        .stats-inner { max-width: 900px; margin: 0 auto; }
+
+        .stats-title {
+            font-size: 1.6rem; font-weight: 700; color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .stats-sub { font-size: 0.95rem; color: #94a3b8; margin-bottom: 48px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 28px 20px;
+        }
+
+        .stat-number {
+            font-size: 2.4rem; font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .stat-label { font-size: 0.82rem; color: #94a3b8; font-weight: 500; }
+
+        /* ── HOW IT WORKS ── */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 24px;
+            counter-reset: steps;
+        }
+
+        .step-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 28px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all .2s;
+        }
+
+        .step-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); }
+
+        .step-number {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff; font-size: 0.9rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .step-card h3 { font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+        .step-card p  { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+        /* ── CTA FINAL ── */
+        .cta-section {
+            background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+            padding: 72px 32px;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 700; color: #fff;
+            margin-bottom: 14px;
+        }
+
+        .cta-section p {
+            font-size: 1rem; color: rgba(255,255,255,0.75);
+            max-width: 480px; margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+
+        .cta-btns {
+            display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+        }
+
+        .cta-white {
+            background: #fff; color: #1d4ed8;
+            padding: 13px 28px; border-radius: 10px;
+            font-size: 0.92rem; font-weight: 600;
+            text-decoration: none; transition: all .2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cta-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+        .cta-outline {
+            background: rgba(255,255,255,0.12);
+            color: #fff; border: 1px solid rgba(255,255,255,0.3);
+            padding: 13px 28px; border-radius: 10px;
+            font-size: 0.92rem; font-weight: 500;
+            text-decoration: none; transition: all .2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cta-outline:hover { background: rgba(255,255,255,0.2); }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #0f172a;
+            padding: 40px 32px;
+            text-align: center;
+            border-top: 1px solid #1e293b;
+        }
+
+        .footer-logo {
+            display: inline-flex; align-items: center; gap: 10px;
+            text-decoration: none; margin-bottom: 12px;
+        }
+
+        .footer-text { font-size: 0.82rem; color: #475569; line-height: 1.6; }
+        .footer-text a { color: #60a5fa; text-decoration: none; }
+        .footer-text a:hover { text-decoration: underline; }
+
+        /* ── DIVIDER ── */
+        .divider {
+            height: 1px; background: var(--border);
+            max-width: 1100px; margin: 0 auto;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav { padding: 0 16px; }
+            .nav-badge { display: none; }
+            .hero { padding: 60px 16px 72px; }
+            .section { padding: 56px 16px; }
+            .galsen-section { padding: 56px 16px; }
+            .galsen-inner { grid-template-columns: 1fr; gap: 36px; }
+            .stats-section { padding: 48px 16px; }
+            .cta-section { padding: 56px 16px; }
+            footer { padding: 32px 16px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-cta { flex-direction: column; align-items: center; }
+            .cta-btns { flex-direction: column; align-items: center; }
+            .cta-main, .cta-secondary, .cta-white, .cta-outline { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#" class="nav-logo">
+            <div class="logo-icon">E</div>
+            <span class="nav-logo-text">Educ<span>sen</span></span>
+        </a>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="nav-badge">Un produit Galsen Up</span>
+        </div>
+        <div class="nav-right">
+            <button class="btn-back" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Retour
+            </button>
+            <a href="connexion.html" class="btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Connexion
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">
+                <i class="fas fa-star"></i>
+                Plateforme éducative sénégalaise
+            </div>
+            <h1>Gérez votre établissement<br><span>avec intelligence</span></h1>
+            <p>
+                Educsen donne aux administrateurs scolaires les outils pour analyser les données de leurs classes, mesurer l'impact des enseignants et prendre de meilleures décisions.
+            </p>
+            <div class="hero-cta">
+                <a href="connexion.html" class="cta-main">
+                    <i class="fas fa-rocket"></i> Commencer maintenant
+                </a>
+                <a href="contact.html" class="cta-secondary">
+                    <i class="fas fa-phone"></i> Nous contacter
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALSEN UP -->
+    <div class="galsen-section">
+        <div class="galsen-inner">
+
+            <div class="galsen-visual">
+                <div class="galsen-logo-big">G</div>
+                <h3>Galsen Up</h3>
+                <p>Groupe d'entrepreneurs tech sénégalais</p>
+                <div class="made-badge">
+                    <i class="fas fa-map-marker-alt"></i>
+                    100% Made in Sénégal
+                </div>
+            </div>
+
+            <div class="galsen-text">
+                <div class="section-tag">
+                    <i class="fas fa-info-circle"></i> À propos
+                </div>
+                <h2 class="section-title">Un produit né au Sénégal,<br>pour le Sénégal</h2>
+                <p>
+                    <strong>Galsen Up</strong> est un groupe d'entrepreneurs technologiques sénégalais dont la mission est de créer des solutions digitales adaptées aux réalités du marché local.
+                </p>
+                <p>
+                    Nos produits sont conçus, développés et maintenus entièrement au Sénégal. Nous comprenons les défis du système éducatif sénégalais parce que nous en faisons partie.
+                </p>
+                <p>
+                    <strong>Educsen</strong> est notre solution dédiée aux établissements scolaires — une plateforme simple, puissante et pensée pour les administrateurs africains.
+                </p>
+
+                <div class="values-list">
+                    <div class="value-item">
+                        <div class="value-dot"></div>
+                        Solutions 100% conçues et développées au Sénégal
+                    </div>
+                    <div class="value-item">
+                        <div class="value-dot"></div>
+                        Adaptées aux réalités du marché sénégalais
+                    </div>
+                    <div class="value-item">
+                        <div class="value-dot"></div>
+                        Support local en français
+                    </div>
+                    <div class="value-item">
+                        <div class="value-dot"></div>
+                        Paiement via Wave, Orange Money ou virement
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FONCTIONNALITES -->
+    <div class="section">
+        <div class="section-tag">
+            <i class="fas fa-tools"></i> Fonctionnalités
+        </div>
+        <h2 class="section-title">Tout ce dont vous avez besoin</h2>
+        <p class="section-sub">
+            Une plateforme complète pour piloter votre établissement scolaire avec des données fiables et en temps réel.
+        </p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon blue">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Analyse des performances</h3>
+                <p>Visualisez les moyennes, progressions et régressions de chaque classe en un coup d'œil grâce à des rapports automatiques.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon purple">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3>Impact des professeurs</h3>
+                <p>Mesurez l'effet de chaque enseignant sur les résultats de ses classes et identifiez ceux qui ont besoin d'accompagnement.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon green">
+                    <i class="fas fa-school"></i>
+                </div>
+                <h3>Gestion des classes</h3>
+                <p>Créez et gérez vos classes, élèves et matières facilement. Organisez votre établissement de A à Z depuis une seule interface.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon orange">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3>Bulletins automatiques</h3>
+                <p>Générez des bulletins de notes complets et professionnels en PDF en quelques secondes, prêts à imprimer.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Alertes & détection</h3>
+                <p>Détectez automatiquement les élèves en difficulté et les classes à risque avant qu'il ne soit trop tard.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon teal">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Assistant IA intégré</h3>
+                <p>Un assistant pédagogique intelligent qui répond à vos questions et génère des rapports détaillés sur votre établissement.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- STATS -->
+    <div class="stats-section">
+        <div class="stats-inner">
+            <h2 class="stats-title">Conçu pour l'éducation sénégalaise</h2>
+            <p class="stats-sub">Des chiffres qui parlent d'eux-mêmes</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Made in Sénégal</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">6+</div>
+                    <div class="stat-label">Modules disponibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24h</div>
+                    <div class="stat-label">Délai d'activation</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">FR</div>
+                    <div class="stat-label">Interface en français</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMMENT CA MARCHE -->
+    <div class="section">
+        <div class="section-tag">
+            <i class="fas fa-play-circle"></i> Comment ça marche
+        </div>
+        <h2 class="section-title">Démarrez en 4 étapes simples</h2>
+        <p class="section-sub">
+            Pas besoin d'être technicien. Educsen est conçu pour être utilisé par tout administrateur scolaire.
+        </p>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Créez votre compte</h3>
+                <p>Inscrivez-vous avec votre email et les informations de votre établissement en moins de 2 minutes.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Ajoutez vos classes</h3>
+                <p>Créez vos classes, ajoutez vos élèves et assignez vos professeurs à chaque matière.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Saisissez les notes</h3>
+                <p>Enregistrez les notes des évaluations et compositions. Le système calcule automatiquement les moyennes.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>Analysez et décidez</h3>
+                <p>Consultez vos rapports, générez vos bulletins et prenez de meilleures décisions pour votre établissement.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA FINAL -->
+    <div class="cta-section">
+        <h2>Prêt à transformer votre gestion scolaire ?</h2>
+        <p>
+            Rejoignez les établissements sénégalais qui pilotent leur école avec Educsen. Abonnement simple, activation rapide.
+        </p>
+        <div class="cta-btns">
+            <a href="index.html" class="cta-white">
+                <i class="fas fa-rocket"></i> Accéder à la plateforme
+            </a>
+            <a href="index.html" class="cta-outline">
+                <i class="fab fa-whatsapp"></i> Nous contacter sur WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <a href="#" class="footer-logo">
+            <div class="logo-icon" style="width:32px;height:32px;font-size:1rem;">E</div>
+            <span style="font-size:1rem;font-weight:700;color:#e2e8f0;">Educ<span style="color:#3b82f6;">sen</span></span>
+        </a>
+        <p class="footer-text">
+            Un produit de <strong style="color:#e2e8f0;">Galsen Up</strong> — Groupe d'entrepreneurs tech sénégalais.<br>
+            Conçu et développé au Sénégal 🇸🇳 &nbsp;|&nbsp;
+            <a href="contact.html">Nous contacter</a>
+        </p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Administrateur | Plateforme Éducative</title>
+    <meta name="description" content="Guide stratégique pour optimiser la gestion pédagogique avec notre plateforme éducative.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --primary-dark: #1d4ed8;
+            --secondary: #475569;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --dark: #0f172a;
+            --dark-light: #334155;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gray-ultralight: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.09), 0 4px 8px rgba(0,0,0,0.04);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── HEADER ─── */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 64px;
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrap {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-mark {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .logo-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.01em;
+        }
+
+        .logo-divider {
+            width: 1px;
+            height: 18px;
+            background: var(--gray-light);
+            margin: 0 4px;
+        }
+
+        .logo-page {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: var(--gray);
+            text-decoration: none;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .back-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .back-btn i { font-size: 0.75rem; }
+
+        /* ─── HERO ─── */
+        .hero {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e3a6e 100%);
+            padding: 72px 0 68px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 70% 50%, rgba(37,99,235,0.35) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 10% 80%, rgba(59,130,246,0.15) 0%, transparent 60%);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        .hero-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 48px;
+        }
+
+        .hero-left { max-width: 580px; }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .hero-badge i { color: #60a5fa; font-size: 0.7rem; }
+
+        .hero-title {
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 18px;
+        }
+
+        .hero-title span {
+            background: linear-gradient(90deg, #60a5fa, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .hero-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-lg);
+            padding: 20px 28px;
+            min-width: 180px;
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-num {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-num span { color: #60a5fa; }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            font-weight: 500;
+        }
+
+        /* ─── PAGE BODY ─── */
+        .page-body {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 48px 32px 96px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            position: sticky;
+            top: 80px;
+        }
+
+        .nav-box {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-box-header {
+            padding: 14px 18px;
+            background: var(--gray-ultralight);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-box-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .nav-box-body { padding: 8px; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-item i {
+            width: 16px;
+            font-size: 0.75rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-item .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .nav-item.active .dot,
+        .nav-item:hover .dot { opacity: 1; }
+
+        /* ─── CONTENT ─── */
+        .content { min-width: 0; }
+
+        /* Alert */
+        .alert {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 18px 22px;
+            background: var(--primary-light);
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-lg);
+            margin-bottom: 48px;
+        }
+
+        .alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .alert-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .alert-text {
+            font-size: 0.85rem;
+            color: #1e40af;
+            line-height: 1.65;
+        }
+
+        /* ─── SECTION ─── */
+        .section { margin-bottom: 56px; }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .section-icon.green  { background: #dcfce7; color: var(--success); }
+        .section-icon.red    { background: #fee2e2; color: var(--error); }
+        .section-icon.blue   { background: var(--primary-light); color: var(--primary); }
+        .section-icon.purple { background: #f3e8ff; color: #9333ea; }
+        .section-icon.amber  { background: #fef3c7; color: var(--warning); }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 3px;
+        }
+
+        .label-green  { color: var(--success); }
+        .label-red    { color: var(--error); }
+        .label-blue   { color: var(--primary); }
+        .label-purple { color: #9333ea; }
+        .label-amber  { color: var(--warning); }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.02em;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 24px;
+        }
+
+        /* ─── CARDS ─── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: #bfdbfe;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .section-do       .card-icon { background: #dcfce7; color: var(--success); }
+        .section-dont     .card-icon { background: #fee2e2; color: var(--error); }
+        .section-students .card-icon { background: var(--primary-light); color: var(--primary); }
+        .section-teachers .card-icon { background: #f3e8ff; color: #9333ea; }
+        .section-tips     .card-icon { background: #fef3c7; color: var(--warning); }
+
+        .card-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.01em;
+        }
+
+        .card-text {
+            font-size: 0.84rem;
+            color: var(--gray);
+            line-height: 1.7;
+        }
+
+        /* ─── CTA ─── */
+        .cta {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e3a6e 100%);
+            border-radius: var(--radius-xl);
+            padding: 52px 56px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 50% 100% at 85% 50%, rgba(37,99,235,0.4) 0%, transparent 70%);
+        }
+
+        .cta::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .cta-left { position: relative; z-index: 1; }
+
+        .cta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(96,165,250,0.15);
+            border: 1px solid rgba(96,165,250,0.3);
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #93c5fd;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 16px;
+        }
+
+        .cta-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            line-height: 1.25;
+            margin-bottom: 10px;
+        }
+
+        .cta-sub {
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.65;
+            max-width: 420px;
+        }
+
+        .cta-actions {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 11px 22px;
+            border-radius: var(--radius);
+            font-size: 0.86rem;
+            font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--white);
+            color: var(--dark);
+        }
+
+        .btn-primary:hover { background: #f1f5f9; }
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.8);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.12);
+            color: var(--white);
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            background: var(--dark);
+            padding: 48px 0 32px;
+        }
+
+        .footer-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .footer-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .footer-logo-mark {
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        .footer-logo-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            font-size: 0.84rem;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: rgba(255,255,255,0.85); }
+
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .footer-copy { font-size: 0.78rem; color: rgba(255,255,255,0.25); }
+        .footer-note { font-size: 0.75rem; color: rgba(255,255,255,0.2); }
+
+        /* ─── ANIMATIONS ─── */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .fade-up.visible { opacity: 1; transform: none; }
+        .d1 { transition-delay: 0.05s; }
+        .d2 { transition-delay: 0.1s; }
+        .d3 { transition-delay: 0.15s; }
+        .d4 { transition-delay: 0.2s; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1024px) {
+            .page-body { grid-template-columns: 1fr; gap: 32px; }
+            .sidebar { position: static; }
+            .nav-box-body { display: flex; flex-wrap: wrap; gap: 4px; }
+            .nav-item { flex: 0 0 auto; }
+            .cta { flex-direction: column; align-items: flex-start; }
+            .cta-actions { flex-direction: row; }
+        }
+
+        @media (max-width: 768px) {
+            .hero-inner { flex-direction: column; }
+            .hero-stats { flex-direction: row; flex-wrap: wrap; }
+            .stat-card { min-width: 140px; flex: 1; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .cta { padding: 36px 28px; }
+            .cta-title { font-size: 1.25rem; }
+            .cta-actions { flex-direction: column; width: 100%; }
+            .btn { width: 100%; }
+        }
+
+        @media (max-width: 480px) {
+            .header-wrap, .hero-inner, .page-body, .footer-wrap { padding-left: 20px; padding-right: 20px; }
+            .logo-divider, .logo-page { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+    <div class="header-wrap">
+        <a href="index.html" class="logo">
+            <div class="logo-mark"><i class="fas fa-graduation-cap"></i></div>
+            <span class="logo-name">Educsen</span>
+            <div class="logo-divider"></div>
+            <span class="logo-page">Guide Administrateur</span>
+        </a>
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Retour au tableau de bord
+        </a>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-left">
+            <div class="hero-badge"><i class="fas fa-shield-alt"></i> Réservé aux administrateurs</div>
+            <h1 class="hero-title">Guide de gestion<br><span>pédagogique</span></h1>
+            <p class="hero-desc">Stratégies et bonnes pratiques pour un pilotage data-driven de la performance académique de votre établissement.</p>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-card">
+                <div class="stat-num">5<span>+</span></div>
+                <div class="stat-label">Sections stratégiques</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">16</div>
+                <div class="stat-label">Bonnes pratiques</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">3<span>×</span></div>
+                <div class="stat-label">Meilleure réactivité</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BODY -->
+<div class="page-body">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="nav-box">
+            <div class="nav-box-header">
+                <i class="fas fa-list" style="font-size:0.7rem;color:var(--gray)"></i>
+                <span class="nav-box-title">Sections du guide</span>
+            </div>
+            <div class="nav-box-body" id="sideNav">
+                <a href="#bonnes-pratiques" class="nav-item active">
+                    <i class="fas fa-check-circle" style="color:var(--success)"></i>
+                    Bonnes pratiques
+                    <span class="dot"></span>
+                </a>
+                <a href="#a-eviter" class="nav-item">
+                    <i class="fas fa-exclamation-circle" style="color:var(--error)"></i>
+                    À éviter
+                    <span class="dot"></span>
+                </a>
+                <a href="#impact-eleves" class="nav-item">
+                    <i class="fas fa-user-graduate" style="color:var(--primary)"></i>
+                    Impact sur les élèves
+                    <span class="dot"></span>
+                </a>
+                <a href="#support-enseignants" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher" style="color:#9333ea"></i>
+                    Support enseignants
+                    <span class="dot"></span>
+                </a>
+                <a href="#strategies-avancees" class="nav-item">
+                    <i class="fas fa-lightbulb" style="color:var(--warning)"></i>
+                    Stratégies avancées
+                    <span class="dot"></span>
+                </a>
+            </div>
+        </div>
+        <div class="nav-box">
+            <div class="nav-box-header">
+                <i class="fas fa-download" style="font-size:0.7rem;color:var(--gray)"></i>
+                <span class="nav-box-title">Ressources</span>
+            </div>
+            <div class="nav-box-body">
+                <a href="#" class="nav-item"><i class="fas fa-file-pdf"></i>Guide PDF complet</a>
+                <a href="#" class="nav-item"><i class="fas fa-chart-bar"></i>Modèles de rapports</a>
+                <a href="#" class="nav-item"><i class="fas fa-calendar-alt"></i>Calendrier pédagogique</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+        <!-- Info alert -->
+        <div class="alert fade-up">
+            <div class="alert-icon"><i class="fas fa-compass"></i></div>
+            <div>
+                <div class="alert-title">Approche stratégique</div>
+                <p class="alert-text">Ce guide va au-delà des fonctionnalités techniques — c'est un cadre pour transformer la gestion pédagogique de votre établissement en un pilotage actif et data-driven de la performance académique.</p>
+            </div>
+        </div>
+
+        <!-- 01 — Bonnes pratiques -->
+        <section id="bonnes-pratiques" class="section section-do">
+            <div class="section-head fade-up">
+                <div class="section-icon green"><i class="fas fa-check"></i></div>
+                <div>
+                    <div class="section-label label-green">Recommandations</div>
+                    <div class="section-title">Bonnes pratiques</div>
+                </div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="cards-grid">
+                <div class="card fade-up d1">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="card-name">Suivi régulier des données</div>
+                    </div>
+                    <p class="card-text">Saisissez les notes hebdomadaires pour maintenir des rapports fiables. La régularité permet d'identifier rapidement les tendances.</p>
+                </div>
+                <div class="card fade-up d2">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        <div class="card-name">Monitoring des performances</div>
+                    </div>
+                    <p class="card-text">Analysez par classe et matière pour détecter précocement les difficultés et ajuster les stratégies pédagogiques.</p>
+                </div>
+                <div class="card fade-up d3">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-bell"></i></div>
+                        <div class="card-name">Utilisation des alertes</div>
+                    </div>
+                    <p class="card-text">Activez les alertes de régression pour un soutien ciblé aux élèves en difficulté dans les délais les plus courts.</p>
+                </div>
+                <div class="card fade-up d4">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-award"></i></div>
+                        <div class="card-name">Reconnaissance des équipes</div>
+                    </div>
+                    <p class="card-text">Valorisez les professeurs dont les classes progressent pour diffuser les meilleures pratiques au sein de l'établissement.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02 — À éviter -->
+        <section id="a-eviter" class="section section-dont">
+            <div class="section-head fade-up">
+                <div class="section-icon red"><i class="fas fa-exclamation"></i></div>
+                <div>
+                    <div class="section-label label-red">Points de vigilance</div>
+                    <div class="section-title">À éviter absolument</div>
+                </div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="cards-grid">
+                <div class="card fade-up d1">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-clock"></i></div>
+                        <div class="card-name">Retard de saisie</div>
+                    </div>
+                    <p class="card-text">L'accumulation de données non saisies compromet la fiabilité des analyses. La fraîcheur des données est critique.</p>
+                </div>
+                <div class="card fade-up d2">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-archive"></i></div>
+                        <div class="card-name">Modification des archives</div>
+                    </div>
+                    <p class="card-text">Les archives sont verrouillées pour préserver la cohérence historique. Ne tentez pas de les altérer.</p>
+                </div>
+                <div class="card fade-up d3">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-user-tie"></i></div>
+                        <div class="card-name">Confusion des indicateurs</div>
+                    </div>
+                    <p class="card-text">Distinguez performance individuelle et efficacité pédagogique. Analysez toujours le contexte global.</p>
+                </div>
+                <div class="card fade-up d4">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
+                        <div class="card-name">Décisions précipitées</div>
+                    </div>
+                    <p class="card-text">Basez-vous sur des tendances établies, pas des observations ponctuelles. La pédagogie demande du recul.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03 — Impact élèves -->
+        <section id="impact-eleves" class="section section-students">
+            <div class="section-head fade-up">
+                <div class="section-icon blue"><i class="fas fa-user-graduate"></i></div>
+                <div>
+                    <div class="section-label label-blue">Résultats attendus</div>
+                    <div class="section-title">Impact sur les élèves</div>
+                </div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="cards-grid">
+                <div class="card fade-up d1">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-search"></i></div>
+                        <div class="card-name">Détection précoce</div>
+                    </div>
+                    <p class="card-text">Identifiez les difficultés avant qu'elles ne deviennent critiques et mettez en place une intervention ciblée.</p>
+                </div>
+                <div class="card fade-up d2">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="card-name">Suivi personnalisé</div>
+                    </div>
+                    <p class="card-text">Un accompagnement adapté à chaque profil d'apprenant, grâce à des données précises sur les forces et faiblesses.</p>
+                </div>
+                <div class="card fade-up d3">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="card-name">Objectifs clairs</div>
+                    </div>
+                    <p class="card-text">Rendez les progrès visibles et mesurables pour renforcer la motivation et l'engagement durable des élèves.</p>
+                </div>
+                <div class="card fade-up d4">
+                    <div class="card-top">
+                        <div class="card-icon"><i class="fas fa-users"></i></div>
+                        <div class="card-name">Collaboration renforcée</div>
+                    </div>
+                    <p class="card-text">Facilitez la communication entre équipes pédagogiques, élèves et familles autour d'indicateurs partagés.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <div class="cta fade-up">
+            <div class="cta-left">
+                <div class="cta-tag"><i class="fas fa-download"></i> Ressources disponibles</div>
+                <div class="cta-title">Prêt à optimiser votre<br>gestion pédagogique ?</div>
+                <p class="cta-sub">Téléchargez le guide complet et accédez aux ressources exclusives pour tirer le meilleur parti de la plateforme.</p>
+            </div>
+            <div class="cta-actions">
+                <button class="btn btn-primary" id="exportPdf">
+                    <i class="fas fa-file-pdf"></i>
+                    Télécharger le guide PDF
+                </button>
+                <a href="dashboard.html" class="btn btn-ghost">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Tableau de bord
+                </a>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-wrap">
+        <div class="footer-top">
+            <a href="index.html" class="footer-logo">
+                <div class="footer-logo-mark"><i class="fas fa-graduation-cap"></i></div>
+                <span class="footer-logo-name">Plateforme Éducative</span>
+            </a>
+            <nav class="footer-links">
+                <a href="index.html">Accueil</a>
+                <a href="dashboard.html">Tableau de bord</a>
+                <a href="documentation.html">Documentation</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+        <div class="footer-bottom">
+            <span class="footer-copy">© 2023 Plateforme Éducative. Tous droits réservés.</span>
+            <span class="footer-note">Guide réservé aux administrateurs et directions d'établissement</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Reveal on scroll
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+    // Smooth scroll nav
+    document.querySelectorAll('.nav-item[href^="#"]').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const t = document.querySelector(link.getAttribute('href'));
+            if (t) window.scrollTo({ top: t.offsetTop - 84, behavior: 'smooth' });
+        });
+    });
+
+    // Active state on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navItems = document.querySelectorAll('.nav-item[href^="#"]');
+    window.addEventListener('scroll', () => {
+        let cur = '';
+        sections.forEach(s => { if (scrollY >= s.offsetTop - 120) cur = s.id; });
+        navItems.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${cur}`));
+    }, { passive: true });
+
+    // PDF button
+    const btn = document.getElementById('exportPdf');
+    btn.addEventListener('click', () => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération en cours…';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> Téléchargement réussi';
+            setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2500);
+        }, 1200);
+    });
+});
+</script>
+</body>
+</html>

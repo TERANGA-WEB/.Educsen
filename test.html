@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil · Educsen</title>
+    <!-- Polices élégantes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        /* Éléments décoratifs abstraits */
+        .shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .shape-1 {
+            background: #d3e0ff;
+            width: 400px;
+            height: 400px;
+            top: -150px;
+            left: -100px;
+        }
+
+        .shape-2 {
+            background: #ffe4d6;
+            width: 500px;
+            height: 500px;
+            bottom: -200px;
+            right: -100px;
+        }
+
+        .shape-3 {
+            background: #c8f0e6;
+            width: 300px;
+            height: 300px;
+            bottom: 30%;
+            left: 20%;
+        }
+
+        /* Grille très légère */
+        .grid-pattern {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Logo en haut à gauche */
+        .logo-wrapper {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease 0.2s forwards;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: -0.01em;
+            color: #0f172a;
+        }
+
+        .logo-text span {
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        /* Conteneur principal (centré) */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem 1.5rem;
+            margin: 1rem;
+        }
+
+        /* Carte centrale */
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 48px;
+            padding: 3rem 2.5rem 2.8rem;
+            box-shadow: 
+                0 20px 40px -12px rgba(0, 0, 0, 0.05),
+                0 8px 24px -6px rgba(0, 0, 0, 0.02),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        /* Étiquette "Bienvenue" */
+        .welcome-tag {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #2563eb;
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease 0.35s forwards;
+        }
+
+        /* Nom de l'école */
+        .school-name {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            line-height: 1.2;
+            color: #0f172a;
+            margin-bottom: 4px;
+            min-height: 3.5rem;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease 0.45s forwards;
+        }
+
+        .school-name em {
+            font-style: normal;
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #94a3b8, transparent);
+            margin: 20px auto 18px;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease 0.6s forwards;
+        }
+
+        /* Sous-texte */
+        .message {
+            color: #475569;
+            font-size: 0.95rem;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease 0.7s forwards;
+        }
+
+        .message strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        /* Bouton principal */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.25s;
+            box-shadow: 0 8px 20px -6px rgba(37, 99, 235, 0.4), 0 2px 0 0 rgba(255,255,255,0.2) inset;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease 0.9s forwards;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 28px -8px #1e3a8a66;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px -4px #1e3a8a;
+        }
+
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 24px;
+            height: 24px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover .btn-icon {
+            transform: translateX(4px);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1.2s forwards;
+        }
+
+        /* Animation de chargement (dots) */
+        .loading-dots {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            height: 2rem;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: #2563eb;
+            border-radius: 50%;
+            animation: dotPulse 1.2s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        /* Keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes dotPulse {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card { padding: 2rem 1.5rem; }
+            .school-name { font-size: 1.6rem; }
+            .btn { width: 100%; }
+            .logo-wrapper { top: 20px; left: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Formes d'arrière-plan abstraites -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="grid-pattern"></div>
+
+    <!-- Logo en haut à gauche -->
+    <div class="logo-wrapper">
+        <div class="logo-icon">E</div>
+        <div class="logo-text">Educ<span>sen</span></div>
+    </div>
+
+    <div class="container">
+        <!-- Carte principale (sans avatar) -->
+        <div class="card">
+            <div class="welcome-tag">BIENVENUE SUR</div>
+
+            <div class="school-name" id="schoolNameEl">
+                <div class="loading-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="message" id="subText">
+                Chargement de vos informations…
+            </div>
+
+            <a href="/userdashboard.html" class="btn">
+                Accéder au tableau de bord
+                <span class="btn-icon">→</span>
+            </a>
+        </div>
+
+        <div class="footer">© 2025 Educsen · Gestion scolaire intelligente</div>
+    </div>
+
+    <!-- Firebase (logique modifiée : suppression de "Connecté en tant que") -->
+    <script type="module">
+        import { initializeApp }               from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+        import {
+            getFirestore, collection,
+            query, where, getDocs, doc, getDoc
+        } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+            authDomain:        "real-educsen.firebaseapp.com",
+            projectId:         "real-educsen",
+            storageBucket:     "real-educsen.firebasestorage.app",
+            messagingSenderId: "80660233362",
+            appId:             "1:80660233362:web:5edf5060254170056eba4b"
+        };
+
+        const app  = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db   = getFirestore(app);
+
+        const schoolNameEl = document.getElementById('schoolNameEl');
+        const subText      = document.getElementById('subText');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.replace('/index.html');
+                return;
+            }
+
+            const displayName = user.displayName || user.email || 'Utilisateur';
+
+            try {
+                // 1️⃣ Trouver l'ID Firestore du user via son email
+                const usersSnap = await getDocs(
+                    query(collection(db, 'users'), where('email', '==', user.email))
+                );
+
+                if (usersSnap.empty) {
+                    renderFallback(displayName);
+                    return;
+                }
+
+                const firestoreUserId = usersSnap.docs[0].id;
+
+                // 2️⃣ Chercher dans la collection "details" le document lié à cet userId
+                let schoolName = null;
+
+                // Tentative 1 : champ userId dans details
+                const detailsSnap = await getDocs(
+                    query(collection(db, 'details'), where('userId', '==', firestoreUserId))
+                );
+                if (!detailsSnap.empty) {
+                    schoolName = detailsSnap.docs[0].data().schoolName || null;
+                }
+
+                // Tentative 2 : document dont l'ID = firestoreUserId
+                if (!schoolName) {
+                    const directDoc = await getDoc(doc(db, 'details', firestoreUserId));
+                    if (directDoc.exists()) {
+                        schoolName = directDoc.data().schoolName || null;
+                    }
+                }
+
+                // 3️⃣ Afficher (sans la phrase "Connecté en tant que")
+                if (schoolName) {
+                    schoolNameEl.innerHTML = `<em>${schoolName}</em>`;
+                    subText.innerHTML =
+                        `<strong>${displayName}</strong><br>` +
+                        `Votre espace de gestion scolaire est prêt.`;
+                } else {
+                    renderFallback(displayName);
+                }
+
+            } catch (err) {
+                console.error('Erreur chargement:', err);
+                renderFallback(displayName);
+            }
+        });
+
+        function renderFallback(name) {
+            schoolNameEl.innerHTML = `<em>Votre établissement</em>`;
+            subText.innerHTML =
+                `<strong>${name}</strong><br>` +
+                `Bienvenue dans votre espace Educsen.`;
+        }
+    </script>
+</body>
+</html>

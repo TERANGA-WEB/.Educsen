@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golago IA · Chargement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --bg-body: #ffffff;
+            --text-primary: #1e293b;
+            --border-subtle: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* ========== OVERLAY MOBILE ========== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ========== SIDEBAR (identique aux autres pages) ========== */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease, transform 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .sidebar.collapsed { width: 80px; }
+
+        .sidebar-header {
+            padding: 20px 16px;
+            border-bottom: 1px solid #334155;
+        }
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+        .logo-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity 0.2s;
+            color: white;
+        }
+        .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
+        .logo-text span { color: #3b82f6; }
+
+        .toggle-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #4b5563;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e2e8f0;
+            flex-shrink: 0;
+        }
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 24px;
+            margin: 0 12px;
+            border-radius: 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .nav-item .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
+        .nav-item span:last-child { transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item span:last-child { opacity: 0; width: 0; display: none; }
+        .nav-item.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3);
+        }
+        .nav-item:hover:not(.active) { background: #334155; color: white; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid #334155;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+            margin-bottom: 12px;
+        }
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            background: #3b82f6;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .user-details { overflow: hidden; }
+        .user-name { font-weight: 500; font-size: 0.95rem; }
+        .user-role { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
+        .sidebar.collapsed .user-details { opacity: 0; width: 0; }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            color: #94a3b8;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* ========== TOPBAR MOBILE ========== */
+        .mobile-topbar {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 998;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+        }
+        .topbar-logo { display: flex; align-items: center; gap: 10px; }
+        .topbar-logo .logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.05rem; font-weight: 700; color: #fff;
+        }
+        .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+        .topbar-logo-text em { color: #3b82f6; font-style: normal; }
+        .topbar-menu-btn {
+            background: none; border: none;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #334155; border-radius: 8px;
+            transition: background .2s;
+        }
+        .topbar-menu-btn:hover { background: #f1f5f9; }
+
+        /* ========== PAGE WRAPPER ========== */
+        .page-wrapper {
+            flex: 1;
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .sidebar.collapsed ~ .page-wrapper {
+            margin-left: 80px;
+        }
+
+        /* ========== MAIN CONTENT (animation) ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .loader-container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* Style du SVG Golago (adapté de la description) */
+        .golago-svg {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            display: block;
+        }
+
+        .golago-svg svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Animation de course */
+        @keyframes run {
+            0% { transform: translateX(0) scaleX(1); }
+            25% { transform: translateX(40px) scaleX(1) rotate(2deg); }
+            50% { transform: translateX(0) scaleX(1) rotate(0); }
+            75% { transform: translateX(-40px) scaleX(1) rotate(-2deg); }
+            100% { transform: translateX(0) scaleX(1); }
+        }
+
+        .run-animation {
+            animation: run 1.5s ease-in-out 2;
+        }
+
+        /* Animation du texte GOLAGO IA */
+        .logo-text-final {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .logo-text-final.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .letter.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ia-part {
+            color: #3b82f6;
+            font-weight: 800;
+            margin-left: 0.5rem;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+        }
+
+        .ia-part.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Effet shine final */
+        @keyframes shine {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.5); }
+            100% { filter: brightness(1); }
+        }
+
+        .shine {
+            animation: shine 0.6s ease-in-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px !important;
+                transition: transform 0.3s ease;
+            }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .sidebar.collapsed { transform: translateX(-100%); }
+            .sidebar.collapsed.mobile-open { transform: translateX(0); }
+
+            .sidebar-overlay { display: block; }
+
+            .mobile-topbar { display: flex; }
+
+            .page-wrapper {
+                margin-left: 0 !important;
+                width: 100%;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .logo-text-final {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY MOBILE -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-header">
+                <div class="logo-area">
+                    <div class="logo-icon">E</div>
+                    <span class="logo-text">Educ<span>sen</span></span>
+                </div>
+                <button class="toggle-btn" id="toggleSidebar">
+                    <span class="material-icons" id="toggleIcon">chevron_left</span>
+                </button>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="/userdashboard.html" class="nav-item">
+                <span class="nav-icon material-icons">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/user-admin/assistant.html" class="nav-item">
+                <span class="nav-icon material-icons">smart_toy</span>
+                <span>Assistant</span>
+            </a>
+            <a href="/user-admin/rapport.html" class="nav-item">
+                <span class="nav-icon material-icons">assessment</span>
+                <span>Rapport</span>
+            </a>
+            <a href="/user-admin/classes.html" class="nav-item">
+                <span class="nav-icon material-icons">school</span>
+                <span>Classes</span>
+            </a>
+            <a href="/user-admin/professeurs.html" class="nav-item">
+                <span class="nav-icon material-icons">person</span>
+                <span>Professeurs</span>
+            </a>
+            <a href="/user-admin/eleves.html" class="nav-item">
+                <span class="nav-icon material-icons">groups</span>
+                <span>Élèves</span>
+            </a>
+            <a href="/user-admin/notes.html" class="nav-item">
+                <span class="nav-icon material-icons">assignment</span>
+                <span>Notes</span>
+            </a>
+            <a href="/user-admin/bulletin.html" class="nav-item">
+                <span class="nav-icon material-icons">receipt_long</span>
+                <span>Bulletins</span>
+            </a>
+            <a href="/user-admin/parametres.html" class="nav-item">
+                <span class="nav-icon material-icons">settings</span>
+                <span>Paramètres</span>
+            </a>
+            <a href="/golago.html" class="nav-item active">
+                <span class="nav-icon material-icons">rocket_launch</span>
+                <span>Golago IA</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">AD</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Administrateur</div>
+                    <div class="user-role">admin</div>
+                </div>
+            </div>
+            <a href="/index.html" class="logout-btn" id="logoutBtn">
+                <span class="material-icons">logout</span>
+                <span>Déconnexion</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- PAGE WRAPPER (contient topbar mobile + contenu) -->
+    <div class="page-wrapper" id="pageWrapper">
+
+        <!-- TOPBAR MOBILE -->
+        <header class="mobile-topbar" id="mobileTopbar">
+            <div class="topbar-logo">
+                <div class="logo-icon">E</div>
+                <span class="topbar-logo-text">Educ<em>sen</em></span>
+            </div>
+            <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <span class="material-icons">menu</span>
+            </button>
+        </header>
+
+        <!-- MAIN CONTENT (animation) -->
+        <main class="main-content">
+            <div class="loader-container">
+                <!-- SVG Golago (simplifié, à remplacer par le vrai dessin) -->
+                <div class="golago-svg" id="golagoSvg">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="30" fill="#2d3748" stroke="#1e293b" stroke-width="2"/>
+                        <circle cx="35" cy="40" r="5" fill="white"/>
+                        <circle cx="65" cy="40" r="5" fill="white"/>
+                        <circle cx="38" cy="42" r="2" fill="black"/>
+                        <circle cx="62" cy="42" r="2" fill="black"/>
+                        <path d="M40 60 Q50 70, 60 60" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <ellipse cx="50" cy="70" rx="8" ry="3" fill="#4a5568"/>
+                    </svg>
+                </div>
+
+                <!-- Texte GOLAGO IA (construit lettre par lettre) -->
+                <div class="logo-text-final" id="logoTextFinal">
+                    <span class="word-golago">
+                        <span class="letter">G</span>
+                        <span class="letter">O</span>
+                        <span class="letter">L</span>
+                        <span class="letter">A</span>
+                        <span class="letter">G</span>
+                        <span class="letter">O</span>
+                    </span>
+                    <span class="ia-part" id="iaPart">IA</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            // ========== GESTION SIDEBAR ==========
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            function openMobile() {
+                sidebar.classList.add('mobile-open');
+                if (overlay) overlay.classList.add('active');
+            }
+            function closeMobile() {
+                sidebar.classList.remove('mobile-open');
+                if (overlay) overlay.classList.remove('active');
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+                }
+            });
+
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
+            });
+
+            overlay.addEventListener('click', closeMobile);
+
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    closeMobile();
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    closeMobile();
+                } else {
+                    toggleIcon.textContent = 'chevron_left';
+                }
+            });
+
+            if (window.innerWidth > 768) {
+                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+            } else {
+                toggleIcon.textContent = 'chevron_left';
+            }
+
+            // ========== ANIMATION GOLAGO ==========
+            const svgContainer = document.getElementById('golagoSvg');
+            const letters = document.querySelectorAll('.letter');
+            const iaPart = document.getElementById('iaPart');
+            const logoFinal = document.getElementById('logoTextFinal');
+
+            // Séquence d'animation
+            setTimeout(() => {
+                // 0 → 0.5s : apparition du Golago (déjà visible, on peut ajouter un fade-in)
+                svgContainer.style.opacity = '1';
+                // Petit zoom
+                svgContainer.style.transition = 'transform 0.5s ease';
+                svgContainer.style.transform = 'scale(1)';
+            }, 100);
+
+            setTimeout(() => {
+                // 0.5 → 2s : course
+                svgContainer.classList.add('run-animation');
+            }, 500);
+
+            setTimeout(() => {
+                // 2 → 2.6s : arrêt, regard (on enlève la course et on ajoute un léger bounce)
+                svgContainer.classList.remove('run-animation');
+                svgContainer.style.transition = 'transform 0.3s ease';
+                svgContainer.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    svgContainer.style.transform = 'scale(1)';
+                }, 300);
+            }, 2000);
+
+            setTimeout(() => {
+                // 2.6 → 3.5s : apparition des lettres GOLAGO
+                letters.forEach((letter, index) => {
+                    setTimeout(() => {
+                        letter.classList.add('visible');
+                    }, index * 100); // 100ms entre chaque lettre
+                });
+            }, 2600);
+
+            setTimeout(() => {
+                // Apparition de IA avec flash
+                iaPart.classList.add('visible');
+                // léger glow sur le svg
+                svgContainer.style.filter = 'drop-shadow(0 0 8px #3b82f6)';
+                setTimeout(() => {
+                    svgContainer.style.filter = 'none';
+                }, 300);
+            }, 3500);
+
+            setTimeout(() => {
+                // 3.5 → 4s : dernier petit saut et shine final
+                svgContainer.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    svgContainer.style.transform = 'translateY(0)';
+                }, 200);
+                // Shine sur le logo final
+                logoFinal.classList.add('shine');
+                setTimeout(() => {
+                    logoFinal.classList.remove('shine');
+                }, 600);
+            }, 3800);
+        })();
+    </script>
+
+    <!-- Petit script pour la déconnexion (simulé) -->
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Déconnexion simulée (redirection vers index.html)');
+            window.location.href = '/index.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educsen | Renouvellement d'abonnement</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --border: #334155;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        /* ── Fond animé ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 800px 600px at 20% 10%, rgba(59,130,246,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 500px at 80% 90%, rgba(139,92,246,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        /* ── Logo ── */
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            justify-content: center;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .logo-text span { color: var(--primary); }
+
+        /* ── Card principale ── */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        /* ── Raison de l'expiration ── */
+        .expiry-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 28px;
+        }
+
+        .expiry-notice i { color: var(--danger); font-size: 1.1rem; margin-top: 2px; flex-shrink: 0; }
+
+        .expiry-notice .notice-title {
+            font-weight: 600;
+            color: #fca5a5;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .expiry-notice .notice-text {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        /* ── Étapes ── */
+        .steps {
+            display: flex;
+            gap: 0;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: calc(33.33% / 2);
+            right: calc(33.33% / 2);
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--border);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .step.active .step-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
+        }
+
+        .step.done .step-circle {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .step.active .step-label { color: var(--primary); font-weight: 600; }
+        .step.done .step-label { color: var(--success); }
+
+        /* ── Titre section ── */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .section-subtitle {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        /* ── Formulaires ── */
+        .form-group { margin-bottom: 16px; }
+
+        .form-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+
+        .form-control::placeholder { color: #4b5563; }
+
+        /* ── Champ code grand ── */
+        .code-input {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-align: center;
+            text-transform: uppercase;
+            padding: 14px;
+        }
+
+        /* ── Bouton principal ── */
+        .btn-primary {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* ── Spinner ── */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Alertes ── */
+        .alert {
+            display: none;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            margin-top: 12px;
+            gap: 8px;
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+
+        .alert.show { display: flex; }
+
+        .alert-success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #6ee7b7; }
+        .alert-error   { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.35);  color: #fca5a5; }
+        .alert-info    { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.35); color: #93c5fd; }
+
+        /* ── Infos virement ── */
+        .virement-box {
+            background: rgba(59,130,246,0.07);
+            border: 1px solid rgba(59,130,246,0.25);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .virement-box .virement-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #93c5fd;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .virement-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(59,130,246,0.1);
+            font-size: 0.82rem;
+        }
+
+        .virement-row:last-child { border-bottom: none; }
+        .virement-row .label { color: var(--text-muted); }
+        .virement-row .value { font-weight: 600; color: var(--text); }
+
+        /* ── Panel succès final ── */
+        .success-panel {
+            text-align: center;
+            padding: 20px 0;
+            display: none;
+        }
+
+        .success-icon {
+            width: 72px; height: 72px;
+            background: rgba(16,185,129,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--success);
+            margin: 0 auto 20px;
+            border: 2px solid rgba(16,185,129,0.35);
+        }
+
+        .success-panel h2 { font-size: 1.3rem; margin-bottom: 8px; }
+        .success-panel p { color: var(--text-muted); font-size: 0.87rem; line-height: 1.6; margin-bottom: 24px; }
+
+        .btn-redirect {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 24px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-redirect:hover { background: #059669; transform: translateY(-1px); }
+
+        /* ── Panels (étapes) ── */
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* ── Footer ── */
+        .card-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.78rem;
+            color: #4b5563;
+        }
+
+        /* ── Loading overlay initial ── */
+        #init-loader {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        #init-loader .spinner {
+            display: inline-block;
+            width: 32px; height: 32px;
+            border-width: 3px;
+            margin-bottom: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <!-- Logo -->
+    <div class="logo-area">
+        <div class="logo-icon">E</div>
+        <div class="logo-text">Edu<span>Metrics</span></div>
+    </div>
+
+    <!-- Card principale -->
+    <div class="card">
+
+        <!-- Loader initial (pendant la vérif Firebase) -->
+        <div id="init-loader">
+            <div class="spinner" style="display:inline-block"></div>
+            <div style="color:var(--text-muted);font-size:0.85rem">Vérification en cours…</div>
+        </div>
+
+        <!-- Contenu principal (caché jusqu'à auth chargé) -->
+        <div id="main-content" style="display:none">
+
+            <!-- Notice expiration (affichée dynamiquement) -->
+            <div class="expiry-notice" id="expiry-notice">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                    <div class="notice-title" id="notice-title">Abonnement expiré</div>
+                    <div class="notice-text" id="notice-text">
+                        Votre accès à Educsen a été suspendu. Renouvelez votre abonnement pour continuer.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étapes -->
+            <div class="steps" id="steps-bar">
+                <div class="step active" id="step-1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Demande</div>
+                </div>
+                <div class="step" id="step-2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Virement</div>
+                </div>
+                <div class="step" id="step-3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Activation</div>
+                </div>
+            </div>
+
+            <!-- ── PANEL 1 : Formulaire de demande ── -->
+            <div class="panel active" id="panel-1">
+                <div class="section-title">Renouveler votre abonnement</div>
+                <div class="section-subtitle">
+                    Remplissez vos informations. Nous vous enverrons les coordonnées de paiement et un code d'activation dès réception du virement.
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nom complet *</label>
+                    <input type="text" class="form-control" id="input-nom" placeholder="Ex : Amadou Diallo" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email de contact *</label>
+                    <input type="email" class="form-control" id="input-email" placeholder="votre@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nom de l'établissement *</label>
+                    <input type="text" class="form-control" id="input-ecole" placeholder="Ex : Lycée Cheikh Anta Diop" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Durée souhaitée</label>
+                    <select class="form-control" id="input-plan">
+                        <option value="mensuel">1 mois</option>
+                        <option value="trimestriel">3 mois</option>
+                        <option value="annuel" selected>1 an (meilleur tarif)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Message (optionnel)</label>
+                    <textarea class="form-control" id="input-message" rows="2" placeholder="Questions, précisions..."></textarea>
+                </div>
+
+                <button class="btn-primary" id="btn-demande" onclick="envoyerDemande()">
+                    <span id="btn-demande-text"><i class="fas fa-paper-plane"></i> Envoyer la demande</span>
+                    <div class="spinner" id="spinner-demande"></div>
+                </button>
+
+                <div class="alert" id="alert-demande"></div>
+            </div>
+
+            <!-- ── PANEL 2 : Instructions virement ── -->
+            <div class="panel" id="panel-2">
+                <div class="section-title">Effectuez le virement</div>
+                <div class="section-subtitle">
+                    Votre demande a été envoyée avec succès ! Effectuez le virement en utilisant les coordonnées ci-dessous, puis patientez — vous recevrez votre code d'activation par email.
+                </div>
+
+                <div class="virement-box">
+                    <div class="virement-title"><i class="fas fa-university"></i> Coordonnées de paiement</div>
+                    <div class="virement-row">
+                        <span class="label">Bénéficiaire</span>
+                        <span class="value">Educsen SARL</span>
+                    </div>
+                    <div class="virement-row">
+                        <span class="label">Banque</span>
+                        <span class="value">CBAO / Wave / Orange Money</span>
+                    </div>
+                    <div class="virement-row" id="virement-montant">
+                        <span class="label">Montant</span>
+                        <span class="value" id="montant-affiche">—</span>
+                    </div>
+                    <div class="virement-row">
+                        <span class="label">Référence</span>
+                        <span class="value" id="ref-affiche" style="color:#60a5fa">—</span>
+                    </div>
+                </div>
+
+                <div class="alert alert-info show">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Une fois le virement effectué, vous recevrez votre code d'activation par email sous 24h. Notez la référence ci-dessus lors du virement.</span>
+                </div>
+
+                <button class="btn-primary" style="margin-top:20px" onclick="allerEtape3()">
+                    <i class="fas fa-key"></i> J'ai déjà reçu mon code
+                </button>
+            </div>
+
+            <!-- ── PANEL 3 : Saisie du code d'activation ── -->
+            <div class="panel" id="panel-3">
+                <div class="section-title">Activer votre abonnement</div>
+                <div class="section-subtitle">
+                    Saisissez le code d'activation que vous avez reçu par email après votre virement.
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Code d'activation</label>
+                    <input type="text" class="form-control code-input" id="input-code"
+                        placeholder="EDU-XXXX-XXXX"
+                        maxlength="13"
+                        oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g,'')">
+                </div>
+
+                <button class="btn-primary" id="btn-activer" onclick="activerCode()">
+                    <span id="btn-activer-text"><i class="fas fa-unlock"></i> Activer l'abonnement</span>
+                    <div class="spinner" id="spinner-activer"></div>
+                </button>
+
+                <div class="alert" id="alert-code"></div>
+
+                <div style="text-align:center;margin-top:16px">
+                    <button onclick="allerEtape2()" style="background:none;border:none;color:var(--text-muted);font-size:0.8rem;cursor:pointer;text-decoration:underline;">
+                        ← Retour aux instructions de paiement
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── PANEL SUCCÈS ── -->
+            <div class="success-panel" id="success-panel">
+                <div class="success-icon"><i class="fas fa-check"></i></div>
+                <h2>Abonnement activé !</h2>
+                <p id="success-message">
+                    Votre abonnement a été renouvelé avec succès. Vous avez maintenant accès à toutes les fonctionnalités d'Educsen.
+                </p>
+                <a href="/userdashboard.html" class="btn-redirect" id="btn-retour">
+                    <i class="fas fa-home"></i> Accéder au tableau de bord
+                </a>
+            </div>
+
+        </div><!-- /main-content -->
+
+    </div><!-- /card -->
+
+    <div class="card-footer">
+        Educsen © 2026 — Support : <a href="mailto:support@edumetrics.sn" style="color:var(--primary)">support@edumetrics.sn</a>
+    </div>
+
+</div><!-- /page-wrapper -->
+
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!--  FIREBASE + LOGIQUE                                      -->
+<!-- ════════════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import {
+    getFirestore,
+    doc, getDoc, updateDoc, setDoc,
+    collection, query, where, getDocs, Timestamp
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+// ─── CONFIG FIREBASE ──────────────────────────────────────────────────────────
+const firebaseConfig = {
+    apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+    authDomain: "real-educsen.firebaseapp.com",
+    projectId: "real-educsen",
+    storageBucket: "real-educsen.firebasestorage.app",
+    messagingSenderId: "80660233362",
+    appId: "1:80660233362:web:5edf5060254170056eba4b"
+};
+
+
+const EMAILJS_SERVICE_ID  = "service_qoa6bgd"; 
+const EMAILJS_TEMPLATE_ID = "template_cn5ej3j";  
+const EMAILJS_PUBLIC_KEY  = "GOcExO-3DqYR1Em2h"; 
+
+// ─── TARIFS (modifie selon tes prix) ─────────────────────────────────────────
+const TARIFS = {
+    mensuel:      { label: "1 mois",  montant: "15 000 FCFA", dureeJours: 30  },
+    trimestriel:  { label: "3 mois",  montant: "40 000 FCFA", dureeJours: 90  },
+    annuel:       { label: "1 an",    montant: "120 000 FCFA", dureeJours: 365 }
+};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// EmailJS init
+window.emailjs?.init(EMAILJS_PUBLIC_KEY);
+
+let currentUser = null;
+let selectedPlan = "annuel";
+let referenceCommande = "";
+
+// ─── AUTH STATE ───────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async (user) => {
+    document.getElementById("init-loader").style.display = "none";
+    document.getElementById("main-content").style.display = "block";
+
+    if (!user) {
+        window.location.href = "connexion.html";
+        return;
+    }
+
+    currentUser = user;
+
+    // Pré-remplissage email
+    document.getElementById("input-email").value = user.email || "";
+
+    // Lire le nom depuis Firestore si dispo
+    try {
+        const userSnap = await getDoc(doc(db, "users", user.uid));
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            document.getElementById("input-nom").value   = data.nom || (user.displayName || "");
+            document.getElementById("input-ecole").value = data.ecole || data.etablissement || "";
+        }
+    } catch { /* ignore */ }
+
+    // Affiche le message d'expiration selon le paramètre URL
+    afficherRaison();
+});
+
+// ─── RAISON EXPIRATION ────────────────────────────────────────────────────────
+function afficherRaison() {
+    const params  = new URLSearchParams(window.location.search);
+    const raison  = params.get("raison") || "expire";
+    const messages = {
+        expire:     { titre: "Abonnement expiré",          texte: "Votre période d'abonnement est terminée. Renouvelez pour continuer à utiliser Educsen." },
+        suspendu:   { titre: "Compte suspendu",            texte: "Votre compte a été suspendu. Contactez-nous pour régulariser votre situation." },
+        inexistant: { titre: "Aucun abonnement actif",     texte: "Aucun abonnement n'est associé à votre compte. Souscrivez maintenant pour accéder à la plateforme." },
+    };
+    const msg = messages[raison] || messages["expire"];
+    document.getElementById("notice-title").textContent = msg.titre;
+    document.getElementById("notice-text").textContent  = msg.texte;
+}
+
+// ─── ÉTAPES ───────────────────────────────────────────────────────────────────
+function allerEtape(n) {
+    [1,2,3].forEach(i => {
+        document.getElementById(`panel-${i}`)?.classList.remove("active");
+        document.getElementById(`step-${i}`)?.classList.remove("active", "done");
+    });
+    for (let i = 1; i < n; i++) {
+        document.getElementById(`step-${i}`)?.classList.add("done");
+        document.getElementById(`step-${i}`).querySelector(".step-circle").innerHTML = '<i class="fas fa-check" style="font-size:0.7rem"></i>';
+    }
+    document.getElementById(`step-${n}`)?.classList.add("active");
+    document.getElementById(`panel-${n}`)?.classList.add("active");
+}
+
+window.allerEtape2 = () => allerEtape(2);
+window.allerEtape3 = () => allerEtape(3);
+
+// ─── PANEL 1 : ENVOI DE LA DEMANDE ───────────────────────────────────────────
+window.envoyerDemande = async function() {
+    const nom     = document.getElementById("input-nom").value.trim();
+    const email   = document.getElementById("input-email").value.trim();
+    const ecole   = document.getElementById("input-ecole").value.trim();
+    const plan    = document.getElementById("input-plan").value;
+    const message = document.getElementById("input-message").value.trim();
+
+    if (!nom || !email || !ecole) {
+        afficherAlerte("alert-demande", "error", "Veuillez remplir tous les champs obligatoires.");
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        afficherAlerte("alert-demande", "error", "Adresse email invalide.");
+        return;
+    }
+
+    setLoading("demande", true);
+
+    // Générer une référence de commande unique
+    selectedPlan = plan;
+    referenceCommande = `EDU-${Date.now().toString(36).toUpperCase().slice(-6)}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+
+    try {
+        // Envoi email via EmailJS
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_name:     "Admin Educsen",
+            from_name:   nom,
+            from_email:  email,
+            ecole:       ecole,
+            plan:        TARIFS[plan].label,
+            montant:     TARIFS[plan].montant,
+            message:     message || "(aucun message)",
+            reference:   referenceCommande,
+            user_uid:    currentUser?.uid || "inconnu",
+            date:        new Date().toLocaleDateString("fr-FR", { day:"2-digit", month:"long", year:"numeric" })
+        });
+
+        // Mise à jour des infos paiement dans le panel 2
+        document.getElementById("montant-affiche").textContent = TARIFS[plan].montant;
+        document.getElementById("ref-affiche").textContent     = referenceCommande;
+
+        afficherAlerte("alert-demande", "success", "Demande envoyée ! Redirection vers les instructions de paiement…");
+
+        setTimeout(() => allerEtape(2), 1800);
+
+    } catch (error) {
+        console.error("[EmailJS] Erreur:", error);
+        afficherAlerte("alert-demande", "error", "Erreur d'envoi. Vérifiez votre connexion ou contactez le support.");
+    } finally {
+        setLoading("demande", false);
+    }
+};
+
+// ─── PANEL 3 : VALIDATION DU CODE ────────────────────────────────────────────
+window.activerCode = async function() {
+    if (!currentUser) {
+        afficherAlerte("alert-code", "error", "Session expirée. Veuillez vous reconnecter.");
+        return;
+    }
+
+    const codeInput = document.getElementById("input-code").value.trim().toUpperCase();
+
+    if (!codeInput || codeInput.length < 10) {
+        afficherAlerte("alert-code", "error", "Veuillez saisir un code d'activation valide.");
+        return;
+    }
+
+    setLoading("activer", true);
+
+    try {
+        // 1. Chercher le code dans Firestore
+        const codesRef   = collection(db, "codes_renouvellement");
+        const codeQuery  = query(codesRef, where("code", "==", codeInput), where("utilise", "==", false));
+        const codeSnap   = await getDocs(codeQuery);
+
+        if (codeSnap.empty) {
+            afficherAlerte("alert-code", "error", "Code invalide ou déjà utilisé. Vérifiez le code reçu par email.");
+            setLoading("activer", false);
+            return;
+        }
+
+        const codeDoc  = codeSnap.docs[0];
+        const codeData = codeDoc.data();
+        const dureeJours = codeData.dureeJours || 365;
+
+        // 2. Calculer la nouvelle date d'expiration
+        const now = new Date();
+        // Si un abonnement existait déjà, prolonger depuis l'expiration actuelle
+        let baseDate = now;
+        try {
+            const abonnSnap = await getDoc(doc(db, "abonnements", currentUser.uid));
+            if (abonnSnap.exists()) {
+                const ancienneDate = abonnSnap.data().dateExpiration?.toDate?.();
+                if (ancienneDate && ancienneDate > now) {
+                    baseDate = ancienneDate; // prolongation depuis l'expiration existante
+                }
+            }
+        } catch { /* ignore, on part de now */ }
+
+        const nouvelleExpiration = new Date(baseDate);
+        nouvelleExpiration.setDate(nouvelleExpiration.getDate() + dureeJours);
+
+        // 3. Mise à jour de l'abonnement dans Firestore
+        const abonnementRef = doc(db, "abonnements", currentUser.uid);
+        await setDoc(abonnementRef, {
+            statut:          "actif",
+            dateExpiration:  Timestamp.fromDate(nouvelleExpiration),
+            dateRenouvellement: Timestamp.fromDate(now),
+            plan:            codeData.plan || "annuel",
+            ecole:           document.getElementById("input-ecole").value.trim() || "",
+            uid:             currentUser.uid,
+            email:           currentUser.email
+        }, { merge: true });
+
+        // 4. Marquer le code comme utilisé
+        await updateDoc(doc(db, "codes_renouvellement", codeDoc.id), {
+            utilise:       true,
+            utilise_par:   currentUser.uid,
+            utilise_le:    Timestamp.fromDate(now)
+        });
+
+        // 5. Afficher le succès
+        document.getElementById("success-message").textContent =
+            `Votre abonnement est actif jusqu'au ${nouvelleExpiration.toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"})}. Bienvenue sur Educsen !`;
+
+        // Redirection vers la page d'origine si disponible
+        const redirectParam = new URLSearchParams(window.location.search).get("redirect");
+        if (redirectParam && redirectParam !== "/abonnement.html") {
+            document.getElementById("btn-retour").href = redirectParam;
+        }
+
+        // Masquer steps et afficher succès
+        document.getElementById("steps-bar").style.display = "none";
+        document.getElementById("expiry-notice").style.display = "none";
+        document.getElementById("panel-3").classList.remove("active");
+        document.getElementById("success-panel").style.display = "block";
+
+    } catch (error) {
+        console.error("[Activation] Erreur:", error);
+        afficherAlerte("alert-code", "error", "Erreur lors de l'activation. Réessayez ou contactez le support.");
+    } finally {
+        setLoading("activer", false);
+    }
+};
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function setLoading(which, loading) {
+    const btn     = document.getElementById(`btn-${which}`);
+    const text    = document.getElementById(`btn-${which}-text`);
+    const spinner = document.getElementById(`spinner-${which}`);
+    if (!btn) return;
+    btn.disabled    = loading;
+    text.style.display   = loading ? "none"   : "flex";
+    spinner.style.display = loading ? "block" : "none";
+}
+
+function afficherAlerte(id, type, message) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `alert alert-${type} show`;
+    el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':type==='info'?'info-circle':'exclamation-circle'}"></i><span>${message}</span>`;
+    if (type !== "info") setTimeout(() => el.classList.remove("show"), 5000);
+}
+</script>
+
+</body>
+</html>

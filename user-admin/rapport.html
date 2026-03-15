@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport de performance | Educsen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary:      #3b82f6;
+            --primary-dark: #2563eb;
+            --sidebar-w:    280px;
+            --sidebar-coll: 80px;
+            --topbar-h:     60px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6fb;
+            color: #1e293b;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: width .3s ease, transform .3s ease;
+            box-shadow: 4px 0 16px rgba(0,0,0,.12);
+        }
+        .sidebar.collapsed { width: var(--sidebar-coll); }
+
+        .sidebar-header {
+            padding: 20px 16px;
+            border-bottom: 1px solid #334155;
+            flex-shrink: 0;
+        }
+        .logo-header { display: flex; align-items: center; justify-content: space-between; }
+        .logo-area   { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+        .logo-icon {
+            width: 42px; height: 42px; flex-shrink: 0;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; font-weight: 700; color: #fff;
+        }
+        .logo-text {
+            font-size: 1.25rem; font-weight: 700; white-space: nowrap;
+            transition: opacity .2s, width .2s; color: #fff;
+        }
+        .logo-text span { color: #3b82f6; }
+        .sidebar.collapsed .logo-text { opacity: 0; width: 0; overflow: hidden; }
+
+        .toggle-btn {
+            background: rgba(255,255,255,.08); border: 1px solid #4b5563;
+            border-radius: 50%; width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #e2e8f0; transition: all .2s; flex-shrink: 0;
+        }
+        .toggle-btn:hover { background: rgba(255,255,255,.18); border-color: #3b82f6; }
+
+        .nav-menu {
+            flex: 1; padding: 20px 0;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 13px 24px; margin: 0 12px;
+            border-radius: 12px; color: #cbd5e1;
+            text-decoration: none; transition: all .2s; white-space: nowrap;
+        }
+        .nav-item .nav-icon { font-size: 1.4rem; width: 24px; text-align: center; flex-shrink: 0; }
+        .sidebar.collapsed .nav-item span:last-child { display: none; }
+        .nav-item.active { background: #3b82f6; color: #fff; box-shadow: 0 8px 16px -4px rgba(59,130,246,.3); }
+        .nav-item:hover:not(.active) { background: #334155; color: #fff; }
+
+        .sidebar-footer { padding: 20px; border-top: 1px solid #334155; flex-shrink: 0; }
+        .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .user-avatar {
+            width: 42px; height: 42px; background: #3b82f6;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
+        }
+        .user-details { overflow: hidden; }
+        .user-name { font-weight: 600; font-size: .95rem; white-space: nowrap; }
+        .user-role  { font-size: .78rem; color: #94a3b8; }
+        .sidebar.collapsed .user-details { display: none; }
+        .logout-btn {
+            width: 100%; padding: 10px; background: rgba(255,255,255,.08);
+            color: #94a3b8; border: none; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 14px; cursor: pointer; transition: all .2s; text-decoration: none;
+        }
+        .logout-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+        .sidebar.collapsed .logout-btn span:last-child { display: none; }
+
+        /* ========== OVERLAY MOBILE ========== */
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.5); z-index: 999;
+            opacity: 0; transition: opacity .3s; pointer-events: none;
+        }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* ========== TOPBAR MOBILE — sticky, collée en haut ========== */
+        .mobile-topbar {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 998;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px;
+            height: var(--topbar-h);
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+        }
+        .topbar-logo { display: flex; align-items: center; gap: 10px; }
+        .topbar-logo .logo-icon { width: 34px; height: 34px; font-size: 1.05rem; }
+        .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+        .topbar-logo-text em { color: #3b82f6; font-style: normal; }
+        .topbar-menu-btn {
+            background: none; border: none;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #334155; border-radius: 8px;
+            transition: background .2s;
+        }
+        .topbar-menu-btn:hover { background: #f1f5f9; }
+
+        /* ========== LAYOUT PRINCIPAL ========== */
+        .page-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            display: flex;
+            flex-direction: column;
+            transition: margin-left .3s ease;
+            min-width: 0;
+        }
+        .sidebar.collapsed ~ .page-wrapper { margin-left: var(--sidebar-coll); }
+
+        .main-content { padding: 32px; flex: 1; }
+
+        /* ========== PAGE HEADER ========== */
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+        }
+        .page-header h1 {
+            font-size: 26px; font-weight: 700; color: #0f172a;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .badge-year {
+            background: #e2e8f0; color: #334155;
+            padding: 4px 12px; border-radius: 30px;
+            font-size: 12px; font-weight: 600;
+        }
+        .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .period-selector {
+            display: flex; align-items: center; gap: 8px;
+            background: #fff; padding: 4px 4px 4px 14px;
+            border-radius: 40px; border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        }
+        .period-label { font-size: 13px; color: #64748b; white-space: nowrap; }
+        .period-select {
+            padding: 7px 14px; border: none;
+            background: #f1f5f9; border-radius: 30px;
+            font-size: 13px; font-weight: 600; color: #1e293b;
+            outline: none; cursor: pointer;
+        }
+        .btn-recommandation {
+            background: #fff; color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 20px; border-radius: 40px;
+            font-weight: 600; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; transition: all .2s; white-space: nowrap;
+        }
+        .btn-recommandation:hover {
+            background: var(--primary); color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59,130,246,.3);
+        }
+
+        /* ========== KPI CAROUSEL ========== */
+        .carousel-section { margin-bottom: 40px; }
+        .carousel-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .carousel-counter { font-size: 12px; color: #94a3b8; font-weight: 500; margin-right: auto; }
+        .arrow-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1.5px solid #e2e8f0; background: #fff; color: #475569;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px;
+            transition: all .2s; box-shadow: 0 2px 6px rgba(0,0,0,.06);
+        }
+        .arrow-btn:hover:not(:disabled) { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .arrow-btn:disabled { opacity: .35; cursor: default; }
+
+        .carousel-viewport { overflow: hidden; border-radius: 20px; }
+        .carousel-track {
+            display: flex;
+            transition: transform .4s cubic-bezier(.4,0,.2,1);
+            will-change: transform; cursor: grab; user-select: none; gap: 20px;
+        }
+        .carousel-track.dragging { cursor: grabbing; transition: none; }
+
+        .kpi-card {
+            flex: 0 0 calc(25% - 15px); min-width: 220px;
+            background: #fff; border-radius: 20px; padding: 22px;
+            border: 1px solid #f0f2f5;
+            box-shadow: 0 4px 16px rgba(0,0,0,.04);
+            transition: box-shadow .2s, border-color .2s;
+        }
+        .kpi-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.08); border-color: #d0d7de; }
+        .kpi-card.danger  { border-top: 4px solid #ef4444; }
+        .kpi-card.success { border-top: 4px solid #10b981; }
+        .kpi-card.warning { border-top: 4px solid #f59e0b; }
+        .kpi-card.info    { border-top: 4px solid #3b82f6; }
+
+        .kpi-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+        }
+        .kpi-icon.danger  { background: #fee2e2; color: #ef4444; }
+        .kpi-icon.success { background: #dcfce7; color: #10b981; }
+        .kpi-icon.warning { background: #fef3c7; color: #f59e0b; }
+        .kpi-icon.info    { background: #dbeafe; color: #3b82f6; }
+        .kpi-icon .material-icons { font-size: 22px; }
+        .kpi-value { font-size: 34px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+        .kpi-label { font-size: 13px; color: #64748b; margin-bottom: 10px; line-height: 1.4; }
+        .kpi-trend {
+            display: inline-block; font-size: 11px; padding: 3px 10px;
+            border-radius: 30px; background: #f1f5f9; color: #475569; font-weight: 500;
+        }
+
+        .dots-row { display: flex; justify-content: center; gap: 6px; margin-top: 16px; align-items: center; }
+        .dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #cbd5e1; border: none; cursor: pointer; padding: 0; transition: all .25s;
+        }
+        .dot.active { width: 22px; border-radius: 4px; background: #3b82f6; }
+
+        /* ========== SECTIONS ========== */
+        .section {
+            background: #fff; border-radius: 24px;
+            border: 1px solid #f0f2f5;
+            box-shadow: 0 4px 16px rgba(0,0,0,.03);
+            margin-bottom: 28px; overflow: hidden;
+        }
+        .section-header {
+            padding: 18px 26px; border-bottom: 1px solid #f1f5f9;
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .section-title {
+            font-size: 17px; font-weight: 700; color: #0f172a;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title .material-icons { color: var(--primary); font-size: 20px; }
+        .section-badge {
+            background: #e6f0ff; color: #2563eb;
+            padding: 4px 14px; border-radius: 30px; font-size: 12px; font-weight: 600;
+        }
+        .section-content { padding: 22px 26px; }
+
+        /* ========== TABLES ========== */
+        .table-container { overflow-x: auto; border-radius: 14px; border: 1px solid #edf2f7; }
+        table { width: 100%; border-collapse: collapse; min-width: 420px; }
+        thead tr { background: linear-gradient(135deg, #f0f5ff, #f8fafc); }
+        th {
+            text-align: left; padding: 13px 18px; color: #475569; font-weight: 600;
+            font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+            border-bottom: 2px solid #e2e8f0; white-space: nowrap;
+        }
+        td { padding: 13px 18px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-size: 14px; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background .15s; }
+        tbody tr:hover td { background: #f8fbff; }
+        .cell-name { font-weight: 600; color: #0f172a; }
+
+        .avg-pill { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 30px; font-size: 13px; font-weight: 700; }
+        .avg-good   { background: #dcfce7; color: #15803d; }
+        .avg-medium { background: #fef9c3; color: #854d0e; }
+        .avg-bad    { background: #fee2e2; color: #b91c1c; }
+
+        .performance-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; }
+        .perf-good   { background: #dcfce7; color: #15803d; }
+        .perf-medium { background: #fef9c3; color: #854d0e; }
+        .perf-bad    { background: #fee2e2; color: #b91c1c; }
+
+        .note-badge { display: inline-block; min-width: 36px; text-align: center; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 14px; }
+        .empty-message { text-align: center; padding: 48px 20px; color: #94a3b8; font-size: 14px; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1200px) {
+            .kpi-card { flex: 0 0 calc(50% - 10px); min-width: 200px; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-w) !important;
+                transition: transform .3s ease;
+            }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .sidebar-overlay { display: block; }
+
+            /* Topbar sticky mobile */
+            .mobile-topbar { display: flex; }
+
+            /* Le wrapper principal n'a plus de margin-left sur mobile */
+            .page-wrapper {
+                margin-left: 0 !important;
+                width: 100%;
+            }
+
+            .main-content { padding: 20px 16px 32px; }
+
+            .page-header { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+            .page-header h1 { font-size: 20px; }
+            .header-right { width: 100%; flex-direction: column; align-items: stretch; gap: 10px; }
+            .period-selector { width: 100%; }
+            .btn-recommandation { width: 100%; justify-content: center; }
+
+            .kpi-card { flex: 0 0 calc(80vw - 32px); min-width: unset; }
+            .kpi-value { font-size: 28px; }
+
+            .section-content { padding: 16px; }
+            .section-header  { padding: 14px 16px; }
+            th, td { padding: 10px 12px; font-size: 13px; }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-card { flex: 0 0 calc(90vw - 32px); }
+            .kpi-value { font-size: 26px; }
+            .carousel-counter { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-header">
+            <div class="logo-area">
+                <div class="logo-icon">E</div>
+                <span class="logo-text">Educ<span>sen</span></span>
+            </div>
+            <button class="toggle-btn" id="toggleSidebar">
+                <span class="material-icons" id="toggleIcon">chevron_left</span>
+            </button>
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+        <a href="/userdashboard.html" class="nav-item">
+            <span class="nav-icon material-icons">dashboard</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="/user-admin/assistant.html" class="nav-item">
+            <span class="nav-icon material-icons">smart_toy</span>
+            <span>Assistant</span>
+        </a>
+        <a href="/user-admin/rapport.html" class="nav-item active">
+            <span class="nav-icon material-icons">assessment</span>
+            <span>Rapport</span>
+        </a>
+        <a href="/user-admin/classes.html" class="nav-item">
+            <span class="nav-icon material-icons">school</span>
+            <span>Classes</span>
+        </a>
+        <a href="/user-admin/professeurs.html" class="nav-item">
+            <span class="nav-icon material-icons">person</span>
+            <span>Professeurs</span>
+        </a>
+        <a href="/user-admin/notes.html" class="nav-item">
+            <span class="nav-icon material-icons">assignment</span>
+            <span>Notes</span>
+        </a>
+        <a href="/user-admin/bulletin.html" class="nav-item">
+            <span class="nav-icon material-icons">receipt_long</span>
+            <span>Bulletins</span>
+        </a>
+        <a href="/user-admin/parametres.html" class="nav-item">
+            <span class="nav-icon material-icons">settings</span>
+            <span>Paramètres</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">DI</div>
+            <div class="user-details">
+                <div class="user-name" id="userNameDisplay">Direction</div>
+                <div class="user-role"  id="userRole">admin</div>
+            </div>
+        </div>
+        <a href="index.html" class="logout-btn" id="logoutBtn">
+            <span class="material-icons">logout</span>
+            <span>Déconnexion</span>
+        </a>
+    </div>
+</aside>
+
+<!-- PAGE WRAPPER (contient topbar + contenu, pousse la sidebar) -->
+<div class="page-wrapper" id="pageWrapper">
+
+    <!-- TOPBAR MOBILE — sticky, toujours en haut même en scroll -->
+    <header class="mobile-topbar" id="mobileTopbar">
+        <div class="topbar-logo">
+            <div class="logo-icon">E</div>
+            <span class="topbar-logo-text">Educ<em>sen</em></span>
+        </div>
+        <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+            <span class="material-icons">menu</span>
+        </button>
+    </header>
+
+    <!-- CONTENU -->
+    <main class="main-content" id="mainContent">
+
+        <div class="page-header">
+            <h1>
+                Rapport de performance
+                <span class="badge-year">2025-2026</span>
+            </h1>
+            <div class="header-right">
+                <div class="period-selector">
+                    <span class="period-label">Période :</span>
+                    <select class="period-select" id="periodSelect">
+                        <option value="derniere">Dernière période</option>
+                        <option value="trimestre1">Trimestre 1</option>
+                        <option value="trimestre2">Trimestre 2</option>
+                        <option value="trimestre3">Trimestre 3</option>
+                        <option value="mois_sept">Septembre</option>
+                        <option value="mois_oct">Octobre</option>
+                        <option value="mois_nov">Novembre</option>
+                    </select>
+                </div>
+                <button class="btn-recommandation" id="recommandationsBtn">
+                    <span class="material-icons">lightbulb</span>
+                    Recommandations
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI CAROUSEL -->
+        <div class="carousel-section">
+            <div class="carousel-nav">
+                <span class="carousel-counter" id="carouselCounter">1 / 4</span>
+                <button class="arrow-btn" id="kpiPrev" disabled>&#8592;</button>
+                <button class="arrow-btn" id="kpiNext">&#8594;</button>
+            </div>
+            <div class="carousel-viewport">
+                <div class="carousel-track" id="kpiTrack">
+
+                    <div class="kpi-card danger">
+                        <div class="kpi-icon danger"><span class="material-icons">trending_down</span></div>
+                        <div class="kpi-value" id="valRegress">---</div>
+                        <div class="kpi-label">Élèves en régression</div>
+                        <span class="kpi-trend">note &lt; 6</span>
+                    </div>
+
+                    <div class="kpi-card success">
+                        <div class="kpi-icon success"><span class="material-icons">trending_up</span></div>
+                        <div class="kpi-value" id="valProgress">---</div>
+                        <div class="kpi-label">Élèves en forte progression</div>
+                        <span class="kpi-trend">note &gt; 17</span>
+                    </div>
+
+                    <div class="kpi-card warning">
+                        <div class="kpi-icon warning"><span class="material-icons">warning</span></div>
+                        <div class="kpi-value" id="valTeachers">---</div>
+                        <div class="kpi-label">Professeurs sous performance</div>
+                        <span class="kpi-trend">moyenne &lt; 10</span>
+                    </div>
+
+                    <div class="kpi-card info">
+                        <div class="kpi-icon info"><span class="material-icons">school</span></div>
+                        <div class="kpi-value" id="valClasses">---</div>
+                        <div class="kpi-label">Classes à risque</div>
+                        <span class="kpi-trend">moyenne &lt; 10</span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="dots-row" id="kpiDots"></div>
+        </div>
+
+        <!-- Professeurs sous performance -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="material-icons">warning</span>
+                    Professeurs sous performance
+                </h2>
+                <span class="section-badge" id="teachersBadge">—</span>
+            </div>
+            <div class="section-content">
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Professeur</th><th>Matière</th><th>Classe(s)</th><th>Moyenne</th></tr></thead>
+                        <tbody id="teachersTable"><tr><td colspan="4" class="empty-message">Chargement...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moyenne des classes -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="material-icons">school</span>
+                    Moyenne des classes
+                </h2>
+                <span class="section-badge">avec performance</span>
+            </div>
+            <div class="section-content">
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Classe</th><th>Moyenne</th><th>Performance</th></tr></thead>
+                        <tbody id="allClassesTable"><tr><td colspan="3" class="empty-message">Chargement...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Élèves en forte progression -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="material-icons">star</span>
+                    Élèves en forte progression
+                </h2>
+                <span class="section-badge" id="progressBadge">—</span>
+            </div>
+            <div class="section-content">
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Élève</th><th>Matière</th><th>Classe</th><th>Note</th></tr></thead>
+                        <tbody id="strongProgressTable"><tr><td colspan="4" class="empty-message">Chargement...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div><!-- /page-wrapper -->
+
+<script type="module">
+    import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged }     from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import {
+        getFirestore, collection, doc, getDocs,
+        setDoc, query, where
+    } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+    import { checkSubscription } from './subscription.js';
+    await checkSubscription();
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+        authDomain: "real-educsen.firebaseapp.com",
+        projectId: "real-educsen",
+        storageBucket: "real-educsen.firebasestorage.app",
+        messagingSenderId: "80660233362",
+        appId: "1:80660233362:web:5edf5060254170056eba4b"
+    };
+
+    const app  = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
+
+    /* ── DOM ── */
+    const allClassesTbody     = document.getElementById('allClassesTable');
+    const strongProgressTbody = document.getElementById('strongProgressTable');
+    const teachersTbody       = document.getElementById('teachersTable');
+    const valRegress          = document.getElementById('valRegress');
+    const valProgress         = document.getElementById('valProgress');
+    const valTeachers         = document.getElementById('valTeachers');
+    const valClasses          = document.getElementById('valClasses');
+    const periodSelect        = document.getElementById('periodSelect');
+
+    /* ── SIDEBAR ── */
+    const sidebar        = document.getElementById('sidebar');
+    const toggleBtn      = document.getElementById('toggleSidebar');
+    const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+    const toggleIcon     = document.getElementById('toggleIcon');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    const openMobile  = () => { sidebar.classList.add('mobile-open');    sidebarOverlay.classList.add('active'); };
+    const closeMobile = () => { sidebar.classList.remove('mobile-open'); sidebarOverlay.classList.remove('active'); };
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+    });
+    mobileMenuBtn.addEventListener('click', () => sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile());
+    sidebarOverlay.addEventListener('click', closeMobile);
+    document.addEventListener('click', e => {
+        if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) closeMobile();
+    });
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) closeMobile();
+        else { sidebar.classList.remove('collapsed'); toggleIcon.textContent = 'chevron_left'; }
+        buildDots(); carouselGoTo(0);
+    });
+
+    /* ── CAROUSEL ── */
+    const track     = document.getElementById('kpiTrack');
+    const prevBtn   = document.getElementById('kpiPrev');
+    const nextBtn   = document.getElementById('kpiNext');
+    const dotsEl    = document.getElementById('kpiDots');
+    const counterEl = document.getElementById('carouselCounter');
+    const slides    = Array.from(track.querySelectorAll('.kpi-card'));
+    const total     = slides.length;
+    let current = 0, dragStartX = 0, dragOffset = 0, isDragging = false;
+
+    const getGap     = () => 20;
+    const getSlideW  = () => slides[0].getBoundingClientRect().width + getGap();
+    const getVisible = () => Math.max(1, Math.floor((track.parentElement.offsetWidth + getGap()) / getSlideW()));
+    const maxIdx     = () => Math.max(0, total - getVisible());
+
+    function carouselGoTo(idx) {
+        current = Math.max(0, Math.min(idx, maxIdx()));
+        track.style.transform = `translateX(-${current * getSlideW()}px)`;
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current >= maxIdx();
+        if (counterEl) counterEl.textContent = `${current + 1} / ${maxIdx() + 1}`;
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    function buildDots() {
+        dotsEl.innerHTML = '';
+        for (let i = 0; i <= maxIdx(); i++) {
+            const d = document.createElement('button');
+            d.className = 'dot' + (i === current ? ' active' : '');
+            d.setAttribute('aria-label', `Carte ${i + 1}`);
+            d.addEventListener('click', () => carouselGoTo(i));
+            dotsEl.appendChild(d);
+        }
+    }
+
+    prevBtn.addEventListener('click', () => carouselGoTo(current - 1));
+    nextBtn.addEventListener('click', () => carouselGoTo(current + 1));
+
+    track.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.clientX; track.classList.add('dragging'); });
+    window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        dragOffset = e.clientX - dragStartX;
+        track.style.transform = `translateX(${-current * getSlideW() + dragOffset}px)`;
+    });
+    window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false; track.classList.remove('dragging');
+        if (dragOffset < -60) carouselGoTo(current + 1);
+        else if (dragOffset > 60) carouselGoTo(current - 1);
+        else carouselGoTo(current);
+        dragOffset = 0;
+    });
+    track.addEventListener('touchstart', e => { dragStartX = e.touches[0].clientX; isDragging = true; }, { passive: true });
+    track.addEventListener('touchmove', e => {
+        if (!isDragging) return;
+        dragOffset = e.touches[0].clientX - dragStartX;
+        track.style.transform = `translateX(${-current * getSlideW() + dragOffset}px)`;
+    }, { passive: true });
+    track.addEventListener('touchend', () => {
+        isDragging = false;
+        if (dragOffset < -50) carouselGoTo(current + 1);
+        else if (dragOffset > 50) carouselGoTo(current - 1);
+        else carouselGoTo(current);
+        dragOffset = 0;
+    });
+
+    requestAnimationFrame(() => { buildDots(); carouselGoTo(0); });
+
+    /* ── CACHE ── */
+    const LS_PRE = 'educsen_rapport_', TTL = 5 * 60 * 1000;
+    function lsGet(uid) {
+        try { const r = localStorage.getItem(LS_PRE + uid); if (!r) return null; const p = JSON.parse(r); return Date.now() - p.timestamp > TTL ? null : p; } catch { return null; }
+    }
+    function lsSet(uid, payload) {
+        try { localStorage.setItem(LS_PRE + uid, JSON.stringify({ timestamp: Date.now(), ...payload })); } catch {}
+    }
+
+    let rawData = null;
+
+    /* ── FETCH ── */
+    async function fetchRawData(uid) {
+        const [classesSnap, evaluationsSnap] = await Promise.all([
+            getDocs(query(collection(db, 'classes'),     where('createdBy', '==', uid))),
+            getDocs(query(collection(db, 'evaluations'), where('createdBy', '==', uid)))
+        ]);
+        const classesMap = new Map(), professeursMap = new Map(), elevesPromises = [];
+        classesSnap.forEach(docSnap => {
+            const data = docSnap.data(), id = docSnap.id, nom = data.nomClasse || 'Inconnue', matieres = data.matieres || [];
+            classesMap.set(id, { nom, matieres });
+            matieres.forEach(m => {
+                if (m.professeurId) {
+                    if (!professeursMap.has(m.professeurId)) professeursMap.set(m.professeurId, { nom: m.professeurNom || 'Inconnu', matiere: m.nom || 'Inconnue', classes: new Set() });
+                    professeursMap.get(m.professeurId).classes.add(nom);
+                }
+            });
+            elevesPromises.push(getDocs(collection(db, 'classes', id, 'eleves')).then(snap => ({ classeId: id, snap })));
+        });
+        const [elevesResults, notesResults] = await Promise.all([
+            Promise.all(elevesPromises),
+            Promise.all(evaluationsSnap.docs.map(async evalDoc => {
+                const d = evalDoc.data();
+                const notesSnap = await getDocs(collection(db, 'evaluations', evalDoc.id, 'notes'));
+                const notes = [];
+                notesSnap.forEach(n => { const nd = n.data(); notes.push({ eleveId: nd.eleveId, note: nd.note }); });
+                return { id: evalDoc.id, classeId: d.classeId, matiere: d.matiere, professeurId: d.professeurId, createdAt: d.createdAt, notes };
+            }))
+        ]);
+        const elevesMap = new Map();
+        elevesResults.forEach(({ classeId, snap }) => {
+            const classeNom = classesMap.get(classeId)?.nom || 'Inconnue';
+            snap.forEach(docSnap => {
+                const d = docSnap.data();
+                elevesMap.set(docSnap.id, { nom: `${d.prenom||''} ${d.nom||''}`.trim()||'Inconnu', prenom: d.prenom, nomFamille: d.nom, classeId, classeNom });
+            });
+        });
+        return { evaluations: notesResults, classesMap, elevesMap, professeursMap };
+    }
+
+    /* ── CALCULS ── */
+    function computeStats(data, periode) {
+        const { evaluations, classesMap, elevesMap, professeursMap } = data;
+        const filtered = evaluations.filter(ev => {
+            if (periode === 'derniere') return true;
+            if (!ev.createdAt) return true;
+            const d = ev.createdAt.toDate ? ev.createdAt.toDate() : new Date(ev.createdAt), m = d.getMonth();
+            if (periode === 'trimestre1') return m >= 8 && m <= 10;
+            if (periode === 'trimestre2') return m >= 11 || m <= 1;
+            if (periode === 'trimestre3') return m >= 2 && m <= 4;
+            if (periode === 'mois_sept') return m === 8;
+            if (periode === 'mois_oct')  return m === 9;
+            if (periode === 'mois_nov')  return m === 10;
+            return true;
+        });
+        const classTotals = new Map(), professorTotals = new Map(), studentNotes = new Map();
+        const strongProgressStudents = [], regressionStudents = [];
+        filtered.forEach(ev => {
+            const { classeId, matiere, professeurId, notes } = ev;
+            notes.forEach(({ eleveId, note }) => {
+                if (!eleveId || note === undefined) return;
+                if (classeId) { if (!classTotals.has(classeId)) classTotals.set(classeId, { total:0, count:0 }); const c = classTotals.get(classeId); c.total += note; c.count++; }
+                if (professeurId) { if (!professorTotals.has(professeurId)) professorTotals.set(professeurId, { total:0, count:0, evaluationsCount:0, lastCreatedAt:null }); const p = professorTotals.get(professeurId); p.total += note; p.count++; }
+                if (!studentNotes.has(eleveId)) studentNotes.set(eleveId, { total:0, count:0, notes:[] });
+                const st = studentNotes.get(eleveId); st.total += note; st.count++; st.notes.push(note);
+                if (note > 17) { const el = elevesMap.get(eleveId); if (el) strongProgressStudents.push({ nomEleve: el.nom, classe: el.classeNom, matiere, note }); }
+                if (note < 6)  { const el = elevesMap.get(eleveId); if (el) regressionStudents.push({ nomEleve: el.nom, classe: el.classeNom, matiere, note }); }
+            });
+            if (professeurId && professorTotals.has(professeurId)) {
+                const p = professorTotals.get(professeurId); p.evaluationsCount++;
+                if (ev.createdAt) { const d = ev.createdAt.toDate ? ev.createdAt.toDate() : new Date(ev.createdAt); if (!p.lastCreatedAt || d > p.lastCreatedAt) p.lastCreatedAt = d; }
+            }
+        });
+        const classAverages = [];
+        classTotals.forEach((stat, classeId) => classAverages.push({ classeId, nom: classesMap.get(classeId)?.nom || 'Inconnue', moyenne: stat.count > 0 ? stat.total / stat.count : 0 }));
+        const professorAverages = [];
+        professorTotals.forEach((stat, profId) => {
+            const info = professeursMap.get(profId) || { nom:'Inconnu', matiere:'Inconnue', classes: new Set() };
+            const moyenne = stat.count > 0 ? stat.total / stat.count : 0;
+            professorAverages.push({ professeurId: profId, nom: info.nom, matiere: info.matiere, classes: Array.from(info.classes), moyenne, evaluationsCount: stat.evaluationsCount });
+        });
+        return {
+            classAverages, professorAverages,
+            regressingClasses:       classAverages.filter(c => c.moyenne < 10),
+            underperformingTeachers: professorAverages.filter(p => p.moyenne < 10).sort((a,b) => a.moyenne - b.moyenne),
+            strongProgressStudents:  strongProgressStudents.slice(0, 50),
+            regressionStudents, studentNotes
+        };
+    }
+
+    /* ── RENDU ── */
+    function renderTable(tbody, rows, emptyMsg, colspan = 10) {
+        tbody.innerHTML = rows.length ? rows.join('') : `<tr><td colspan="${colspan}" class="empty-message">${emptyMsg}</td></tr>`;
+    }
+    const avgPill   = moy  => `<span class="avg-pill ${moy>=14?'avg-good':moy>=10?'avg-medium':'avg-bad'}">${moy.toFixed(2)}</span>`;
+    const noteBadge = note => `<span class="note-badge ${note>=17?'avg-good':note>=10?'avg-medium':'avg-bad'}">${note}</span>`;
+
+    function renderReport(stats) {
+        const { classAverages, underperformingTeachers, strongProgressStudents, regressionStudents, regressingClasses } = stats;
+        valRegress.textContent  = regressionStudents.length;
+        valProgress.textContent = strongProgressStudents.length;
+        valTeachers.textContent = underperformingTeachers.length;
+        valClasses.textContent  = regressingClasses.length;
+        document.getElementById('teachersBadge').textContent = `${underperformingTeachers.length} prof(s)`;
+        document.getElementById('progressBadge').textContent = `${strongProgressStudents.length} élève(s)`;
+
+        renderTable(teachersTbody, underperformingTeachers.map(p => `
+            <tr>
+                <td><div class="cell-name">${p.nom}</div></td>
+                <td>${p.matiere}</td>
+                <td style="color:#64748b">${p.classes.join(', ')||'—'}</td>
+                <td>${avgPill(p.moyenne)}</td>
+            </tr>`), 'Aucun professeur sous performance ✓', 4);
+
+        renderTable(allClassesTbody, [...classAverages].sort((a,b) => b.moyenne - a.moyenne).map(c => {
+            const pc = c.moyenne>=14?'perf-good':c.moyenne>=10?'perf-medium':'perf-bad';
+            const ic = c.moyenne>=14?'trending_up':c.moyenne>=10?'trending_flat':'trending_down';
+            const lb = c.moyenne>=14?'Bonne':c.moyenne>=10?'Moyenne':'Faible';
+            return `<tr>
+                <td><div class="cell-name">${c.nom}</div></td>
+                <td>${avgPill(c.moyenne)}</td>
+                <td><span class="performance-badge ${pc}"><span class="material-icons" style="font-size:15px">${ic}</span>${lb}</span></td>
+            </tr>`;
+        }), 'Aucune classe trouvée', 3);
+
+        renderTable(strongProgressTbody, strongProgressStudents.map(i => `
+            <tr>
+                <td><div class="cell-name">${i.nomEleve}</div></td>
+                <td>${i.matiere}</td>
+                <td style="color:#64748b">${i.classe}</td>
+                <td>${noteBadge(i.note)}</td>
+            </tr>`), 'Aucun élève en forte progression', 4);
+    }
+
+    /* ── SAVE ── */
+    async function saveReport(uid, stats) {
+        try {
+            const { classesMap, elevesMap } = rawData;
+            await setDoc(doc(db, 'rapport_professeurs', uid), { userId: uid, data: stats.professorAverages, lastUpdated: new Date().toISOString() }, { merge: true });
+            const elevesByClass = new Map();
+            stats.studentNotes.forEach((s, eleveId) => {
+                const el = elevesMap.get(eleveId); if (!el) return;
+                if (!elevesByClass.has(el.classeId)) elevesByClass.set(el.classeId, []);
+                const moy = s.count > 0 ? s.total / s.count : 0;
+                elevesByClass.get(el.classeId).push({ id: eleveId, nom: el.nomFamille||'', prenom: el.prenom||'', moyenne: moy, nombreNotes: s.count, evolution: moy>14?'progression':moy<10?'régression':'stable', forteProgression: s.notes.some(n=>n>17) });
+            });
+            await Promise.all(Array.from(elevesByClass.entries()).map(([classeId, eleves]) =>
+                setDoc(doc(db, 'rapport-eleves', `${uid}_${classeId}`), { className: classesMap.get(classeId)?.nom||'Inconnue', createdBy: uid, dateGeneration: new Date().toISOString(), eleves })
+            ));
+        } catch(e) { console.warn('Sauvegarde échouée', e); }
+    }
+
+    function showLoading() {
+        [allClassesTbody, strongProgressTbody, teachersTbody].forEach(t => t.innerHTML = '<tr><td colspan="10" class="empty-message">Chargement...</td></tr>');
+        [valRegress, valProgress, valTeachers, valClasses].forEach(el => el.textContent = '---');
+    }
+
+    async function init(uid) {
+        showLoading();
+        const cached = lsGet(uid);
+        if (cached?.stats) {
+            renderReport(cached.stats);
+            fetchRawData(uid).then(fresh => { rawData = fresh; const s = computeStats(rawData, periodSelect.value); lsSet(uid, { stats: s }); saveReport(uid, s); }).catch(console.warn);
+            return;
+        }
+        rawData = await fetchRawData(uid);
+        const stats = computeStats(rawData, periodSelect.value);
+        lsSet(uid, { stats });
+        renderReport(stats);
+        saveReport(uid, stats);
+    }
+
+    periodSelect.addEventListener('change', () => { if (rawData) renderReport(computeStats(rawData, periodSelect.value)); });
+    document.getElementById('recommandationsBtn')?.addEventListener('click', () => { /* À implémenter */ });
+
+    /* ── AUTH ── */
+    onAuthStateChanged(auth, async user => {
+        if (!user) { window.location.href = '/connexion.html'; return; }
+        const avatarEl = document.getElementById('userAvatar');
+        const nameEl   = document.getElementById('userNameDisplay');
+        const roleEl   = document.getElementById('userRole');
+        if (avatarEl) avatarEl.textContent = (user.email?.[0]||'U').toUpperCase();
+        if (nameEl)   nameEl.textContent   = user.email || 'Utilisateur';
+        if (roleEl)   roleEl.textContent   = 'admin';
+        const usersSnap = await getDocs(query(collection(db, 'users'), where('email', '==', user.email)));
+        if (usersSnap.empty) {
+            [allClassesTbody, strongProgressTbody, teachersTbody].forEach(t => t.innerHTML = '<tr><td colspan="10" class="empty-message">Utilisateur introuvable.</td></tr>');
+            return;
+        }
+        const firestoreUserId = usersSnap.docs[0].id;
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async e => {
+                e.preventDefault();
+                const { getAuth: gA, signOut } = await import('https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js');
+                await signOut(gA()); window.location.href = '/connexion.html';
+            });
+        }
+        init(firestoreUserId);
+    });
+</script>
+</body>
+</html>
