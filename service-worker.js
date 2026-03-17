@@ -1,60 +1,79 @@
 // service-worker.js
 
-const CACHE_NAME = 'mon site-v1';
+const CACHE_NAME = 'educsen-v1';
+
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-    '/userdashboard.html',
-  '/images/icon-192.png', 
-  '/images/icon-512.png'
+  '/userdashboard.html',
+  '/images/icon-192x192.png',
+  '/images/icon-512x512.png'
 ];
 
-// Installation : on ouvre un cache et on ajoute les fichiers
+// Installation : mise en cache des fichiers essentiels
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache ouvert');
+        console.log('[SW] Cache ouvert');
         return cache.addAll(urlsToCache);
       })
+      .then(() => self.skipWaiting()) // Activation immédiate
   );
 });
 
-// Interception des requêtes : on répond avec le cache si disponible
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Si la ressource est dans le cache, on la retourne
-        if (response) {
-          return response;
-        }
-        // Sinon on va la chercher sur le réseau
-        return fetch(event.request);
-      })
-  );
-});
-
-// Nettoyage des anciens caches (optionnel mais recommandé)
+// Activation : suppression des anciens caches
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            // Supprimer les anciens caches
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames
+          .filter(name => name !== CACHE_NAME)
+          .map(name => {
+            console.log('[SW] Suppression ancien cache:', name);
+            return caches.delete(name);
+          })
       );
-    })
+    }).then(() => self.clients.claim()) // Prend le contrôle immédiatement
   );
 });
+
+// Interception des requêtes : cache d'abord, réseau ensuite
 self.addEventListener('fetch', event => {
+  // Ignorer les requêtes non-GET et Firebase
+  if (
+    event.request.method !== 'GET' ||
+    event.request.url.includes('firestore.googleapis.com') ||
+    event.request.url.includes('firebase') ||
+    event.request.url.includes('gstatic.com')
+  ) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
-      .then(response => response || fetch(event.request))
+      .then(cachedResponse => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request)
+          .then(networkResponse => {
+            // Mettre en cache les nouvelles ressources statiques
+            if (networkResponse && networkResponse.status === 200) {
+              const responseClone = networkResponse.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, responseClone);
+              });
+            }
+            return networkResponse;
+          })
+          .catch(() => {
+            // Fallback si hors ligne et pas dans le cache
+            if (event.request.destination === 'document') {
+              return caches.match('/index.html');
+            }
+          });
+      })
   );
 });
