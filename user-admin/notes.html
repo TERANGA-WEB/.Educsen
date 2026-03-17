@@ -659,10 +659,8 @@ async function doGenLink(){
     const dateTs=dateStr?(()=>{const[y,m,d]=dateStr.split('-').map(Number);return Timestamp.fromDate(new Date(y,m-1,d,12,0,0));})():Timestamp.now();
     try{
         await setDoc(doc(db,'saisie_tokens',token),{token,mode:'deleg',classeId:curC.id,nomClasse:curC.nomClasse,matiereNom:curM.nom,coefficient:curM.coefficient||1,professeurId:curM.professeurId||null,professeurNom:curM.professeurNom||null,type:$('selType').value,date:dateTs,titre:buildTitre(),eleves:eleves.map((e,i)=>({id:e.id,nom:e.nom,prenom:e.prenom,index:i})),used:false,createdBy:user.uid,createdAt:serverTimestamp()});
-        // Construire l'URL correcte vers formulaire-note.html
-        // Détecte automatiquement le bon chemin selon la structure du déploiement
-        const basePath=location.pathname.substring(0,location.pathname.lastIndexOf('/')+1);
-        const formUrl=`${location.origin}${basePath}formulaire-note.html?token=${token}`;
+        // formulaire-note.html est à la racine du dépôt
+        const formUrl=`${location.origin}/formulaire-note.html?token=${token}`;
         $('lval').value=formUrl;
         $('lrev').classList.remove('hidden');btn.classList.add('hidden');
         showMsg('✅ Lien généré. Copiez-le et envoyez-le au professeur.','ok');
