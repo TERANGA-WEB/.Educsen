@@ -1,629 +1,720 @@
-// assistant.js — Module de recherche pédagogique Educsen
-// Nettoyé : doublons supprimés, fonctions unifiées, parsing simplifié
+// fonctionnalite.js — Module de fonctionnalités avancées pour Educsen
+// IA : Groq (Llama 3.3) — 100% gratuit, disponible au Sénégal
 
 import {
     collection, query, where, getDocs,
 } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
 // ─────────────────────────────────────────────────────────────
-// CACHE PAR UTILISATEUR
+// CONFIG GROQ
 // ─────────────────────────────────────────────────────────────
-const CACHE_TTL = 15 * 60 * 1000;
-const _cache    = new Map();
+const GROQ_API_KEY  = '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';
+const GROQ_MODEL    = 'llama-3.3-70b-versatile';
+const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
-function getCache(userId) {
-    if (!_cache.has(userId)) {
-        _cache.set(userId, {
-            classes:        null, classesTTL:   0,
-            evals:          null, evalsTTL:      0,
-            allEleves:      null, elevesTTL:     0,
-            elevesByClasse: {},   // { [classeId]: { data, ttl } }
-            notesByEval:    {},   // { [evalId]:   { data, ttl } }
-        });
+// ─────────────────────────────────────────────────────────────
+// CACHE
+// ─────────────────────────────────────────────────────────────
+const CACHE_TTL = 10 * 60 * 1000;
+const _cache = new Map();
+function cacheGet(key) {
+    const e = _cache.get(key);
+    if (!e || Date.now() - e.time > CACHE_TTL) return null;
+    return e.data;
+}
+function cacheSet(key, data) { _cache.set(key, { data, time: Date.now() }); }
+function norm(str) { return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
+
+// ─────────────────────────────────────────────────────────────
+// STOCKAGE STRUCTURÉ — données du dernier rapport (pour le PDF)
+// ─────────────────────────────────────────────────────────────
+let _lastRecoData = null;
+export function getLastRecoData() { return _lastRecoData; }
+
+function getAnneeScol() {
+    const now = new Date();
+    const y   = now.getFullYear();
+    return now.getMonth() >= 8 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// DÉTECTION — recommandations
+// ─────────────────────────────────────────────────────────────
+const RECO_KEYWORDS = [
+    'recommandation', 'recommandations', 'recommande', 'recommendation',
+    'conseil', 'conseils', 'analyse prof', 'analyse professeur',
+    'bilan prof', 'bilan professeur', 'performance prof',
+    'que faire pour', 'améliorer les profs', 'ameliorer les profs',
+    'rapport prof', 'rapport professeur', 'eleves a aider',
+    'élèves à aider', 'élèves à féliciter', 'feliciter',
+    'donne moi des recommandations', 'génère des recommandations',
+    'genere des recommandations',
+];
+export function isRecommandationRequest(message) {
+    const n = norm(message);
+    return RECO_KEYWORDS.some(kw => n.includes(norm(kw)));
+}
+
+// ─────────────────────────────────────────────────────────────
+// DÉTECTION — évolution
+// ─────────────────────────────────────────────────────────────
+const EVOLUTION_PATTERNS = [
+    { regex: /(?:evolution|évolution|progression|suivi|courbe)\s+(?:de\s+(?:la\s+)?)?classe\s+(.*)/i,           type: 'classe' },
+    { regex: /(?:evolution|évolution|progression|suivi|courbe)\s+(?:classe)\s+(.*)/i,                            type: 'classe' },
+    { regex: /(?:evolution|évolution|progression|suivi|courbe)\s+(?:de\s+(?:l[''`]?)?)?(?:eleve|élève)\s+(.*)/i, type: 'eleve'  },
+    { regex: /(?:evolution|évolution|progression|suivi|courbe)\s+(?:eleve|élève)\s+(.*)/i,                       type: 'eleve'  },
+    { regex: /(?:evolution|évolution|progression|suivi|courbe)\s+(?:du\s+)?(?:prof(?:esseur)?)\s+(.*)/i,         type: 'professeur' },
+    { regex: /(?:evolution|évolution|progression|suivi|courbe)\s+(?:prof(?:esseur)?)\s+(.*)/i,                   type: 'professeur' },
+];
+export function isEvolutionRequest(message) {
+    return EVOLUTION_PATTERNS.some(p => p.regex.test(message));
+}
+export function parseEvolutionRequest(message) {
+    for (const p of EVOLUTION_PATTERNS) {
+        const m = message.match(p.regex);
+        if (m) return { type: p.type, name: m[1].trim() };
     }
-    return _cache.get(userId);
-}
-
-// ─────────────────────────────────────────────────────────────
-// SESSIONS — menu interactif
-// ─────────────────────────────────────────────────────────────
-const _sessions = new Map();
-
-// ─────────────────────────────────────────────────────────────
-// NORMALISATION
-// ─────────────────────────────────────────────────────────────
-function norm(str) {
-    if (!str) return '';
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/\s+/g, ' ');
-}
-
-// Correspondance flexible entre deux chaînes normalisées
-function matches(a, b) {
-    const na = norm(a), nb = norm(b);
-    return na === nb
-        || na.replace(/\s/g, '') === nb.replace(/\s/g, '')
-        || na.includes(nb)
-        || nb.includes(na);
-}
-
-// ─────────────────────────────────────────────────────────────
-// FIRESTORE — CLASSES
-// ─────────────────────────────────────────────────────────────
-async function getClasses(db, userId) {
-    const c = getCache(userId);
-    if (c.classes && Date.now() - c.classesTTL < CACHE_TTL) return c.classes;
-    const snap = await getDocs(query(collection(db, 'classes'), where('createdBy', '==', userId)));
-    c.classes  = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    c.classesTTL = Date.now();
-    return c.classes;
-}
-
-// ─────────────────────────────────────────────────────────────
-// FIRESTORE — ÉVALUATIONS
-// ─────────────────────────────────────────────────────────────
-async function getEvaluations(db, userId) {
-    const c = getCache(userId);
-    if (c.evals && Date.now() - c.evalsTTL < CACHE_TTL) return c.evals;
-    const snap = await getDocs(query(collection(db, 'evaluations'), where('createdBy', '==', userId)));
-    c.evals    = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    c.evalsTTL = Date.now();
-    return c.evals;
-}
-
-// ─────────────────────────────────────────────────────────────
-// FIRESTORE — NOTES D'UNE ÉVALUATION
-// ─────────────────────────────────────────────────────────────
-async function getNotes(db, evalId, userId) {
-    const c      = getCache(userId);
-    const cached = c.notesByEval[evalId];
-    if (cached && Date.now() - cached.ttl < CACHE_TTL) return cached.data;
-    const snap = await getDocs(collection(db, 'evaluations', evalId, 'notes'));
-    const data = snap.docs.map(d => ({ id: d.id, evalId, ...d.data() }));
-    c.notesByEval[evalId] = { data, ttl: Date.now() };
-    return data;
-}
-
-// ─────────────────────────────────────────────────────────────
-// FIRESTORE — ÉLÈVES D'UNE CLASSE
-// ─────────────────────────────────────────────────────────────
-async function getElevesDeClasse(db, classeId, userId) {
-    const c      = getCache(userId);
-    const cached = c.elevesByClasse[classeId];
-    if (cached && Date.now() - cached.ttl < CACHE_TTL) return cached.data;
-    const snap = await getDocs(collection(db, 'classes', classeId, 'eleves'));
-    const data = snap.docs.map(d => ({ id: d.id, classeId, ...d.data() }));
-    c.elevesByClasse[classeId] = { data, ttl: Date.now() };
-    return data;
-}
-
-async function getTousLesEleves(db, userId) {
-    const c = getCache(userId);
-    if (c.allEleves && Date.now() - c.elevesTTL < CACHE_TTL) return c.allEleves;
-    const classes = await getClasses(db, userId);
-    const all     = [];
-    await Promise.all(classes.map(async cl => {
-        const eleves = await getElevesDeClasse(db, cl.id, userId);
-        all.push(...eleves);
-    }));
-    c.allEleves  = all;
-    c.elevesTTL  = Date.now();
-    return all;
-}
-
-// ─────────────────────────────────────────────────────────────
-// RECHERCHE — ÉLÈVE (retourne TOUS les homonymes)
-// ─────────────────────────────────────────────────────────────
-async function findEleves(db, terme, userId) {
-    const nt     = norm(terme);
-    const eleves = await getTousLesEleves(db, userId);
-    return eleves.filter(e => {
-        const p = norm(e.prenom || '');
-        const n = norm(e.nom    || '');
-        return matches(p + ' ' + n, nt) || p.includes(nt) || n.includes(nt);
-    });
-}
-
-// Message de choix quand plusieurs élèves ont le même nom
-async function buildDisambigMsg(db, homonymes, userId) {
-    const classes = await getClasses(db, userId);
-    const lignes  = homonymes.map((e, i) => {
-        const cl        = classes.find(c => c.id === e.classeId);
-        const classeNom = cl ? (cl.nomClasse || cl.classeNom || 'Classe inconnue') : 'Classe inconnue';
-        return `${i + 1}️⃣ <strong>${e.prenom} ${e.nom}</strong> — ${classeNom}`;
-    }).join('<br>');
-    return `👥 Plusieurs élèves correspondent à ce nom. Lequel souhaitez-vous ?<br><br>${lignes}<br><br>Tapez le numéro correspondant.`;
-}
-
-// ─────────────────────────────────────────────────────────────
-// RECHERCHE — PROFESSEUR (fonction unique partagée)
-// ─────────────────────────────────────────────────────────────
-async function findProfesseur(db, terme, userId) {
-    const nt      = norm(terme);
-    const classes = await getClasses(db, userId);
-
-    // 1. Chercher dans les matieres des classes
-    for (const cl of classes) {
-        for (const m of (cl.matieres || [])) {
-            if (m.professeurNom && norm(m.professeurNom).includes(nt))
-                return { professeurId: m.professeurId, professeurNom: m.professeurNom };
-        }
-    }
-
-    // 2. Chercher dans les évaluations
-    const evals = await getEvaluations(db, userId);
-    for (const ev of evals) {
-        if (ev.professeurNom && norm(ev.professeurNom).includes(nt))
-            return { professeurId: ev.professeurId, professeurNom: ev.professeurNom };
-    }
-
     return null;
 }
 
 // ─────────────────────────────────────────────────────────────
-// NOTES — POUR UN ÉLÈVE
+// FETCH — données Firestore
 // ─────────────────────────────────────────────────────────────
-async function getNotesEleve(db, eleveId, userId) {
-    const evals  = await getEvaluations(db, userId);
-    const result = [];
-    await Promise.all(evals.map(async ev => {
-        const notes = await getNotes(db, ev.id, userId);
-        const n     = notes.find(n => n.eleveId === eleveId);
-        if (n) result.push({
-            matiere:       ev.matiereNom || ev.matiere || ev.nomMatiere || 'Matière inconnue',
-            note:          Number(n.note || n.valeur),
-            professeurNom: ev.professeurNom || 'Inconnu',
-            classeId:      ev.classeId || null,
+async function fetchData(db, userId) {
+    const cacheKey = `reco_data_${userId}`;
+    const cached = cacheGet(cacheKey);
+    if (cached) return cached;
+
+    const [classesSnap, evalsSnap] = await Promise.all([
+        getDocs(query(collection(db, 'classes'),     where('createdBy', '==', userId))),
+        getDocs(query(collection(db, 'evaluations'), where('createdBy', '==', userId)))
+    ]);
+
+    const classesMap     = new Map();
+    const professeursMap = new Map();
+    const elevesPromises = [];
+
+    classesSnap.forEach(docSnap => {
+        const d  = docSnap.data();
+        const id = docSnap.id;
+        const nom = d.nomClasse || 'Inconnue';
+        classesMap.set(id, { nom, matieres: d.matieres || [] });
+        (d.matieres || []).forEach(m => {
+            if (m.professeurId) {
+                if (!professeursMap.has(m.professeurId))
+                    professeursMap.set(m.professeurId, { nom: m.professeurNom || 'Inconnu', matiere: m.nom || 'Inconnue', classes: new Set() });
+                professeursMap.get(m.professeurId).classes.add(nom);
+            }
         });
-    }));
+        elevesPromises.push(
+            getDocs(collection(db, 'classes', id, 'eleves')).then(snap => ({ classeId: id, snap }))
+        );
+    });
+
+    const [elevesResults, notesResults] = await Promise.all([
+        Promise.all(elevesPromises),
+        Promise.all(evalsSnap.docs.map(async evalDoc => {
+            const d = evalDoc.data();
+            const notesSnap = await getDocs(collection(db, 'evaluations', evalDoc.id, 'notes'));
+            const notes = [];
+            notesSnap.forEach(n => { const nd = n.data(); notes.push({ eleveId: nd.eleveId, note: nd.note }); });
+            return { id: evalDoc.id, classeId: d.classeId, matiere: d.matiere || d.matiereNom || d.nomMatiere || 'Inconnue', professeurId: d.professeurId, createdAt: d.createdAt, notes };
+        }))
+    ]);
+
+    const elevesMap = new Map();
+    elevesResults.forEach(({ classeId, snap }) => {
+        const classeNom = classesMap.get(classeId)?.nom || 'Inconnue';
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            elevesMap.set(docSnap.id, { nom: `${d.prenom || ''} ${d.nom || ''}`.trim() || 'Inconnu', classeId, classeNom });
+        });
+    });
+
+    const result = { evaluations: notesResults, classesMap, elevesMap, professeursMap };
+    cacheSet(cacheKey, result);
     return result;
 }
 
 // ─────────────────────────────────────────────────────────────
-// NOTES — POUR UNE CLASSE ENTIÈRE
+// CALCUL — stats par professeur
 // ─────────────────────────────────────────────────────────────
-async function getNotesClasse(db, classeId, userId) {
-    const evals       = await getEvaluations(db, userId);
-    const evalsClasse = evals.filter(ev => ev.classeId === classeId);
-    const notesByEleve = {};
+function buildProfStats(data) {
+    const { evaluations, elevesMap, professeursMap } = data;
+    const profMap = new Map();
 
-    await Promise.all(evalsClasse.map(async ev => {
-        const matiere = ev.matiereNom || ev.matiere || ev.nomMatiere || 'Inconnue';
-        const notes   = await getNotes(db, ev.id, userId);
-        notes.forEach(n => {
-            const val = Number(n.note || n.valeur);
-            if (!n.eleveId || isNaN(val)) return;
-            if (!notesByEleve[n.eleveId]) notesByEleve[n.eleveId] = [];
-            notesByEleve[n.eleveId].push({ matiere, note: val, professeurNom: ev.professeurNom || 'Inconnu' });
+    evaluations.forEach(ev => {
+        const { professeurId, matiere, notes } = ev;
+        if (!professeurId) return;
+        const info = professeursMap.get(professeurId) || { nom: 'Inconnu', matiere, classes: new Set() };
+        if (!profMap.has(professeurId)) profMap.set(professeurId, { info, eleves: new Map(), allNotes: [] });
+        const entry = profMap.get(professeurId);
+        notes.forEach(({ eleveId, note }) => {
+            if (!eleveId || note === undefined) return;
+            const eleve = elevesMap.get(eleveId);
+            if (!eleve) return;
+            if (!entry.eleves.has(eleveId)) entry.eleves.set(eleveId, { nom: eleve.nom, classe: eleve.classeNom, notes: [], matiere });
+            entry.eleves.get(eleveId).notes.push(note);
+            entry.allNotes.push(note);
         });
-    }));
-
-    return notesByEleve;
-}
-
-// ─────────────────────────────────────────────────────────────
-// UTILITAIRE — barre de progression ASCII
-// ─────────────────────────────────────────────────────────────
-function bar(value, max = 20, len = 20) {
-    const filled = Math.round((value / max) * len);
-    return '█'.repeat(Math.max(0, filled)) + '░'.repeat(Math.max(0, len - filled));
-}
-
-// ─────────────────────────────────────────────────────────────
-// HANDLER — BULLETIN SIMPLE D'UN ÉLÈVE
-// ─────────────────────────────────────────────────────────────
-async function handleBulletin(db, terme, userId, eleveForce = null) {
-    const eleve = eleveForce || await (async () => {
-        const list = await findEleves(db, terme, userId);
-        if (list.length === 0) return null;
-        if (list.length === 1) return list[0];
-        // Homonymes — stocker et demander
-        _sessions.set(userId, { waitingFor: 'eleve_choice', action: 'bulletin', homonymes: list });
-        return 'disambig';
-    })();
-
-    if (!eleve)            return `😕 Élève "${terme}" introuvable.`;
-    if (eleve === 'disambig') return await buildDisambigMsg(db, _sessions.get(userId).homonymes, userId);
-
-    const notes = await getNotesEleve(db, eleve.id, userId);
-    if (notes.length === 0)
-        return `🎓 <strong>${eleve.prenom} ${eleve.nom}</strong>\n📭 Aucune note enregistrée.`;
-
-    let total = 0, count = 0;
-    const lignes = [];
-    notes.forEach(({ matiere, note }) => {
-        if (isNaN(note)) return;
-        lignes.push(`- <strong>${matiere}</strong> : ${note}/20`);
-        total += note; count++;
     });
 
-    if (count === 0) return `🎓 <strong>${eleve.prenom} ${eleve.nom}</strong>\nAucune note valide trouvée.`;
+    const result = [];
+    profMap.forEach((entry, profId) => {
+        const { info, eleves, allNotes } = entry;
+        const profMoy = allNotes.length > 0 ? allNotes.reduce((a, b) => a + b, 0) / allNotes.length : 0;
+        const elevesData = [];
+        eleves.forEach(ed => {
+            const moy = ed.notes.reduce((a, b) => a + b, 0) / ed.notes.length;
+            elevesData.push({ nom: ed.nom, classe: ed.classe, matiere: ed.matiere, moyenneEleve: moy });
+        });
+        const aFeliciter = elevesData.filter(e => e.moyenneEleve > 14).sort((a, b) => b.moyenneEleve - a.moyenneEleve).slice(0, 5);
+        const aAider     = elevesData.filter(e => e.moyenneEleve < 10).sort((a, b) => a.moyenneEleve - b.moyenneEleve).slice(0, 5);
+        const statut     = profMoy >= 14 ? 'maintenir' : profMoy >= 10 ? 'progresser' : 'ameliorer';
+        result.push({ profId, nom: info.nom, matiere: info.matiere, classes: Array.from(info.classes), profMoy, statut, aFeliciter, aAider });
+    });
 
-    const moy = (total / count).toFixed(2);
-    return `🎓 <strong>Bulletin de ${eleve.prenom} ${eleve.nom}</strong>\n\n`
-        + lignes.join('\n')
-        + `\n\n📊 <strong>Moyenne Générale : ${moy}/20</strong>`;
+    return result.sort((a, b) => a.profMoy - b.profMoy);
 }
 
 // ─────────────────────────────────────────────────────────────
-// HANDLER — RAPPORT DÉTAILLÉ D'UN ÉLÈVE
+// GROQ — recommandation par prof (existant)
 // ─────────────────────────────────────────────────────────────
-async function handleRapportEleve(db, terme, userId, eleveForce = null) {
-    const eleve = eleveForce || await (async () => {
-        const list = await findEleves(db, terme, userId);
-        if (list.length === 0) return null;
-        if (list.length === 1) return list[0];
-        _sessions.set(userId, { waitingFor: 'eleve_choice', action: 'rapport', homonymes: list });
-        return 'disambig';
-    })();
+async function generateRecoForProf(profData) {
+    const { nom, matiere, classes, profMoy, statut, aFeliciter, aAider } = profData;
+    const feliciterList = aFeliciter.length > 0 ? aFeliciter.map(e => `${e.nom} (${e.moyenneEleve.toFixed(1)}/20, classe ${e.classe})`).join(', ') : 'aucun élève avec une moyenne supérieure à 14';
+    const aiderList     = aAider.length > 0     ? aAider.map(e => `${e.nom} (${e.moyenneEleve.toFixed(1)}/20, classe ${e.classe})`).join(', ')     : 'aucun élève en difficulté détecté';
+    const statutLabel   = statut === 'ameliorer' ? 'sous performance — moyenne inférieure à 10' : statut === 'progresser' ? 'performance moyenne — entre 10 et 14' : 'bonne performance — supérieure à 14';
 
-    if (!eleve)            return `😕 Élève "${terme}" introuvable.`;
-    if (eleve === 'disambig') return await buildDisambigMsg(db, _sessions.get(userId).homonymes, userId);
+    const prompt = `Tu es un conseiller pédagogique pour une école en Afrique francophone.
 
-    const classes   = await getClasses(db, userId);
-    const classe    = classes.find(c => c.id === eleve.classeId);
-    const classeNom = classe ? (classe.nomClasse || classe.classeNom || 'Inconnue') : 'Inconnue';
+Données du professeur :
+- Nom : ${nom}
+- Matière : ${matiere}
+- Classes : ${classes.join(', ') || 'non renseignées'}
+- Moyenne globale : ${profMoy.toFixed(2)}/20
+- Statut : ${statutLabel}
+- Élèves à féliciter (moyenne > 14) : ${feliciterList}
+- Élèves à accompagner (moyenne < 10) : ${aiderList}
 
-    const notesRaw = await getNotesEleve(db, eleve.id, userId);
-    if (notesRaw.length === 0)
-        return `📋 <strong>${eleve.prenom} ${eleve.nom}</strong> (${classeNom})\n📭 Aucune note enregistrée.`;
+Génère exactement 3 paragraphes séparés uniquement par |||
 
-    // Agrégation par matière
-    const byMatiere = new Map();
-    let totalGen = 0, nbGen = 0;
-    notesRaw.forEach(({ matiere, note }) => {
-        if (isNaN(note)) return;
-        if (!byMatiere.has(matiere)) byMatiere.set(matiere, []);
-        byMatiere.get(matiere).push(note);
-        totalGen += note; nbGen++;
+Paragraphe 1 : Message à l'administrateur — que doit faire l'admin concernant ce professeur, avec des actions concrètes.
+Paragraphe 2 : Élèves à féliciter — cite leurs noms et leurs points forts, message valorisant.
+Paragraphe 3 : Élèves à aider — cite leurs noms et propose des stratégies pédagogiques concrètes.
+
+Réponds UNIQUEMENT avec les 3 paragraphes séparés par |||. Rien d'autre.`;
+
+    const response = await fetch(GROQ_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({
+            model: GROQ_MODEL, max_tokens: 900, temperature: 0.65,
+            messages: [
+                { role: 'system', content: 'Tu es un conseiller pédagogique expert pour les écoles en Afrique francophone. Tu réponds toujours en français, de façon bienveillante, précise et professionnelle. Tu ne génères jamais de markdown, jamais de titres, jamais de numéros. Uniquement des paragraphes séparés par |||.' },
+                { role: 'user', content: prompt }
+            ]
+        })
     });
-    if (nbGen === 0) return `📋 <strong>${eleve.prenom} ${eleve.nom}</strong>\nAucune note valide.`;
-
-    const moy = totalGen / nbGen;
-    const profil = moy < 10 ? 'faible' : moy <= 12 ? 'moyen' : 'bon';
-
-    const stats  = [], fortes = [], moyennes = [], faibles = [];
-    for (const [matiere, notes] of byMatiere.entries()) {
-        const m = notes.reduce((a, b) => a + b, 0) / notes.length;
-        stats.push({ matiere, moyenne: m, nb: notes.length });
-        if (m >= 13)      fortes.push({ matiere, moyenne: m });
-        else if (m >= 10) moyennes.push({ matiere, moyenne: m });
-        else              faibles.push({ matiere, moyenne: m });
-    }
-
-    // Intro aléatoire selon profil
-    const intros = {
-        faible:   [`${eleve.prenom} présente des résultats préoccupants avec ${moy.toFixed(2)}/20. `, `Avec ${moy.toFixed(2)}/20, ${eleve.prenom} se situe en dessous du seuil de réussite. `],
-        moyen:    [`${eleve.prenom} obtient ${moy.toFixed(2)}/20, un niveau correct mais perfectible. `, `Les résultats de ${eleve.prenom} sont satisfaisants (${moy.toFixed(2)}/20) mais des progrès sont possibles. `],
-        bon:      [`${eleve.prenom} se distingue avec une excellente moyenne de ${moy.toFixed(2)}/20. `, `Félicitations à ${eleve.prenom} pour sa moyenne de ${moy.toFixed(2)}/20. `],
-    };
-    const recos = {
-        faible:   ['Soutien ciblé dans les matières sous la moyenne.', 'Tutorat par un pair ou un enseignant pour les notions fondamentales.', 'Entretien avec les parents pour définir un plan de remédiation.'],
-        moyen:    ['Consolider les acquis par des exercices d\'approfondissement.', 'Encourager la participation orale pour gagner en confiance.', 'Fixer des objectifs progressifs dans les matières faibles.'],
-        bon:      ['Proposer des projets avancés ou des défis académiques.', 'Préparer l\'élève à des concours ou options d\'excellence.', 'Approfondissement autonome dans les matières de prédilection.'],
-    };
-    const conclu = {
-        faible: `La situation de ${eleve.prenom} nécessite une intervention rapide. Un accompagnement personnalisé et un dialogue avec la famille sont essentiels.`,
-        moyen:  `${eleve.prenom} dispose d'une base solide. Avec plus d'investissement, le cap des 12 peut être dépassé.`,
-        bon:    `Félicitations à ${eleve.prenom} pour ces excellents résultats. Il/elle est invité(e) à maintenir cette dynamique.`,
-    };
-
-    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-    const maxLen = Math.max(...stats.map(s => s.matiere.length));
-
-    let r = `📋 <strong>Rapport pédagogique – ${eleve.prenom} ${eleve.nom}</strong>\n`;
-    r += `Classe : <strong>${classeNom}</strong>\n\n`;
-    r += pick(intros[profil]);
-    r += `Évalué(e) dans ${stats.length} matière(s). `;
-    r += `Fortes (≥13) : ${fortes.length} · Moyennes (10-12) : ${moyennes.length} · Faibles (<10) : ${faibles.length}.\n\n`;
-
-    r += `📚 <strong>Détail par matière</strong>\n`;
-    stats.sort((a, b) => b.moyenne - a.moyenne).forEach(s => {
-        r += `${s.matiere.padEnd(maxLen)} : ${bar(s.moyenne)} ${s.moyenne.toFixed(2)}/20 (${s.nb} note(s))\n`;
-    });
-    r += '\n';
-
-    if (fortes.length > 0)  r += `✅ <strong>Points forts</strong> : ${fortes.map(f => `${f.matiere} (${f.moyenne.toFixed(2)})`).join(', ')}\n`;
-    if (faibles.length > 0) r += `⚠️ <strong>Points faibles</strong> : ${faibles.map(f => `${f.matiere} (${f.moyenne.toFixed(2)})`).join(', ')}\n`;
-    r += '\n';
-
-    r += `🎯 <strong>Recommandations</strong> :\n`;
-    [...recos[profil]].sort(() => Math.random() - 0.5).slice(0, 3).forEach(rec => r += `- ${rec}\n`);
-    r += '\n';
-
-    r += `📝 <strong>Conclusion</strong> : ${conclu[profil]}`;
-    return r;
+    if (!response.ok) { const err = await response.text(); throw new Error(`Groq ${response.status}: ${err}`); }
+    const data  = await response.json();
+    const text  = data.choices?.[0]?.message?.content?.trim() || '';
+    const parts = text.split('|||').map(p => p.trim()).filter(Boolean);
+    return { admin: parts[0] || 'Recommandation non disponible.', felicite: parts[1] || 'Aucune donnée.', aider: parts[2] || 'Aucune donnée.' };
 }
 
 // ─────────────────────────────────────────────────────────────
-// HANDLER — RAPPORT COMPLET D'UNE CLASSE
+// GROQ — analyse générale (NOUVEAU)
 // ─────────────────────────────────────────────────────────────
-async function handleRapportClasse(db, terme, userId) {
-    const classes = await getClasses(db, userId);
-    const classe  = classes.find(c => matches(c.nomClasse || c.classeNom || '', terme));
-    if (!classe) return `😕 Classe "${terme}" introuvable. Vérifiez le nom.`;
+async function generateGlobalAnalysis(profsData, stats) {
+    const topProfs  = profsData.filter(p => p.statut === 'maintenir').map(p => `${p.nom} (${p.profMoy.toFixed(1)}/20)`).join(', ') || 'aucun';
+    const weakProfs = profsData.filter(p => p.statut === 'ameliorer').map(p => `${p.nom} (${p.profMoy.toFixed(1)}/20)`).join(', ') || 'aucun';
 
-    const { id: classeId, matieres: matieresInfo = [] } = classe;
-    const classeNom = classe.nomClasse || classe.classeNom || terme;
+    const prompt = `Tu es un conseiller pédagogique rédigeant un rapport administratif officiel pour un établissement scolaire en Afrique francophone.
 
-    const eleves = await getElevesDeClasse(db, classeId, userId);
-    if (eleves.length === 0)
-        return `📚 Classe <strong>${classeNom}</strong>\nAucun élève inscrit.`;
+Données globales de l'établissement :
+- Nombre de professeurs analysés : ${stats.total}
+- Moyenne générale de l'établissement : ${stats.moyGlobale.toFixed(2)}/20
+- Professeurs performants (moy > 14) : ${stats.nbMaintenir} — ${topProfs}
+- Professeurs en développement (10–14) : ${stats.nbProgresser}
+- Professeurs en difficulté (moy < 10) : ${stats.nbAmeliorer} — ${weakProfs}
 
-    const notesByEleve = await getNotesClasse(db, classeId, userId);
+Rédige exactement 3 paragraphes d'analyse générale, sobres et professionnels, à destination du directeur de l'établissement, séparés par |||.
+Paragraphe 1 : Bilan objectif de la situation pédagogique globale.
+Paragraphe 2 : Identification des forces et des axes d'amélioration.
+Paragraphe 3 : Orientation stratégique globale recommandée.
+Ton administratif, sans bullet points ni titres. Réponds UNIQUEMENT avec les 3 paragraphes séparés par |||.`;
 
-    // Stats par élève
-    const elevesStats = eleves.map(e => {
-        const ns = (notesByEleve[e.id] || []).filter(n => !isNaN(n.note));
-        const total = ns.reduce((s, n) => s + n.note, 0);
-        return { id: e.id, prenom: e.prenom || '', nom: e.nom || '', notes: ns, moyenne: ns.length ? total / ns.length : 0, nb: ns.length };
-    }).filter(e => e.nb > 0);
+    const response = await fetch(GROQ_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({
+            model: GROQ_MODEL, max_tokens: 800, temperature: 0.5,
+            messages: [
+                { role: 'system', content: 'Conseiller pédagogique expert. Rapports administratifs sobres et professionnels en français. Jamais de markdown.' },
+                { role: 'user', content: prompt }
+            ]
+        })
+    });
+    if (!response.ok) throw new Error(`Groq global ${response.status}`);
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+}
 
-    if (elevesStats.length === 0)
-        return `📚 Classe <strong>${classeNom}</strong>\nAucune note enregistrée.`;
+function fallbackGlobalAnalysis(stats) {
+    return [
+        `L'analyse pédagogique de l'établissement pour l'année scolaire en cours révèle une moyenne générale de ${stats.moyGlobale.toFixed(2)}/20. Sur les ${stats.total} enseignants évalués, ${stats.nbMaintenir} affichent des résultats satisfaisants supérieurs à 14, ${stats.nbProgresser} se situent dans une dynamique intermédiaire entre 10 et 14, et ${stats.nbAmeliorer} nécessitent un accompagnement pédagogique prioritaire.`,
+        `Cette analyse met en lumière un établissement dont le potentiel pédagogique est réel, mais qui requiert une attention particulière sur certains profils d'enseignement. La disparité des résultats entre les différentes matières et classes appelle à une intervention ciblée de l'administration, tant sur le plan de la formation continue que du suivi régulier des pratiques pédagogiques.`,
+        `Il est recommandé à la direction de mettre en place un conseil pédagogique mensuel permettant de mutualiser les bonnes pratiques des enseignants performants au bénéfice de ceux en difficulté. Un suivi trimestriel des indicateurs de performance constituera un outil de pilotage essentiel pour mesurer l'impact des actions correctives engagées.`
+    ].join('|||');
+}
 
-    const moyClasse = elevesStats.reduce((s, e) => s + e.moyenne, 0) / elevesStats.length;
-    const faible    = elevesStats.filter(e => e.moyenne < 10).length;
-    const moyen     = elevesStats.filter(e => e.moyenne >= 10 && e.moyenne <= 12).length;
-    const fort      = elevesStats.filter(e => e.moyenne > 12).length;
-    const total     = elevesStats.length;
+// ─────────────────────────────────────────────────────────────
+// GROQ — recommandations prioritaires (NOUVEAU)
+// ─────────────────────────────────────────────────────────────
+async function generatePriorityReco(profsData, stats) {
+    const prompt = `Tu es conseiller pédagogique senior. Données de l'établissement :
+- ${stats.nbAmeliorer} enseignant(s) en difficulté, ${stats.nbProgresser} en développement, ${stats.nbMaintenir} performants
+- Moyenne générale : ${stats.moyGlobale.toFixed(2)}/20
+- Année scolaire : ${getAnneeScol()}
 
-    const sorted  = [...elevesStats].sort((a, b) => b.moyenne - a.moyenne);
-    const top3    = sorted.slice(0, 3);
-    const bottom3 = sorted.slice(-3).reverse();
+Formule exactement 4 recommandations prioritaires, numérotées, concrètes et actionnables, à destination de l'administration. Chaque recommandation : 2 à 3 phrases maximum. Ton sobre et administratif, sans markdown. Sépare chaque recommandation par |||. Réponds UNIQUEMENT avec les 4 recommandations.`;
 
-    // Stats par matière
-    const matiereMap = new Map();
-    elevesStats.forEach(e => e.notes.forEach(n => {
-        if (!matiereMap.has(n.matiere)) {
-            const info = matieresInfo.find(m => m.nom === n.matiere || m.matiereNom === n.matiere);
-            matiereMap.set(n.matiere, { sum: 0, count: 0, prof: n.professeurNom || info?.professeurNom || 'Inconnu' });
+    const response = await fetch(GROQ_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({
+            model: GROQ_MODEL, max_tokens: 700, temperature: 0.5,
+            messages: [
+                { role: 'system', content: 'Conseiller pédagogique expert. Réponses en français, ton administratif, pas de markdown.' },
+                { role: 'user', content: prompt }
+            ]
+        })
+    });
+    if (!response.ok) throw new Error(`Groq priority ${response.status}`);
+    const data = await response.json();
+    return (data.choices?.[0]?.message?.content?.trim() || '')
+        .split('|||').map(s => s.replace(/^\d+[\.\)]\s*/, '').trim()).filter(Boolean);
+}
+
+function fallbackPriorityReco(stats) {
+    return [
+        `Organiser des séances de formation pédagogique ciblées pour les ${stats.nbAmeliorer} enseignant(s) en difficulté, avec un suivi mensuel des progrès réalisés et des objectifs mesurables définis en concertation avec chaque concerné.`,
+        `Mettre en place un système de tutorat interne permettant aux enseignants les plus performants de partager leurs méthodes et approches pédagogiques lors de séances collectives organisées au minimum une fois par trimestre.`,
+        `Renforcer le suivi individualisé des élèves en difficulté en impliquant directement les familles dans le processus d'accompagnement, par des réunions régulières et des bilans intermédiaires transmis en cours de trimestre.`,
+        `Établir un tableau de bord de suivi des performances pédagogiques mis à jour après chaque séquence d'évaluations, afin de permettre à la direction de prendre des décisions éclairées et d'anticiper les situations à risque avant la fin de l'année scolaire.`
+    ];
+}
+
+// ─────────────────────────────────────────────────────────────
+// FALLBACK par prof (existant)
+// ─────────────────────────────────────────────────────────────
+function fallbackReco(pd) {
+    const { nom, profMoy, statut, aFeliciter, aAider } = pd;
+    const adminOptions = {
+        ameliorer: [`La moyenne de ${nom} est de ${profMoy.toFixed(2)}/20, en dessous du seuil acceptable. Il est urgent d'organiser un entretien avec ce professeur pour identifier les difficultés rencontrées et mettre en place un plan d'amélioration concret avec des objectifs mensuels mesurables.`, `Avec ${profMoy.toFixed(2)}/20, ${nom} nécessite un accompagnement pédagogique immédiat. L'administration devrait envisager des séances de formation ciblées, un suivi rapproché des évaluations et un soutien méthodologique adapté à sa matière.`],
+        progresser: [`La moyenne de ${nom} est de ${profMoy.toFixed(2)}/20, un niveau satisfaisant mais encore perfectible. L'administration peut accompagner cette progression en proposant des ressources pédagogiques supplémentaires.`, `Avec ${profMoy.toFixed(2)}/20, ${nom} est sur une bonne trajectoire. Il serait bénéfique d'encourager la diversification des méthodes pédagogiques.`],
+        maintenir:  [`Avec une excellente moyenne de ${profMoy.toFixed(2)}/20, ${nom} démontre un niveau d'enseignement remarquable. L'administration devrait valoriser ces résultats et encourager ce professeur à partager ses bonnes pratiques.`, `La moyenne de ${profMoy.toFixed(2)}/20 de ${nom} reflète un travail pédagogique de très haute qualité. Il convient de maintenir ce niveau en offrant à ce professeur les ressources et la reconnaissance nécessaires.`]
+    };
+    const idx      = Math.floor(Math.random() * 2);
+    const adminMsg = adminOptions[statut][idx];
+    const feliciteMsg = aFeliciter.length > 0 ? `Les élèves <strong>${aFeliciter.map(e => `${e.nom} (${e.moyenneEleve.toFixed(1)}/20)`).join('</strong>, <strong>')}</strong> se distinguent par leurs excellentes performances dans cette matière.` : `Aucun élève n'a atteint une moyenne supérieure à 14 pour cette période.`;
+    const aiderMsg    = aAider.length > 0 ? `Les élèves <strong>${aAider.map(e => `${e.nom} (${e.moyenneEleve.toFixed(1)}/20)`).join('</strong>, <strong>')}</strong> nécessitent un soutien urgent et personnalisé.` : `Aucun élève n'est en situation d'échec pour cette période.`;
+    return { admin: adminMsg, felicite: feliciteMsg, aider: aiderMsg };
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILITAIRES HTML
+// ─────────────────────────────────────────────────────────────
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatParagraph(text) {
+    if (text.includes('<strong>')) return text;
+    return escHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDU — carte HTML d'un professeur (inchangé)
+// ─────────────────────────────────────────────────────────────
+function renderRecoCard(profData, paragraphs) {
+    const { nom, matiere, classes, profMoy, statut, aFeliciter, aAider } = profData;
+    const statusConf = {
+        ameliorer:  { color: '#b91c1c', bg: '#fee2e2', icon: '📉', label: 'À améliorer'  },
+        progresser: { color: '#92400e', bg: '#fef3c7', icon: '📊', label: 'À progresser' },
+        maintenir:  { color: '#15803d', bg: '#dcfce7', icon: '📈', label: 'À maintenir'  },
+    };
+    const sc         = statusConf[statut];
+    const classesTxt = classes.length > 0 ? classes.join(', ') : 'Classes non renseignées';
+    return `
+<div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+  <div style="padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <div style="font-weight:700;font-size:15px;color:#0f172a;">${escHtml(nom)}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px;">${escHtml(matiere)} · ${escHtml(classesTxt)} · Moy. <strong>${profMoy.toFixed(2)}/20</strong></div>
+    </div>
+    <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:30px;font-size:11px;font-weight:700;background:${sc.bg};color:${sc.color};">${sc.icon} ${sc.label}</span>
+  </div>
+  <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px;">
+    <div style="background:linear-gradient(135deg,#eff6ff,#f8faff);border-left:4px solid #3b82f6;border-radius:10px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#2563eb;margin-bottom:8px;">🔷 Message à l'administration</div>
+      <div style="font-size:13px;line-height:1.85;color:#334155;">${formatParagraph(paragraphs.admin)}</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#f0fdf4,#f8fffe);border-left:4px solid #10b981;border-radius:10px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#059669;margin-bottom:8px;">⭐ Élèves à féliciter (${aFeliciter.length})</div>
+      <div style="font-size:13px;line-height:1.85;color:#334155;">${formatParagraph(paragraphs.felicite)}</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#fef9f0,#fffbf0);border-left:4px solid #f59e0b;border-radius:10px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#d97706;margin-bottom:8px;">🤝 Élèves à accompagner (${aAider.length})</div>
+      <div style="font-size:13px;line-height:1.85;color:#334155;">${formatParagraph(paragraphs.aider)}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// FONCTION PRINCIPALE — RECOMMANDATIONS
+// ─────────────────────────────────────────────────────────────
+export async function handleRecommandations(db, userId, addMessageFn) {
+    if (!userId) return '❌ Utilisateur non connecté.';
+
+    addMessageFn(
+        `<div style="display:flex;align-items:center;gap:8px;color:#3b82f6;font-weight:600;"><span>✨</span> Analyse en cours… Récupération des données Firestore.</div>`,
+        'assistant'
+    );
+
+    try {
+        const rawData   = await fetchData(db, userId);
+        const profsData = buildProfStats(rawData);
+
+        if (profsData.length === 0) return `😕 Aucun professeur trouvé. Vérifiez que des évaluations ont bien été saisies.`;
+
+        // ── Stats globales (avant la boucle pour les appels parallèles) ──
+        const stats = {
+            total:       profsData.length,
+            nbAmeliorer: profsData.filter(p => p.statut === 'ameliorer').length,
+            nbProgresser:profsData.filter(p => p.statut === 'progresser').length,
+            nbMaintenir: profsData.filter(p => p.statut === 'maintenir').length,
+            moyGlobale:  profsData.length > 0 ? profsData.reduce((s, p) => s + p.profMoy, 0) / profsData.length : 0
+        };
+
+        // ── Lancer analyse globale et recommandations en parallèle ──
+        const globalPromise   = generateGlobalAnalysis(profsData, stats)
+            .catch(err => { console.warn('Fallback global:', err.message); return fallbackGlobalAnalysis(stats); });
+        const priorityPromise = generatePriorityReco(profsData, stats)
+            .catch(err => { console.warn('Fallback priority:', err.message); return fallbackPriorityReco(stats); });
+
+        // ── Construction HTML + accumulation données ──
+        let html = `
+<div style="margin-bottom:20px;">
+  <div style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px;">📋 Recommandations pédagogiques</div>
+  <div style="font-size:12px;color:#94a3b8;">${profsData.length} professeur(s) analysé(s) · ⚡ Groq IA (Llama 3.3) · ${new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</div>
+</div>`;
+
+        const profsParags = [];
+        for (let i = 0; i < profsData.length; i++) {
+            const pd = profsData[i];
+            addMessageFn(
+                `<span style="color:#94a3b8;font-size:13px;">⏳ Génération pour <strong>${escHtml(pd.nom)}</strong> (${i + 1}/${profsData.length})…</span>`,
+                'assistant'
+            );
+            let paragraphs;
+            try { paragraphs = await generateRecoForProf(pd); }
+            catch (err) { console.warn(`Fallback prof ${pd.nom}:`, err.message); paragraphs = fallbackReco(pd); }
+            html += renderRecoCard(pd, paragraphs);
+            profsParags.push({ pd, paragraphs });
         }
-        const entry = matiereMap.get(n.matiere);
-        entry.sum += n.note; entry.count++;
-    }));
 
-    const matiereStats = [];
-    matiereMap.forEach((v, k) => {
-        const m = v.sum / v.count;
-        matiereStats.push({ matiere: k, moy: m, prof: v.prof, niveau: m < 10 ? 'Faible' : m <= 12 ? 'Suffisant' : 'Très bien' });
+        // ── Attendre les appels parallèles ──
+        const [globalAnalyse, priorityRecos] = await Promise.all([globalPromise, priorityPromise]);
+
+        // ── Résumé HTML ──
+        html += `
+<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;font-size:13px;color:#475569;display:flex;gap:20px;flex-wrap:wrap;margin-top:4px;">
+  <span>📉 <strong style="color:#b91c1c;">${stats.nbAmeliorer}</strong> à améliorer</span>
+  <span>📊 <strong style="color:#92400e;">${stats.nbProgresser}</strong> à progresser</span>
+  <span>📈 <strong style="color:#15803d;">${stats.nbMaintenir}</strong> à maintenir</span>
+  <span style="margin-left:auto;font-size:11px;color:#cbd5e1;">⚡ Groq · Llama 3.3 · 70B</span>
+</div>`;
+
+        // ── Agréger les élèves (dédoublonnés) ──
+        const felMap  = new Map();
+        const aiderMap = new Map();
+        profsParags.forEach(({ pd }) => {
+            pd.aFeliciter.forEach(e => {
+                if (!felMap.has(e.nom) || felMap.get(e.nom).moyenneEleve < e.moyenneEleve) felMap.set(e.nom, e);
+            });
+            pd.aAider.forEach(e => {
+                if (!aiderMap.has(e.nom) || aiderMap.get(e.nom).moyenneEleve > e.moyenneEleve) aiderMap.set(e.nom, e);
+            });
+        });
+
+        // ── Stocker les données structurées pour le PDF ──
+        _lastRecoData = {
+            anneeScol: getAnneeScol(),
+            date:      new Date(),
+            stats,
+            globalAnalyse,
+            priorityRecos: Array.isArray(priorityRecos) ? priorityRecos : fallbackPriorityReco(stats),
+            profs: {
+                ameliorer:  profsParags.filter(p => p.pd.statut === 'ameliorer'),
+                progresser: profsParags.filter(p => p.pd.statut === 'progresser'),
+                maintenir:  profsParags.filter(p => p.pd.statut === 'maintenir'),
+            },
+            elevesAFeliciter: Array.from(felMap.values()).sort((a, b) => b.moyenneEleve - a.moyenneEleve),
+            elevesAAider:     Array.from(aiderMap.values()).sort((a, b) => a.moyenneEleve - b.moyenneEleve),
+        };
+
+        return html;
+
+    } catch (err) {
+        console.error('handleRecommandations error:', err);
+        return `❌ Erreur : ${err.message}`;
+    }
+}
+
+// ═════════════════════════════════════════════════════════════
+// FONCTIONNALITÉ 2 — SUIVI DE PROGRESSION DANS LE TEMPS
+// ═════════════════════════════════════════════════════════════
+
+async function fetchEvolutionData(db, userId) {
+    const cacheKey = `evolution_data_${userId}`;
+    const cached = cacheGet(cacheKey);
+    if (cached) return cached;
+
+    const [classesSnap, evalsSnap] = await Promise.all([
+        getDocs(query(collection(db, 'classes'),     where('createdBy', '==', userId))),
+        getDocs(query(collection(db, 'evaluations'), where('createdBy', '==', userId)))
+    ]);
+
+    const classesMap     = new Map();
+    const elevesPromises = [];
+    classesSnap.forEach(docSnap => {
+        const d = docSnap.data();
+        classesMap.set(docSnap.id, { nom: d.nomClasse || 'Inconnue', matieres: d.matieres || [] });
+        elevesPromises.push(getDocs(collection(db, 'classes', docSnap.id, 'eleves')).then(snap => ({ classeId: docSnap.id, snap })));
     });
 
-    // Intros
-    const intros = {
-        critique:     [`Classe ${classeNom} : résultats préoccupants, moyenne ${moyClasse.toFixed(2)}/20. `, `Situation critique : seuls ${fort} élèves dépassent la moyenne sur ${total} évalués. `],
-        intermediaire:[`Classe ${classeNom} : moyenne de ${moyClasse.toFixed(2)}/20, niveau correct mais perfectible. `, `Avec ${fort} élèves au-dessus de 12 et ${faible} en difficulté, une marge de progression existe. `],
-        excellent:    [`Classe ${classeNom} : excellents résultats, moyenne ${moyClasse.toFixed(2)}/20. `, `${fort} élèves dépassent 12/20 — un travail de qualité remarquable. `],
-    };
-    const niveauCle = moyClasse < 10 ? 'critique' : moyClasse <= 12 ? 'intermediaire' : 'excellent';
-    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const elevesMap     = new Map();
+    const elevesResults = await Promise.all(elevesPromises);
+    elevesResults.forEach(({ classeId, snap }) => {
+        const classeNom = classesMap.get(classeId)?.nom || 'Inconnue';
+        snap.forEach(d => { const data = d.data(); elevesMap.set(d.id, { nom: `${data.prenom || ''} ${data.nom || ''}`.trim() || 'Inconnu', classeId, classeNom }); });
+    });
 
-    const maxM = matiereStats.length ? Math.max(...matiereStats.map(m => m.matiere.length)) : 0;
-    const maxP = matiereStats.length ? Math.max(...matiereStats.map(m => m.prof.length)) : 0;
-
-    let r = `📋 <strong>Rapport pédagogique – Classe ${classeNom}</strong>\n\n`;
-    r += pick(intros[niveauCle]);
-    r += `Sur ${eleves.length} élève(s), ${total} ont participé aux évaluations. `;
-    r += `Répartition : ${faible} sous 10 · ${moyen} entre 10 et 12 · ${fort} au-delà de 12.\n\n`;
-
-    r += `📊 <strong>Répartition visuelle</strong>\n`;
-    r += `Faibles (<10)  : ${bar(faible, total)} ${faible}/${total}\n`;
-    r += `Moyens (10-12) : ${bar(moyen,  total)} ${moyen}/${total}\n`;
-    r += `Forts (>12)    : ${bar(fort,   total)} ${fort}/${total}\n\n`;
-
-    if (top3.length)    r += `🏆 Meilleurs : ${top3.map(e    => `${e.prenom} ${e.nom} (${e.moyenne.toFixed(2)})`).join(', ')}\n`;
-    if (bottom3.length) r += `🤝 À soutenir : ${bottom3.map(e => `${e.prenom} ${e.nom} (${e.moyenne.toFixed(2)})`).join(', ')}\n`;
-    r += '\n';
-
-    if (matiereStats.length > 0) {
-        r += `📚 <strong>Par matière</strong>\n`;
-        matiereStats.forEach(m => {
-            r += `${m.matiere.padEnd(maxM)} (${m.prof.padEnd(maxP)}) : ${bar(m.moy)} ${m.moy.toFixed(2)}/20 – ${m.niveau}\n`;
-        });
-        r += '\n';
-    }
-
-    // Recommandations
-    const recoCritique     = matiereStats.filter(m => m.niveau === 'Faible');
-    const recoExcellent    = matiereStats.filter(m => m.niveau === 'Très bien');
-    const recos            = [];
-    if (recoCritique.length)  recos.push(`Remédiation prioritaire en ${recoCritique.map(m => m.matiere).join(', ')}.`);
-    if (recoExcellent.length) recos.push(`Valoriser les résultats en ${recoExcellent.map(m => m.matiere).join(', ')}.`);
-    if (faible > total * 0.3) recos.push('Plus de 30% d\'élèves en difficulté : réunion pédagogique recommandée.');
-    else if (fort > total * 0.4) recos.push('Dynamique positive : envisager des projets interdisciplinaires.');
-    else recos.push('Différencier les activités selon les profils d\'élèves.');
-
-    r += `<strong>Recommandations</strong> : ${recos.join(' ')}\n\n`;
-
-    r += `<strong>Conclusion</strong> : `;
-    if (niveauCle === 'critique')     r += `Situation nécessitant une intervention immédiate. Remédiation et suivi individualisé indispensables.`;
-    else if (niveauCle === 'intermediaire') r += `Résultats encourageants. Un accompagnement ciblé élèvera le niveau général.`;
-    else r += `Résultats remarquables. Maintenez cette dynamique en encourageant l'excellence.`;
-
-    return r;
-}
-
-// ─────────────────────────────────────────────────────────────
-// HANDLER — BILAN D'UN PROFESSEUR
-// ─────────────────────────────────────────────────────────────
-async function handleProfesseur(db, terme, userId) {
-    const prof = await findProfesseur(db, terme, userId);
-    if (!prof) return `😕 Professeur "${terme}" introuvable.`;
-
-    const evals     = await getEvaluations(db, userId);
-    const profEvals = evals.filter(ev => ev.professeurId === prof.professeurId);
-    if (profEvals.length === 0)
-        return `👨‍🏫 Professeur <strong>${prof.professeurNom}</strong> : aucune évaluation enregistrée.`;
-
-    // Moyennes par classe et matière
-    const byClasse  = new Map();
-    const byMatiere = new Map();
-    let sumTotal = 0, countTotal = 0;
-
-    await Promise.all(profEvals.map(async ev => {
-        const notes   = await getNotes(db, ev.id, userId);
-        const valides = notes.map(n => Number(n.note || n.valeur)).filter(v => !isNaN(v));
-        if (!valides.length) return;
-
-        const moy = valides.reduce((a, b) => a + b, 0) / valides.length;
-        sumTotal += moy; countTotal++;
-
-        const matiere = ev.matiereNom || ev.matiere || ev.nomMatiere || 'Inconnue';
-        if (!byMatiere.has(matiere)) byMatiere.set(matiere, { sum: 0, count: 0 });
-        byMatiere.get(matiere).sum += moy;
-        byMatiere.get(matiere).count++;
-
-        const classes = await getClasses(db, userId);
-        const cl = classes.find(c => c.id === ev.classeId);
-        const classeNom = cl ? (cl.nomClasse || cl.classeNom || 'Inconnue') : 'Inconnue';
-        if (!byClasse.has(classeNom)) byClasse.set(classeNom, { sum: 0, count: 0 });
-        byClasse.get(classeNom).sum += moy;
-        byClasse.get(classeNom).count++;
+    const evaluations = await Promise.all(evalsSnap.docs.map(async evalDoc => {
+        const d = evalDoc.data();
+        const notesSnap = await getDocs(collection(db, 'evaluations', evalDoc.id, 'notes'));
+        const notes = [];
+        notesSnap.forEach(n => { const nd = n.data(); if (nd.eleveId && nd.note !== undefined) notes.push({ eleveId: nd.eleveId, note: Number(nd.note) }); });
+        let date = null;
+        if (d.createdAt) date = d.createdAt.toDate ? d.createdAt.toDate() : new Date(d.createdAt);
+        return { id: evalDoc.id, classeId: d.classeId, matiere: d.matiere || d.matiereNom || d.nomMatiere || 'Inconnue', professeurId: d.professeurId, professeurNom: d.professeurNom || 'Inconnu', date, notes };
     }));
+    evaluations.sort((a, b) => { if (!a.date) return 1; if (!b.date) return -1; return a.date - b.date; });
 
-    if (countTotal === 0) return `👨‍🏫 Professeur <strong>${prof.professeurNom}</strong> : aucune note valide.`;
-
-    const moyGlobale = sumTotal / countTotal;
-    const statut     = moyGlobale >= 14 ? '📈 Performant' : moyGlobale >= 10 ? '📊 En développement' : '📉 À accompagner';
-
-    let r = `👨‍🏫 <strong>Bilan – ${prof.professeurNom}</strong>\n\n`;
-    r += `Moyenne globale : <strong>${moyGlobale.toFixed(2)}/20</strong>  ${statut}\n`;
-    r += `Évaluations : ${profEvals.length}\n\n`;
-
-    if (byMatiere.size > 0) {
-        r += `📚 <strong>Par matière</strong>\n`;
-        byMatiere.forEach((v, k) => {
-            const m = v.sum / v.count;
-            r += `- ${k} : ${bar(m)} ${m.toFixed(2)}/20\n`;
-        });
-        r += '\n';
-    }
-
-    if (byClasse.size > 0) {
-        r += `🏫 <strong>Par classe</strong>\n`;
-        byClasse.forEach((v, k) => {
-            const m = v.sum / v.count;
-            r += `- ${k} : ${bar(m)} ${m.toFixed(2)}/20\n`;
-        });
-    }
-
-    return r;
+    const result = { classesMap, elevesMap, evaluations };
+    cacheSet(cacheKey, result);
+    return result;
 }
 
-// ─────────────────────────────────────────────────────────────
-// AIDE
-// ─────────────────────────────────────────────────────────────
-const AIDE = `📖 <strong>Commandes disponibles</strong>
+function sparkline(values) {
+    if (values.length === 0) return '';
+    const blocks = ['▁','▂','▃','▄','▅','▆','▇','█'];
+    const mn = Math.min(...values), mx = Math.max(...values);
+    const range = mx - mn || 1;
+    return values.map(v => blocks[Math.round(((v - mn) / range) * 7)]).join('');
+}
 
-<strong>Élève</strong>
-- <code>eleve [nom]</code> — bulletin de notes
-- <code>rapport eleve [nom]</code> — rapport pédagogique détaillé
+function tendanceIcon(values) {
+    if (values.length < 2) return { icon: '➡️', color: '#64748b', label: 'Stable' };
+    const first = values.slice(0, Math.ceil(values.length / 2)).reduce((a,b) => a+b,0) / Math.ceil(values.length/2);
+    const last  = values.slice(-Math.ceil(values.length / 2)).reduce((a,b) => a+b,0) / Math.ceil(values.length/2);
+    const diff  = last - first;
+    if (diff > 1.5)  return { icon: '📈', color: '#15803d', label: `+${diff.toFixed(1)} pts` };
+    if (diff < -1.5) return { icon: '📉', color: '#b91c1c', label: `${diff.toFixed(1)} pts` };
+    return { icon: '➡️', color: '#92400e', label: 'Stable' };
+}
 
-<strong>Classe</strong>
-- <code>rapport classe [nom]</code> — rapport complet d'une classe
+function renderProgressPoints(points) {
+    if (points.length === 0) return '<em style="color:#94a3b8">Aucune donnée</em>';
+    const max = 20, barW = 160;
+    return points.map(p => {
+        const pct   = Math.min(100, (p.moyenne / max) * 100);
+        const color = p.moyenne >= 14 ? '#10b981' : p.moyenne >= 10 ? '#f59e0b' : '#ef4444';
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><div style="font-size:11px;color:#64748b;width:90px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(p.label)}</div><div style="flex:1;background:#f1f5f9;border-radius:4px;height:10px;max-width:${barW}px;"><div style="width:${pct.toFixed(1)}%;background:${color};height:10px;border-radius:4px;"></div></div><div style="font-size:12px;font-weight:700;color:${color};width:36px;text-align:right;">${p.moyenne.toFixed(1)}</div></div>`;
+    }).join('');
+}
 
-<strong>Professeur</strong>
-- <code>professeur [nom]</code> — bilan d'un professeur
-
-<strong>Fonctionnalités avancées (IA)</strong>
-- <code>recommandations</code> — analyse IA de tous les professeurs
-- <code>evolution classe [nom]</code> — courbe de progression d'une classe
-- <code>evolution eleve [nom]</code> — courbe de progression d'un élève
-- <code>evolution prof [nom]</code> — courbe de progression d'un professeur`;
-
-// ─────────────────────────────────────────────────────────────
-// PATTERNS DE ROUTING
-// ─────────────────────────────────────────────────────────────
-const PATTERNS = [
-    {
-        re: /(?:rapport|bilan|résultats?|performances?)\s+(?:de\s+)?(?:la\s+)?classe\s+(?:de\s+)?(.*)/i,
-        fn: (m, db, uid) => handleRapportClasse(db, m[1].trim(), uid),
-    },
-    {
-        re: /(?:rapport|bilan|suivi|performances?)\s+(?:de\s+)?(?:l'?)?(?:élève|eleve|etudiant)s?\s+(?:de\s+)?(.*)/i,
-        fn: (m, db, uid) => handleRapportEleve(db, m[1].trim(), uid),
-    },
-    {
-        re: /(?:notes?|résultats?|bulletin|eleve)\s+(?:de\s+)?(.*)/i,
-        fn: (m, db, uid) => handleBulletin(db, m[1].trim(), uid),
-    },
-    {
-        re: /professeur\s+(.*)/i,
-        fn: (m, db, uid) => handleProfesseur(db, m[1].trim(), uid),
-    },
-];
-
-// ─────────────────────────────────────────────────────────────
-// EXPORT — FONCTION PRINCIPALE
-// ─────────────────────────────────────────────────────────────
-export default async function assistant(message, userId, db) {
-    const msg = message.trim();
-    if (!userId) return '❌ Utilisateur non identifié. Veuillez vous reconnecter.';
-    if (!db)     return '❌ Base de données non disponible. Veuillez recharger la page.';
-
-    // Aide
-    if (norm(msg) === 'aide' || msg === '/aide') return AIDE;
-
-    // Annulation de session
-    if (['annuler', 'cancel', 'quitter'].includes(norm(msg))) {
-        _sessions.delete(userId);
-        return '❌ Annulé. Tapez <code>aide</code> pour les commandes.';
+async function evolutionClasse(db, userId, classeNom) {
+    const { classesMap, elevesMap, evaluations } = await fetchEvolutionData(db, userId);
+    let classeId = null, classeNomOfficiel = '';
+    for (const [id, cl] of classesMap.entries()) {
+        if (norm(cl.nom).includes(norm(classeNom)) || norm(classeNom).includes(norm(cl.nom))) { classeId = id; classeNomOfficiel = cl.nom; break; }
     }
+    if (!classeId) return `😕 Classe "<strong>${escHtml(classeNom)}</strong>" introuvable.`;
 
-    // Routing direct par patterns
-    for (const p of PATTERNS) {
-        const m = msg.match(p.re);
-        if (m && m[1]?.trim()) {
-            _sessions.delete(userId);
-            try { return await p.fn(m, db, userId); }
-            catch (err) { console.error(err); return '❌ Une erreur est survenue.'; }
+    const evalsClasse = evaluations.filter(ev => ev.classeId === classeId && ev.date);
+    if (evalsClasse.length === 0) return `😕 Aucune évaluation datée pour la classe <strong>${escHtml(classeNomOfficiel)}</strong>.`;
+
+    const byMonth = new Map();
+    evalsClasse.forEach(ev => {
+        const key = ev.date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+        if (!byMonth.has(key)) byMonth.set(key, []);
+        ev.notes.forEach(n => byMonth.get(key).push(n.note));
+    });
+    const points = [];
+    byMonth.forEach((notes, label) => { points.push({ label, moyenne: notes.reduce((a,b) => a+b,0) / notes.length }); });
+
+    const toutesNotes = evalsClasse.flatMap(ev => ev.notes.map(n => n.note));
+    const moyGlobale  = toutesNotes.reduce((a,b) => a+b,0) / toutesNotes.length;
+    const moyVals     = points.map(p => p.moyenne);
+    const tend        = tendanceIcon(moyVals);
+    const spark       = sparkline(moyVals);
+    const best        = [...points].sort((a,b) => b.moyenne - a.moyenne)[0];
+    const worst       = [...points].sort((a,b) => a.moyenne - b.moyenne)[0];
+
+    const elevesClasse = Array.from(elevesMap.values()).filter(e => e.classeId === classeId);
+    const elevesEvo = elevesClasse.map(eleve => {
+        let eleveId = null;
+        for (const [id, el] of elevesMap.entries()) { if (el === eleve) { eleveId = id; break; } }
+        const notesE = evalsClasse.flatMap(ev => { const found = ev.notes.find(n => n.eleveId === eleveId); return found ? [found.note] : []; });
+        const moy    = notesE.length > 0 ? notesE.reduce((a,b) => a+b,0) / notesE.length : null;
+        const t      = notesE.length >= 2 ? tendanceIcon(notesE) : null;
+        return { nom: eleve.nom, moy, tend: t, spark: sparkline(notesE) };
+    }).filter(e => e.moy !== null).sort((a,b) => b.moy - a.moy);
+
+    const topEleves    = elevesEvo.slice(0, 3);
+    const bottomEleves = elevesEvo.slice(-3).reverse();
+
+    return `<div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+  <div style="padding:16px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div><div style="font-weight:700;font-size:16px;color:#0f172a;">📊 Évolution — Classe ${escHtml(classeNomOfficiel)}</div><div style="font-size:12px;color:#64748b;margin-top:2px;">${evalsClasse.length} évaluation(s) · ${points.length} période(s) · ${elevesEvo.length} élève(s)</div></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:30px;background:#f1f5f9;"><span style="font-size:18px;">${tend.icon}</span><span style="font-weight:700;font-size:13px;color:${tend.color};">${tend.label}</span></div>
+  </div>
+  <div style="padding:18px 20px;display:flex;flex-direction:column;gap:18px;">
+    <div style="background:#f8fafc;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:10px;">📈 Tendance générale</div>
+      <div style="font-family:monospace;font-size:22px;letter-spacing:2px;color:#3b82f6;margin-bottom:8px;">${spark}</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:#475569;"><span>Moyenne : <strong style="color:#0f172a;">${moyGlobale.toFixed(2)}/20</strong></span><span>Meilleur mois : <strong style="color:#10b981;">${best.label} (${best.moyenne.toFixed(1)})</strong></span><span>Mois difficile : <strong style="color:#ef4444;">${worst.label} (${worst.moyenne.toFixed(1)})</strong></span></div>
+    </div>
+    <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:10px;">📅 Moyenne par période</div>${renderProgressPoints(points)}</div>
+    ${topEleves.length > 0 ? `<div style="background:linear-gradient(135deg,#f0fdf4,#f8fffe);border-left:4px solid #10b981;border-radius:10px;padding:14px 16px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#059669;margin-bottom:10px;">⭐ Meilleurs élèves</div>${topEleves.map(e => `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #dcfce7;"><span style="font-size:13px;font-weight:600;color:#0f172a;">${escHtml(e.nom)}</span><div style="display:flex;align-items:center;gap:8px;"><span style="font-family:monospace;font-size:13px;color:#10b981;">${e.spark}</span><span style="font-size:12px;font-weight:700;color:#15803d;">${e.moy.toFixed(1)}/20</span>${e.tend ? `<span title="${e.tend.label}">${e.tend.icon}</span>` : ''}</div></div>`).join('')}</div>` : ''}
+    ${bottomEleves.length > 0 ? `<div style="background:linear-gradient(135deg,#fef9f0,#fffbf0);border-left:4px solid #f59e0b;border-radius:10px;padding:14px 16px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#d97706;margin-bottom:10px;">🤝 Élèves à suivre</div>${bottomEleves.map(e => `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #fef3c7;"><span style="font-size:13px;font-weight:600;color:#0f172a;">${escHtml(e.nom)}</span><div style="display:flex;align-items:center;gap:8px;"><span style="font-family:monospace;font-size:13px;color:#f59e0b;">${e.spark}</span><span style="font-size:12px;font-weight:700;color:#92400e;">${e.moy.toFixed(1)}/20</span>${e.tend ? `<span title="${e.tend.label}">${e.tend.icon}</span>` : ''}</div></div>`).join('')}</div>` : ''}
+  </div>
+</div>`;
+}
+
+async function evolutionEleve(db, userId, eleveNom) {
+    const { elevesMap, evaluations } = await fetchEvolutionData(db, userId);
+    let eleveId = null, eleveData = null;
+    for (const [id, el] of elevesMap.entries()) {
+        if (norm(el.nom).includes(norm(eleveNom)) || norm(eleveNom).includes(norm(el.nom).split(' ')[0])) { eleveId = id; eleveData = el; break; }
+    }
+    if (!eleveId) return `😕 Élève "<strong>${escHtml(eleveNom)}</strong>" introuvable.`;
+
+    const notesChronos = [];
+    evaluations.forEach(ev => {
+        const n = ev.notes.find(n => n.eleveId === eleveId);
+        if (n && ev.date) notesChronos.push({ date: ev.date, label: ev.date.toLocaleDateString('fr-FR', { day:'numeric', month:'short' }), note: n.note, matiere: ev.matiere });
+    });
+    if (notesChronos.length === 0) return `😕 Aucune note datée pour <strong>${escHtml(eleveData.nom)}</strong>.`;
+
+    const byMatiere = new Map();
+    notesChronos.forEach(n => { if (!byMatiere.has(n.matiere)) byMatiere.set(n.matiere, []); byMatiere.get(n.matiere).push(n.note); });
+    const matierePoints = [];
+    byMatiere.forEach((notes, matiere) => { matierePoints.push({ label: matiere, moyenne: notes.reduce((a,b) => a+b,0) / notes.length }); });
+
+    const allNotes   = notesChronos.map(n => n.note);
+    const moyGlobale = allNotes.reduce((a,b) => a+b,0) / allNotes.length;
+    const tend       = tendanceIcon(allNotes);
+    const spark      = sparkline(allNotes);
+    const best       = [...notesChronos].sort((a,b) => b.note - a.note)[0];
+    const worst      = [...notesChronos].sort((a,b) => a.note - b.note)[0];
+
+    const byMonth = new Map();
+    notesChronos.forEach(n => { const key = n.date.toLocaleDateString('fr-FR', { month:'short', year:'2-digit' }); if (!byMonth.has(key)) byMonth.set(key, []); byMonth.get(key).push(n.note); });
+    const chronoPoints = [];
+    byMonth.forEach((notes, label) => { chronoPoints.push({ label, moyenne: notes.reduce((a,b) => a+b,0) / notes.length }); });
+
+    return `<div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+  <div style="padding:16px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div><div style="font-weight:700;font-size:16px;color:#0f172a;">🎓 Évolution — ${escHtml(eleveData.nom)}</div><div style="font-size:12px;color:#64748b;margin-top:2px;">Classe ${escHtml(eleveData.classeNom)} · ${notesChronos.length} note(s) · ${byMatiere.size} matière(s)</div></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:30px;background:#f1f5f9;"><span style="font-size:18px;">${tend.icon}</span><span style="font-weight:700;font-size:13px;color:${tend.color};">${tend.label}</span></div>
+  </div>
+  <div style="padding:18px 20px;display:flex;flex-direction:column;gap:18px;">
+    <div style="background:#f8fafc;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:10px;">📈 Courbe de progression</div>
+      <div style="font-family:monospace;font-size:22px;letter-spacing:2px;color:#3b82f6;margin-bottom:8px;">${spark}</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:#475569;"><span>Moyenne : <strong style="color:#0f172a;">${moyGlobale.toFixed(2)}/20</strong></span><span>Meilleure note : <strong style="color:#10b981;">${best.note}/20 en ${best.matiere}</strong></span><span>Note la plus basse : <strong style="color:#ef4444;">${worst.note}/20 en ${worst.matiere}</strong></span></div>
+    </div>
+    <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:10px;">📅 Moyenne par mois</div>${renderProgressPoints(chronoPoints)}</div>
+    <div style="background:linear-gradient(135deg,#eff6ff,#f8faff);border-left:4px solid #3b82f6;border-radius:10px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#2563eb;margin-bottom:10px;">📚 Performance par matière</div>
+      ${renderProgressPoints(matierePoints.sort((a,b) => b.moyenne - a.moyenne))}
+    </div>
+  </div>
+</div>`;
+}
+
+async function evolutionProfesseur(db, userId, profNom) {
+    const { classesMap, evaluations } = await fetchEvolutionData(db, userId);
+    const profEvals = evaluations.filter(ev => ev.professeurNom && norm(ev.professeurNom).includes(norm(profNom)));
+    if (profEvals.length === 0) return `😕 Professeur "<strong>${escHtml(profNom)}</strong>" introuvable.`;
+
+    const profNomOfficiel = profEvals[0].professeurNom;
+    const byMonth = new Map();
+    profEvals.forEach(ev => { if (!ev.date) return; const key = ev.date.toLocaleDateString('fr-FR', { month:'short', year:'2-digit' }); if (!byMonth.has(key)) byMonth.set(key, []); ev.notes.forEach(n => byMonth.get(key).push(n.note)); });
+    const points = [];
+    byMonth.forEach((notes, label) => { points.push({ label, moyenne: notes.reduce((a,b) => a+b,0) / notes.length }); });
+
+    const byMatiere = new Map();
+    profEvals.forEach(ev => { if (!byMatiere.has(ev.matiere)) byMatiere.set(ev.matiere, []); ev.notes.forEach(n => byMatiere.get(ev.matiere).push(n.note)); });
+    const matierePoints = [];
+    byMatiere.forEach((notes, matiere) => { matierePoints.push({ label: matiere, moyenne: notes.reduce((a,b) => a+b,0) / notes.length }); });
+
+    const byClasse = new Map();
+    profEvals.forEach(ev => { const nom = classesMap.get(ev.classeId)?.nom || 'Inconnue'; if (!byClasse.has(nom)) byClasse.set(nom, []); ev.notes.forEach(n => byClasse.get(nom).push(n.note)); });
+    const classePoints = [];
+    byClasse.forEach((notes, classe) => { classePoints.push({ label: classe, moyenne: notes.reduce((a,b) => a+b,0) / notes.length }); });
+
+    const allNotes   = profEvals.flatMap(ev => ev.notes.map(n => n.note));
+    const moyGlobale = allNotes.reduce((a,b) => a+b,0) / allNotes.length;
+    const tend       = tendanceIcon(points.map(p => p.moyenne));
+    const spark      = sparkline(points.map(p => p.moyenne));
+
+    return `<div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+  <div style="padding:16px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div><div style="font-weight:700;font-size:16px;color:#0f172a;">👨‍🏫 Évolution — ${escHtml(profNomOfficiel)}</div><div style="font-size:12px;color:#64748b;margin-top:2px;">${profEvals.length} évaluation(s) · ${byClasse.size} classe(s) · ${byMatiere.size} matière(s)</div></div>
+    <div style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:30px;background:#f1f5f9;"><span style="font-size:18px;">${tend.icon}</span><span style="font-weight:700;font-size:13px;color:${tend.color};">${tend.label}</span></div>
+  </div>
+  <div style="padding:18px 20px;display:flex;flex-direction:column;gap:18px;">
+    <div style="background:#f8fafc;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:10px;">📈 Tendance globale</div>
+      <div style="font-family:monospace;font-size:22px;letter-spacing:2px;color:#3b82f6;margin-bottom:8px;">${spark}</div>
+      <div style="font-size:13px;color:#475569;">Moyenne globale : <strong style="color:#0f172a;">${moyGlobale.toFixed(2)}/20</strong></div>
+    </div>
+    <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;margin-bottom:10px;">📅 Moyenne par période</div>${renderProgressPoints(points)}</div>
+    <div style="background:linear-gradient(135deg,#eff6ff,#f8faff);border-left:4px solid #3b82f6;border-radius:10px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#2563eb;margin-bottom:10px;">🏫 Performance par classe</div>${renderProgressPoints(classePoints.sort((a,b) => b.moyenne - a.moyenne))}
+    </div>
+    ${matierePoints.length > 1 ? `<div style="background:linear-gradient(135deg,#f0fdf4,#f8fffe);border-left:4px solid #10b981;border-radius:10px;padding:14px 16px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#059669;margin-bottom:10px;">📚 Performance par matière</div>${renderProgressPoints(matierePoints.sort((a,b) => b.moyenne - a.moyenne))}</div>` : ''}
+  </div>
+</div>`;
+}
+
+export async function handleEvolution(db, userId, type, name) {
+    if (!userId) return '❌ Utilisateur non connecté.';
+    if (!name || !name.trim()) return `❓ Précisez un nom. Ex : <em>evolution classe 5eA</em> · <em>evolution eleve Moussa</em> · <em>evolution prof Diop</em>`;
+    try {
+        switch (type) {
+            case 'classe':     return await evolutionClasse(db, userId, name);
+            case 'eleve':      return await evolutionEleve(db, userId, name);
+            case 'professeur': return await evolutionProfesseur(db, userId, name);
+            default:           return `❓ Type non reconnu. Utilisez : classe, eleve ou prof.`;
         }
+    } catch (err) {
+        console.error('handleEvolution error:', err);
+        return `❌ Erreur : ${err.message}`;
     }
-
-    // Menu interactif — session en cours
-    const session = _sessions.get(userId);
-
-    // Disambiguation homonymes
-    if (session?.waitingFor === 'eleve_choice') {
-        const idx = parseInt(msg, 10) - 1;
-        if (isNaN(idx) || idx < 0 || idx >= session.homonymes.length)
-            return `❌ Tapez un numéro entre 1 et ${session.homonymes.length} (ou "annuler").`;
-        const eleveChoisi = session.homonymes[idx];
-        const action      = session.action;
-        _sessions.delete(userId);
-        try {
-            if (action === 'bulletin') return await handleBulletin(db, '', userId, eleveChoisi);
-            if (action === 'rapport')  return await handleRapportEleve(db, '', userId, eleveChoisi);
-        } catch (err) { console.error(err); return '❌ Une erreur est survenue.'; }
-    }
-
-    if (session?.waitingFor === 'name') {
-        _sessions.delete(userId);
-        try {
-            switch (session.choice) {
-                case 1: return await handleBulletin(db, msg, userId);
-                case 2: return await handleProfesseur(db, msg, userId);
-                case 3: return await handleRapportClasse(db, msg, userId);
-                case 4: return await handleRapportEleve(db, msg, userId);
-            }
-        } catch (err) { console.error(err); return '❌ Une erreur est survenue.'; }
-    }
-
-    if (session?.waitingFor === 'choice') {
-        const choice = parseInt(msg, 10);
-        if (isNaN(choice) || choice < 1 || choice > 4)
-            return '❌ Tapez 1, 2, 3 ou 4 (ou "annuler").';
-        _sessions.set(userId, { waitingFor: 'name', choice });
-        return `📝 ${['Nom de l\'élève :', 'Nom du professeur :', 'Nom de la classe :', 'Nom de l\'élève :'][choice - 1]}`;
-    }
-
-    // Nouveau menu
-    _sessions.set(userId, { waitingFor: 'choice' });
-    return `❓ Commande non reconnue. Choisissez :
-
-1️⃣ Bulletin de notes d'un élève
-2️⃣ Bilan d'un professeur
-3️⃣ Rapport d'une classe
-4️⃣ Rapport pédagogique d'un élève
-
-Tapez 1, 2, 3 ou 4 — ou <code>aide</code> pour toutes les commandes.`;
 }
