@@ -179,3 +179,4 @@ export async function getSubscriptionInfo(uid) {
         return null;
     }
 }
+
