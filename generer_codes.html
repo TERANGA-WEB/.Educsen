@@ -1,481 +1,336 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<link rel="icon" href="/images/icon-192x192.png" type="image/png">
+    <meta charset="UTF-8">
+    <link rel="icon" href="/images/icon-192x192.png" type="image/png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edusen · Saisie des notes — Professeur</title>
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-    --blue:#2563eb;--blue-l:#3b82f6;--blue-soft:#eff6ff;--blue-mid:#dbeafe;
-    --green:#059669;--green-soft:#f0fdf4;--green-mid:#bbf7d0;
-    --amber:#d97706;--amber-mid:#fde68a;--red:#dc2626;--red-soft:#fef2f2;
-    --surface:#f1f5f9;--white:#fff;--ink:#0f172a;--ink2:#334155;--ink3:#64748b;
-    --border:#e2e8f0;--border2:#cbd5e1;
-    --grad:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
-    --grad-g:linear-gradient(135deg,#059669 0%,#10b981 100%);
-    --t:all 0.2s ease;--r:14px;--rl:20px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+    <title>Educsen | Admin — Générateur de codes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --border: #334155;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { font-size: 1.4rem; margin-bottom: 4px; }
+        .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+        .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 18px; color: #93c5fd; }
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+        .form-group { flex: 1; min-width: 160px; }
+        label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:5px; }
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--text);
+            font-size: 0.875rem;
+            font-family: inherit;
+            outline: none;
+        }
+        select:focus, input:focus { border-color: var(--primary); }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; font-size:0.75rem; padding:6px 12px; }
 
-/* TOPBAR */
-.topbar{background:var(--white);border-bottom:1px solid var(--border);height:62px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);}
-.lm{width:34px;height:34px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;}
-.ln{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;}
-.ln em{color:var(--blue-l);font-style:normal;}
-.tbadge{display:inline-flex;align-items:center;gap:.5rem;background:#fef9c3;border:1px solid var(--amber-mid);border-radius:20px;padding:.3rem .9rem;font-size:.75rem;font-weight:800;color:#78350f;}
+        /* Table codes */
+        .codes-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        .codes-table th {
+            text-align: left; font-size: 0.75rem; color: var(--muted);
+            padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 500;
+        }
+        .codes-table td {
+            padding: 10px 10px; font-size: 0.82rem; border-bottom: 1px solid rgba(51,65,85,0.5);
+        }
+        .code-badge {
+            font-family: monospace; font-size: 0.9rem; font-weight: 700;
+            color: #60a5fa; letter-spacing: 0.05em;
+        }
+        .badge {
+            padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+        }
+        .badge-actif    { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-utilise  { background: rgba(148,163,184,0.15); color: var(--muted); border: 1px solid var(--border); }
+        .badge-mensuel  { background: rgba(59,130,246,0.15); color: #93c5fd; }
+        .badge-annuel   { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+        .badge-trimestriel { background: rgba(245,158,11,0.15); color: #fcd34d; }
 
-/* PAGE */
-.page{flex:1;max-width:720px;margin:0 auto;padding:2rem 1.5rem 4rem;width:100%;}
+        .empty-state { text-align: center; padding: 32px; color: var(--muted); font-size: 0.85rem; }
+        .alert {
+            padding: 10px 14px; border-radius: 7px; font-size: 0.83rem; margin-top: 12px;
+            display:none; align-items:center; gap:8px;
+        }
+        .alert.show { display: flex; }
+        .alert-success { background: rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#6ee7b7; }
+        .alert-error   { background: rgba(239,68,68,0.12);  border:1px solid rgba(239,68,68,0.3);  color:#fca5a5; }
 
-/* STATES */
-#stLoad{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;padding:3rem;}
-.spin{width:52px;height:52px;border:5px solid var(--border);border-top-color:var(--blue-l);border-radius:50%;animation:sp .9s linear infinite;}
-@keyframes sp{to{transform:rotate(360deg)}}
-.sptxt{font-size:.95rem;color:var(--ink3);font-weight:600;}
-#stErr{display:none;flex:1;align-items:center;justify-content:center;padding:2rem;}
-#stOk{display:none;flex:1;align-items:center;justify-content:center;padding:2rem;}
-.state-card{background:var(--white);border-radius:var(--rl);padding:3rem 2.5rem;max-width:460px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.08);}
-.sc-icon{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.4rem;}
-.sc-icon.err{background:var(--red-soft);border:2px solid #fecaca;color:var(--red);}
-.sc-icon.ok{background:var(--green-soft);border:2px solid var(--green-mid);color:var(--green);animation:pop .4s ease;}
-@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-.sc-title{font-size:1.4rem;font-weight:800;color:var(--ink);margin-bottom:.7rem;}
-.sc-sub{font-size:.9rem;color:var(--ink3);line-height:1.6;}
-.ok-badge{display:inline-flex;align-items:center;gap:.5rem;background:#dcfce7;color:#14532d;border:1px solid var(--green-mid);border-radius:20px;padding:.4rem 1rem;font-size:.82rem;font-weight:800;margin-top:1.2rem;}
-
-/* MAIN */
-#stMain{display:none;flex-direction:column;flex:1;}
-
-.ctx-banner{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.3rem 1.5rem;margin-bottom:1.4rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.05);}
-.ctx-icon{width:44px;height:44px;background:var(--blue-soft);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:1.1rem;flex-shrink:0;}
-.ctx-info{flex:1;}
-.ctx-classe{font-size:1rem;font-weight:800;color:var(--ink);}
-.ctx-meta{font-size:.8rem;color:var(--ink3);margin-top:.2rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
-.ctx-tag{background:var(--blue-soft);color:var(--blue);border-radius:6px;padding:.15rem .55rem;font-size:.72rem;font-weight:800;}
-.ctx-warn{background:#fef9c3;border:1px solid var(--amber-mid);border-radius:10px;padding:.55rem 1rem;font-size:.76rem;font-weight:700;color:#78350f;display:flex;align-items:center;gap:.45rem;flex-shrink:0;}
-
-/* SAISIE CARD */
-.card{background:var(--white);border-radius:var(--rl);border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,.07);overflow:hidden;}
-.ch{padding:1.4rem 1.8rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.9rem;}
-.ci{width:40px;height:40px;background:var(--blue-soft);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--blue);}
-.ctit{font-size:1.05rem;font-weight:800;color:var(--ink);}
-.csub{font-size:.78rem;color:var(--ink3);margin-top:.15rem;}
-.cb{padding:1.5rem 1.8rem;}
-
-/* PROGRESS */
-.prog{height:5px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.4rem;}
-.pf{height:100%;background:var(--grad);border-radius:10px;transition:width .3s;}
-.prog-info{display:flex;justify-content:space-between;font-size:.78rem;color:var(--ink3);font-weight:600;margin-bottom:.5rem;}
-
-/* TABLE DES NOTES */
-.nt{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;}
-.nth{display:grid;grid-template-columns:38px 1fr 1fr 108px 80px;padding:.6rem 1.1rem;background:var(--surface);border-bottom:1px solid var(--border);}
-.nthc{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);}
-.nrs{max-height:500px;overflow-y:auto;}
-.nr{display:grid;grid-template-columns:38px 1fr 1fr 108px 80px;align-items:center;padding:.55rem 1.1rem;border-bottom:1px solid var(--border);transition:var(--t);}
-.nr:last-child{border-bottom:none;}
-.nr:hover{background:#f8fafc;}
-.nr.abs{opacity:.4;}
-.nr.abs .ni{pointer-events:none;}
-.nn{width:28px;height:28px;background:var(--blue-mid);color:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:800;}
-.nnm{font-size:.9rem;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:.4rem;}
-.nprn{font-size:.86rem;font-weight:500;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ni{width:86px;padding:.48rem .6rem;border:1.5px solid var(--border);border-radius:9px;font-size:.95rem;font-weight:800;text-align:center;font-family:inherit;color:var(--ink);background:#fff;outline:none;transition:var(--t);}
-.ni:focus{border-color:var(--blue-l);box-shadow:0 0 0 3px rgba(59,130,246,.1);}
-.ni.vok{border-color:var(--green);background:var(--green-soft);}
-.ni.verr{border-color:var(--red);background:var(--red-soft);}
-.al{display:flex;align-items:center;gap:.35rem;font-size:.74rem;font-weight:700;color:var(--ink3);cursor:pointer;}
-.al input{accent-color:var(--amber);cursor:pointer;}
-.stats-bar{display:flex;gap:1.4rem;padding:.75rem 1.1rem;background:var(--surface);border-top:1px solid var(--border);flex-wrap:wrap;}
-.stat{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--ink3);}
-.stat strong{font-weight:800;color:var(--ink);}
-
-/* FOOTER */
-.cf{padding:1.2rem 1.8rem;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
-.btn-g{background:var(--grad-g);color:#fff;border:none;padding:.85rem 2.5rem;border-radius:11px;font-weight:800;font-size:.95rem;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:.6rem;transition:var(--t);box-shadow:0 4px 14px rgba(5,150,105,.3);}
-.btn-g:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(5,150,105,.38);}
-.btn-g:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-.ft-info{font-size:.76rem;color:var(--ink3);font-style:italic;line-height:1.4;}
-
-/* CONFIRM OVERLAY */
-.overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(5px);padding:1rem;}
-.overlay.open{display:flex;}
-.confirm-box{background:#fff;border-radius:var(--rl);padding:2.5rem;max-width:440px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.2);text-align:center;}
-.cicon{width:60px;height:60px;border-radius:50%;background:#fef9c3;border:2px solid var(--amber-mid);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--amber);margin:0 auto 1.3rem;}
-.ctit{font-size:1.25rem;font-weight:800;color:var(--ink);margin-bottom:.6rem;}
-.csub{font-size:.88rem;color:var(--ink3);line-height:1.6;margin-bottom:1.5rem;}
-.c-sum{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.2rem;text-align:left;font-size:.84rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:.5rem;}
-.c-row{display:flex;justify-content:space-between;}
-.c-lbl{color:var(--ink3);}
-.c-val{font-weight:800;color:var(--ink);}
-.c-btns{display:flex;gap:.8rem;justify-content:center;}
-.btn-cancel{background:var(--surface);color:var(--ink2);border:1px solid var(--border);padding:.7rem 1.6rem;border-radius:10px;font-weight:700;font-size:.88rem;font-family:inherit;cursor:pointer;transition:var(--t);}
-.btn-cancel:hover{background:var(--border);}
-.btn-confirm{background:var(--grad-g);color:#fff;border:none;padding:.7rem 2rem;border-radius:10px;font-weight:800;font-size:.88rem;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;transition:var(--t);}
-.btn-confirm:disabled{opacity:.6;cursor:not-allowed;}
-
-@media(max-width:580px){
-    .topbar{padding:0 1rem;}.tbadge{display:none;}
-    .page{padding:1.2rem .8rem 3rem;}
-    .nth,.nr{grid-template-columns:32px 1fr 88px 68px;}.nthc:nth-child(3),.nprn{display:none;}
-    .ch,.cb,.cf{padding:1rem;}
-    .ctx-banner{flex-direction:column;align-items:flex-start;}
-}
-</style>
+        .instructions {
+            background: rgba(245,158,11,0.07);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .instructions h3 { color: #fcd34d; font-size:0.85rem; margin-bottom:8px; }
+        .instructions ol { margin-left: 18px; }
+        .instructions li { font-size: 0.8rem; color: var(--muted); margin-bottom:4px; line-height:1.5; }
+        .instructions code { background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius:3px; font-size:0.78rem; color:#93c5fd; }
+    </style>
 </head>
 <body>
-
-<!-- TOPBAR -->
-<div class="topbar">
-    <a href="#" class="logo" onclick="return false">
-        <div class="lm"><i class="fas fa-chart-line"></i></div>
-        <div class="ln">Edu<em>sen</em></div>
-    </a>
-    <div class="tbadge"><i class="fas fa-exclamation-triangle"></i> Lien usage unique</div>
-</div>
-
-<!-- ÉTAT : CHARGEMENT -->
-<div id="stLoad" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;padding:3rem;">
-    <div class="spin"></div>
-    <div class="sptxt">Vérification du lien…</div>
-</div>
-
-<!-- ÉTAT : ERREUR -->
-<div id="stErr" style="display:none;flex:1;align-items:center;justify-content:center;padding:2rem;">
-    <div class="state-card">
-        <div class="sc-icon err"><i class="fas fa-ban"></i></div>
-        <div class="sc-title" id="errTitle">Lien invalide</div>
-        <div class="sc-sub" id="errDesc">Ce lien est invalide ou a déjà été utilisé.</div>
+<div class="container">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;">E</div>
+        <h1>Admin — Générateur de codes</h1>
     </div>
-</div>
+    <div class="subtitle">Outil réservé à l'administrateur Educsen. Ne pas partager cette page.</div>
 
-<!-- ÉTAT : SUCCÈS FINAL -->
-<div id="stOk" style="display:none;flex:1;align-items:center;justify-content:center;padding:2rem;">
-    <div class="state-card">
-        <div class="sc-icon ok"><i class="fas fa-check"></i></div>
-        <div class="sc-title">Notes enregistrées !</div>
-        <div class="sc-sub">Les notes ont été sauvegardées dans le système Edusen.<br>Ce lien est maintenant désactivé.</div>
-        <div class="ok-badge"><i class="fas fa-lock"></i> Lien désactivé — usage unique</div>
+    <!-- Instructions EmailJS -->
+    <div class="instructions">
+        <h3><i class="fas fa-info-circle"></i> Configuration EmailJS (à faire une fois)</h3>
+        <ol>
+            <li>Créer un compte sur <strong>emailjs.com</strong> (gratuit jusqu'à 200 emails/mois)</li>
+            <li>Créer un <strong>Service</strong> (ex: Gmail) → noter le <code>Service ID</code></li>
+            <li>Créer un <strong>Template</strong> avec les variables : <code>from_name</code>, <code>from_email</code>, <code>ecole</code>, <code>plan</code>, <code>montant</code>, <code>reference</code>, <code>message</code>, <code>date</code></li>
+            <li>Dans <code>abonnement.html</code>, remplacer <code>EMAILJS_SERVICE_ID</code>, <code>EMAILJS_TEMPLATE_ID</code>, <code>EMAILJS_PUBLIC_KEY</code></li>
+            <li>Dans <code>subscription.js</code>, ajouter l'import dans chaque page protégée (voir commentaire en haut du fichier)</li>
+        </ol>
     </div>
-</div>
 
-<!-- ÉTAT : FORMULAIRE PROF -->
-<div id="stMain" style="display:none;flex-direction:column;flex:1;">
-    <div class="page">
-
-        <!-- Contexte -->
-        <div class="ctx-banner">
-            <div class="ctx-icon"><i class="fas fa-graduation-cap"></i></div>
-            <div class="ctx-info">
-                <div class="ctx-classe" id="ctxClasse">—</div>
-                <div class="ctx-meta">
-                    <span id="ctxMat">—</span>
-                    <span class="ctx-tag" id="ctxType">—</span>
-                    <span id="ctxDate" style="color:var(--ink3)">—</span>
-                </div>
+    <!-- Générateur -->
+    <div class="card">
+        <h2><i class="fas fa-key"></i> Générer de nouveaux codes</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Plan</label>
+                <select id="gen-plan">
+                    <option value="mensuel">Mensuel (30 jours)</option>
+                    <option value="trimestriel">Trimestriel (90 jours)</option>
+                    <option value="annuel" selected>Annuel (365 jours)</option>
+                </select>
             </div>
-            <div class="ctx-warn"><i class="fas fa-exclamation-triangle"></i> Usage unique</div>
+            <div class="form-group">
+                <label>Nombre de codes</label>
+                <input type="number" id="gen-count" value="1" min="1" max="20">
+            </div>
         </div>
+        <button class="btn btn-primary" onclick="genererCodes()">
+            <i class="fas fa-magic"></i> Générer et enregistrer dans Firestore
+        </button>
+        <div class="alert" id="alert-gen"></div>
+    </div>
 
-        <!-- Card saisie -->
-        <div class="card">
-            <div class="ch">
-                <div class="ci"><i class="fas fa-pencil-alt"></i></div>
-                <div>
-                    <div class="ctit">Saisie des notes</div>
-                    <div class="csub" id="nbElvSubtitle">— élèves</div>
-                </div>
-            </div>
-            <div class="cb">
-                <div class="prog-info">
-                    <span>Progression</span>
-                    <span id="progTxt">0 / 0</span>
-                </div>
-                <div class="prog"><div class="pf" id="pf" style="width:0%"></div></div>
-
-                <div class="nt">
-                    <div class="nth">
-                        <span class="nthc">#</span>
-                        <span class="nthc">Nom</span>
-                        <span class="nthc">Prénom</span>
-                        <span class="nthc">Note /20</span>
-                        <span class="nthc">Absent</span>
-                    </div>
-                    <div class="nrs" id="nrs"></div>
-                    <div class="stats-bar">
-                        <div class="stat"><i class="fas fa-check-circle" style="color:var(--green)"></i><strong id="stOkN">0</strong> notes</div>
-                        <div class="stat"><i class="fas fa-user-slash" style="color:var(--amber)"></i><strong id="stAbsN">0</strong> absents</div>
-                        <div class="stat"><i class="fas fa-clock" style="color:var(--border2)"></i><strong id="stPendN">0</strong> restantes</div>
-                        <div class="stat" style="margin-left:auto"><i class="fas fa-calculator" style="color:var(--blue)"></i>Moy. <strong id="stMoyN">—</strong></div>
-                    </div>
-                </div>
-            </div>
-            <div class="cf">
-                <div class="ft-info">
-                    Toutes les notes doivent être saisies.<br>
-                    La validation est <strong>irréversible</strong>.
-                </div>
-                <button class="btn-g" id="btnValider" disabled>
-                    <i class="fas fa-check-circle"></i> Valider et soumettre
-                </button>
-            </div>
+    <!-- Liste des codes -->
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <h2 style="margin:0"><i class="fas fa-list"></i> Codes enregistrés</h2>
+            <button class="btn btn-primary" style="padding:7px 14px;font-size:0.8rem" onclick="chargerCodes()">
+                <i class="fas fa-sync-alt"></i> Rafraîchir
+            </button>
+        </div>
+        <div id="codes-container">
+            <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>
         </div>
     </div>
 </div>
 
-<!-- CONFIRMATION -->
-<div class="overlay" id="overlay">
-    <div class="confirm-box">
-        <div class="cicon"><i class="fas fa-paper-plane"></i></div>
-        <div class="ctit">Confirmer la soumission</div>
-        <div class="csub">Cette action est <strong>irréversible</strong>. Le lien sera désactivé après validation.</div>
-        <div class="c-sum" id="cSum"></div>
-        <div class="c-btns">
-            <button class="btn-cancel" onclick="closeConfirm()">Annuler</button>
-            <button class="btn-confirm" id="btnConfirm"><i class="fas fa-check"></i> Confirmer</button>
-        </div>
-    </div>
-</div>
-
-<script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js","firebase/auth":"https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js","firebase/firestore":"https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"}}</script>
 <script type="module">
-import{initializeApp}from'firebase/app';
-import{getAuth,signInAnonymously,onAuthStateChanged}from'firebase/auth';
-import{getFirestore,doc,getDoc,collection,addDoc,writeBatch,serverTimestamp,updateDoc,Timestamp}from'firebase/firestore';
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, orderBy, query, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-const cfg={apiKey:"AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",authDomain:"real-educsen.firebaseapp.com",projectId:"real-educsen",storageBucket:"real-educsen.firebasestorage.app",messagingSenderId:"80660233362",appId:"1:80660233362:web:5edf5060254170056eba4b"};
-const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+const firebaseConfig = {
+    apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+    authDomain: "real-educsen.firebaseapp.com",
+    projectId: "real-educsen",
+    storageBucket: "real-educsen.firebasestorage.app",
+    messagingSenderId: "80660233362",
+    appId: "1:80660233362:web:5edf5060254170056eba4b"
+};
 
-/* STATE */
-let token=null,tData=null,eleves=[],nst={};
+const DUREES = { mensuel: 30, trimestriel: 90, annuel: 365 };
 
-const $=id=>document.getElementById(id);
+const app  = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const db   = getFirestore(app);
+const auth = getAuth(app);
 
-function showState(s){
-    $('stLoad').style.display='none';
-    $('stErr').style.display='none';
-    $('stOk').style.display='none';
-    $('stMain').style.display='none';
-    if(s==='load')$('stLoad').style.display='flex';
-    if(s==='err') $('stErr').style.display='flex';
-    if(s==='ok')  $('stOk').style.display='flex';
-    if(s==='main')$('stMain').style.display='flex';
-}
+// ── Attendre que l'utilisateur soit connecté avant de charger ─────────────────
+document.getElementById("codes-container").innerHTML =
+    '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Vérification de l\'authentification…</div>';
 
-function showErr(title,desc){$('errTitle').textContent=title;$('errDesc').textContent=desc;showState('err');}
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        // Afficher un formulaire de connexion inline
+        document.getElementById("codes-container").innerHTML = `
+            <div style="padding:24px;text-align:center">
+                <p style="color:#fca5a5;margin-bottom:16px;font-size:0.85rem">
+                    <i class="fas fa-lock"></i> Vous devez être connecté pour accéder à cet outil.
+                </p>
+                <input type="email" id="login-email" placeholder="Email admin" 
+                    style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+                    border-radius:7px;color:var(--text);font-size:0.875rem;margin-bottom:8px;outline:none;">
+                <input type="password" id="login-password" placeholder="Mot de passe" 
+                    style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+                    border-radius:7px;color:var(--text);font-size:0.875rem;margin-bottom:12px;outline:none;">
+                <button onclick="connexionAdmin()" 
+                    style="background:var(--primary);color:white;border:none;border-radius:7px;
+                    padding:10px 24px;font-size:0.875rem;font-weight:600;cursor:pointer;width:100%">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                </button>
+                <div id="login-error" style="color:#fca5a5;font-size:0.8rem;margin-top:10px;display:none"></div>
+            </div>`;
 
-/* INIT */
-async function init(){
-    showState('load');
-    const params=new URLSearchParams(location.search);
-    token=params.get('token');
-    if(!token){showErr('Lien invalide','Aucun token trouvé dans l\'URL. Vérifiez que le lien est complet.');return;}
-
-    /* Auth anonyme avec timeout de 10 secondes */
-    try{
-        await Promise.race([
-            (async()=>{
-                await signInAnonymously(auth);
-                await new Promise((resolve,reject)=>{
-                    const unsub=auth.onAuthStateChanged(user=>{
-                        unsub();
-                        if(user)resolve(user);
-                        else reject(new Error('Auth null'));
-                    });
-                });
-            })(),
-            new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),10000))
-        ]);
-    }catch(e){
-        console.error('Auth anon failed:',e);
-        const isTimeout=e.message==='timeout';
-        showErr(
-            isTimeout?'Connexion trop lente':'Erreur d\'accès',
-            isTimeout
-                ?'Le service met trop de temps à répondre. Vérifiez votre connexion et rechargez la page.'
-                :'Impossible d\'accéder au service. Assurez-vous que la connexion anonyme est activée sur Firebase.'
-        );
-        return;
+        window.connexionAdmin = async function() {
+            const email    = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                const errEl = document.getElementById("login-error");
+                errEl.textContent = "Email ou mot de passe incorrect.";
+                errEl.style.display = "block";
+            }
+        };
+    } else {
+        // Connecté → charger les codes
+        chargerCodes();
     }
+});
 
-    try{
-        const snap=await getDoc(doc(db,'saisie_tokens',token));
-        if(!snap.exists()){showErr('Lien introuvable','Ce lien n\'existe pas. Contactez l\'administrateur.');return;}
-        tData=snap.data();
-        if(tData.used){showErr('Lien déjà utilisé',`Ce lien a déjà été utilisé pour "${tData.matiereNom}" — ${tData.nomClasse}. Les notes ont été enregistrées.`);return;}
-        if(!tData.eleves||tData.eleves.length===0){showErr('Classe non prête','La liste des élèves n\'est pas encore disponible. Contactez l\'administrateur.');return;}
-
-        eleves=tData.eleves;
-        renderContext();
-        buildTable();
-        showState('main');
-    }catch(e){
-        console.error(e);
-        const isPerms=e?.code==='permission-denied';
-        showErr(
-            isPerms?'Accès refusé':'Erreur de connexion',
-            isPerms
-                ?'Les règles de sécurité Firestore bloquent l\'accès. Contactez l\'administrateur.'
-                :'Impossible de vérifier ce lien. Vérifiez votre connexion et réessayez.'
-        );
-    }
+// Génère un code du format EDU-XXXX-XXXX
+function genererCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const seg   = (n) => Array.from({length:n}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    return `EDU-${seg(4)}-${seg(4)}`;
 }
 
-/* RENDER CONTEXT */
-function renderContext(){
-    $('ctxClasse').textContent=tData.nomClasse||'—';
-    $('ctxMat').textContent=tData.matiereNom||'—';
-    const validTypes=['Devoir','Examen'];
-    const typeVal=validTypes.includes(tData.type)?tData.type:'Devoir';
-    $('ctxType').textContent=typeVal;
-    $('nbElvSubtitle').textContent=`${eleves.length} élève(s)`;
+window.genererCodes = async function() {
+    const plan  = document.getElementById("gen-plan").value;
+    const count = parseInt(document.getElementById("gen-count").value) || 1;
+    const codesRef = collection(db, "codes_renouvellement");
+    const codesGeneres = [];
 
-    // Date
-    let dateStr='—';
-    if(tData.date){
-        const d=tData.date.toDate?tData.date.toDate():new Date(tData.date.seconds*1000);
-        dateStr=d.toLocaleDateString('fr-FR');
-    }
-    $('ctxDate').textContent=dateStr;
-    document.title=`Edusen · ${tData.matiereNom} — ${tData.nomClasse}`;
-}
-
-/* BUILD TABLE */
-function buildTable(){
-    const cont=$('nrs');cont.innerHTML='';nst={};
-    eleves.forEach((el,i)=>{
-        nst[el.id]={note:null,absent:false};
-        const row=document.createElement('div');
-        row.className='nr';row.id=`nr-${el.id}`;
-        row.innerHTML=`
-            <div class="nn">${i+1}</div>
-            <div class="nnm">${el.nom}</div>
-            <div class="nprn">${el.prenom}</div>
-            <input class="ni" id="ni-${el.id}" type="number" min="0" max="20" step="0.25" placeholder="—">
-            <label class="al"><input type="checkbox" id="ab-${el.id}"> Absent</label>
-        `;
-        cont.appendChild(row);
-        const inp=$(`ni-${el.id}`),chk=$(`ab-${el.id}`);
-        inp.addEventListener('input',e=>{
-            const v=parseFloat(e.target.value);
-            if(e.target.value===''){nst[el.id].note=null;inp.className='ni';}
-            else if(isNaN(v)||v<0||v>20){nst[el.id].note=null;inp.className='ni verr';}
-            else{nst[el.id].note=v;inp.className='ni vok';}
-            refreshStats();
-        });
-        chk.addEventListener('change',e=>{
-            nst[el.id].absent=e.target.checked;
-            const r=$(`nr-${el.id}`);
-            if(e.target.checked){r.classList.add('abs');inp.disabled=true;inp.value='';inp.className='ni';nst[el.id].note=null;}
-            else{r.classList.remove('abs');inp.disabled=false;}
-            refreshStats();
-        });
-    });
-    refreshStats();
-}
-
-/* STATS */
-function refreshStats(){
-    const total=eleves.length;let ok=0,abs=0,sum=0,cnt=0;
-    eleves.forEach(e=>{const s=nst[e.id];if(s.absent)abs++;else if(s.note!==null){ok++;sum+=s.note;cnt++;}});
-    const pend=total-ok-abs,pct=total>0?Math.round(((ok+abs)/total)*100):0;
-    $('stOkN').textContent=ok;$('stAbsN').textContent=abs;$('stPendN').textContent=pend;
-    $('stMoyN').textContent=cnt>0?(sum/cnt).toFixed(2)+'/20':'—';
-    $('pf').style.width=pct+'%';
-    $('progTxt').textContent=`${ok+abs} / ${total}`;
-    $('btnValider').disabled=pend>0;
-}
-
-/* CONFIRM DIALOG */
-function openConfirm(){
-    const total=eleves.length;let ok=0,abs=0,sum=0,cnt=0;
-    eleves.forEach(e=>{const s=nst[e.id];if(s.absent)abs++;else if(s.note!==null){ok++;sum+=s.note;cnt++;}});
-    const moy=cnt>0?(sum/cnt).toFixed(2)+'/20':'N/A';
-    $('cSum').innerHTML=`
-        <div class="c-row"><span class="c-lbl">Classe</span><span class="c-val">${tData.nomClasse}</span></div>
-        <div class="c-row"><span class="c-lbl">Matière</span><span class="c-val">${tData.matiereNom}</span></div>
-        <div class="c-row"><span class="c-lbl">Type</span><span class="c-val">${['Devoir','Examen'].includes(tData.type)?tData.type:'Devoir'}</span></div>
-        <div class="c-row"><span class="c-lbl">Élèves notés</span><span class="c-val">${ok} / ${total}</span></div>
-        <div class="c-row"><span class="c-lbl">Absents</span><span class="c-val">${abs}</span></div>
-        <div class="c-row"><span class="c-lbl">Moyenne de classe</span><span class="c-val">${moy}</span></div>
-    `;
-    $('overlay').classList.add('open');
-}
-
-window.closeConfirm=function(){$('overlay').classList.remove('open');};
-$('btnValider').addEventListener('click',openConfirm);
-
-/* SUBMIT */
-async function submit(){
-    const btn=$('btnConfirm');
-    btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Enregistrement…';
-
-    try{
-        /* Calcul moyenne */
-        const notesArr=eleves.map(el=>nst[el.id]);
-        const valides=notesArr.filter(s=>!s.absent&&s.note!==null);
-        const moy=valides.length>0?(valides.reduce((s,n)=>s+n.note,0)/valides.length).toString():null;
-
-        const typeVal=['Devoir','Examen'].includes(tData.type)?tData.type:'Devoir';
-
-        /* 1. Créer le doc évaluation */
-        const evalRef=await addDoc(collection(db,'evaluations'),{
-            classeId:tData.classeId,
-            classeNom:tData.nomClasse,
-            matiere:tData.matiereNom,
-            coefficient:tData.coefficient||1,
-            professeurId:tData.professeurId||null,
-            type:typeVal,
-            date:tData.date||Timestamp.now(),
-            titre:tData.titre||`${typeVal} - ${tData.matiereNom}`,
-            moyenneClasse:moy,
-            createdBy:tData.createdBy,
-            createdAt:serverTimestamp(),
-            sourceToken:token
-        });
-
-        /* 2. Sous-collection notes */
-        const batch=writeBatch(db);
-        eleves.forEach(el=>{
-            const s=nst[el.id];
-            const nRef=doc(collection(db,'evaluations',evalRef.id,'notes'));
-            batch.set(nRef,{
-                eleveId:el.id||null,
-                eleveNom:el.nom,
-                elevePrenom:el.prenom,
-                note:s.absent?null:s.note,
-                absent:s.absent||false,
-                updatedAt:serverTimestamp()
+    try {
+        for (let i = 0; i < Math.min(count, 20); i++) {
+            const code = genererCode();
+            await addDoc(codesRef, {
+                code,
+                plan,
+                dureeJours: DUREES[plan],
+                utilise: false,
+                cree_le: Timestamp.fromDate(new Date()),
+                utilise_par: null,
+                utilise_le: null
             });
-        });
-        await batch.commit();
-
-        /* 3. Invalider le token */
-        await updateDoc(doc(db,'saisie_tokens',token),{
-            used:true,
-            usedAt:serverTimestamp(),
-            evalId:evalRef.id
-        });
-
-        window.closeConfirm();
-        showState('ok');
-    }catch(e){
-        console.error(e);
-        btn.disabled=false;
-        btn.innerHTML='<i class="fas fa-check"></i> Confirmer';
-        alert('Erreur lors de l\'enregistrement. Réessayez.');
+            codesGeneres.push(code);
+        }
+        afficherAlerte("alert-gen", "success", `✅ ${codesGeneres.length} code(s) créé(s) : ${codesGeneres.join(', ')}`);
+        chargerCodes();
+    } catch (err) {
+        console.error(err);
+        afficherAlerte("alert-gen", "error", "Erreur Firestore : " + err.message);
     }
+};
+
+window.chargerCodes = async function() {
+    const container = document.getElementById("codes-container");
+    container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>';
+    try {
+        const q    = query(collection(db, "codes_renouvellement"), orderBy("cree_le", "desc"));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+            container.innerHTML = '<div class="empty-state">Aucun code généré pour le moment.</div>';
+            return;
+        }
+
+        let html = `<table class="codes-table">
+            <thead><tr>
+                <th>Code</th><th>Plan</th><th>Durée</th><th>Statut</th><th>Créé le</th><th></th>
+            </tr></thead><tbody>`;
+
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            const date = d.cree_le?.toDate?.()?.toLocaleDateString("fr-FR") || "—";
+            const statutBadge = d.utilise
+                ? `<span class="badge badge-utilise">Utilisé</span>`
+                : `<span class="badge badge-actif">Disponible</span>`;
+            const planBadge = `<span class="badge badge-${d.plan}">${d.plan}</span>`;
+
+            html += `<tr>
+                <td><span class="code-badge">${d.code}</span></td>
+                <td>${planBadge}</td>
+                <td>${d.dureeJours} j.</td>
+                <td>${statutBadge}</td>
+                <td>${date}</td>
+                <td>${!d.utilise ? `<button class="btn btn-danger" onclick="supprimerCode('${docSnap.id}')"><i class="fas fa-trash"></i></button>` : ''}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+    } catch (err) {
+        container.innerHTML = `<div class="empty-state" style="color:#fca5a5">Erreur : ${err.message}<br>Vérifiez les règles Firestore.</div>`;
+    }
+};
+
+window.supprimerCode = async function(id) {
+    if (!confirm("Supprimer ce code ?")) return;
+    try {
+        await deleteDoc(doc(db, "codes_renouvellement", id));
+        chargerCodes();
+    } catch (err) {
+        alert("Erreur suppression : " + err.message);
+    }
+};
+
+function afficherAlerte(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = `alert alert-${type} show`;
+    el.innerHTML = msg;
+    if (type !== "info") setTimeout(() => el.classList.remove("show"), 7000);
 }
 
-$('btnConfirm').addEventListener('click',submit);
-$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))window.closeConfirm();});
-
-init();
+// Le chargement est géré par onAuthStateChanged ci-dessus
 </script>
 </body>
 </html>
