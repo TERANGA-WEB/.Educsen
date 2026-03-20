@@ -2,27 +2,145 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="/images/icon-192x192.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edusen · Gestion des classes</title>
-    <!-- Material Icons & Google Fonts -->
+    <title>Dashboard | Educsen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #f3f4f6;
-            color: #1e293b;
-            display: flex;
+            background: #f8fafc;
             min-height: 100vh;
+            display: flex;
+            color: #1e293b;
         }
 
-        /* ---------- SIDEBAR (inchangée) ---------- */
+        /* ====== LOADER PREMIUM ====== */
+        .loader-section {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        .loader-section.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        /* Particules */
+        .loader-particles {
+            position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+        }
+        .lp {
+            position: absolute; border-radius: 50%;
+            background: #3b82f6; opacity: 0;
+            animation: lpFloat linear infinite;
+        }
+        @keyframes lpFloat {
+            0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 0.6; }
+            100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+        }
+
+        /* Container central */
+        .loader-center {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0; position: relative; z-index: 1;
+            animation: loaderAppear 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+            opacity: 0; transform: scale(0.6);
+        }
+        @keyframes loaderAppear {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Halo derrière le logo */
+        .loader-halo {
+            position: absolute;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%);
+            top: 50%; left: 50%; transform: translate(-50%, -58%);
+            animation: haloGlow 2s ease-in-out infinite;
+        }
+        @keyframes haloGlow {
+            0%, 100% { transform: translate(-50%,-58%) scale(1);   opacity: 0.6; }
+            50%       { transform: translate(-50%,-58%) scale(1.3); opacity: 1;   }
+        }
+
+        /* Logo icône */
+        .loader-logo-icon {
+            width: 100px; height: 100px;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border-radius: 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 46px; font-weight: 800; color: white;
+            box-shadow: 0 20px 60px rgba(37,99,235,0.35), 0 0 0 0 rgba(59,130,246,0.4);
+            animation: logoBounce 1.2s cubic-bezier(0.34,1.56,0.64,1) 0.4s both,
+                       logoPulse 2s ease-in-out 1.6s infinite;
+            opacity: 0; transform: scale(0.5) rotate(-5deg);
+            margin-bottom: 28px; position: relative; z-index: 2;
+        }
+        @keyframes logoBounce {
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 20px 60px rgba(37,99,235,0.35), 0 0 0 0 rgba(59,130,246,0.4); }
+            50%       { box-shadow: 0 24px 70px rgba(37,99,235,0.5), 0 0 0 12px rgba(59,130,246,0); }
+        }
+
+        /* Texte lettre par lettre */
+        .loader-text {
+            display: flex; gap: 0; overflow: hidden;
+            margin-bottom: 36px;
+        }
+        .loader-letter {
+            font-size: 2.8rem; font-weight: 800; color: #1e293b;
+            opacity: 0; transform: translateY(20px);
+            animation: letterUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+            font-family: 'Inter', sans-serif; letter-spacing: -1px;
+        }
+        .loader-letter.accent { color: #3b82f6; }
+        @keyframes letterUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Barre de chargement futuriste */
+        .loader-bar-wrap {
+            width: 280px; height: 3px;
+            background: #e2e8f0; border-radius: 10px; overflow: hidden;
+            opacity: 0; animation: fadeEl 0.3s ease 1.8s both;
+        }
+        .loader-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #2563eb, #60a5fa, #2563eb);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(59,130,246,0.6);
+            animation: barFill 2s ease 1.8s forwards, barShimmer 1.2s linear 1.8s infinite;
+        }
+        @keyframes barFill    { to { width: 100%; } }
+        @keyframes barShimmer { to { background-position: -200% 0; } }
+
+        /* Loading text */
+        .loader-loading-text {
+            margin-top: 14px; font-size: 13px; color: #94a3b8;
+            font-weight: 500; letter-spacing: 0.3px;
+            opacity: 0; animation: fadeEl 0.3s ease 2s both;
+            transition: opacity 0.3s;
+        }
+        @keyframes fadeEl { to { opacity: 1; } }
+
+        /* Exit animation */
+        .loader-section.exit .loader-center {
+            animation: loaderExit 0.5s cubic-bezier(0.4,0,1,1) forwards;
+        }
+        @keyframes loaderExit {
+            to { opacity: 0; transform: scale(0.85) translateY(-30px); }
+        }
+
+        /* ---------- SIDEBAR (copiée depuis classes.html) ---------- */
         .sidebar {
             width: 280px;
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -298,828 +416,760 @@
             margin-left: 80px;
         }
 
-        .main-content {
-            padding: 30px 32px;
-        }
+        /* ====== MAIN CONTENT (gardé du dashboard original) ====== */
+        .main-content { padding: 30px; width: 100%; }
 
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
+        /* ====== HEADER ====== */
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 40px; background: white;
+            padding: 25px 30px; border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
         }
+        .dashboard-title { font-size: 28px; font-weight: 700; color: #1e293b; letter-spacing: -0.5px; }
+        .current-date   { font-size: 15px; color: #64748b; font-weight: 500; }
 
-        .page-header h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #0f172a;
+        /* ====== STAT CARDS ====== */
+        .stats-cards {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 20px; margin-bottom: 40px;
         }
-
-        /* Titre amélioré (dégradé) */
-        .page-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 0;
-            line-height: 1.2;
+        .stat-card {
+            background: white; border-radius: 16px; padding: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
         }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 16px 16px 0 0;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1); }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 1rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            box-shadow: 0 8px 18px rgba(59,130,246,0.3);
+        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .stat-title  { font-size: 14px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-icon {
+            width: 50px; height: 50px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: white;
+            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+        }
+        .stat-icon.classes     { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .stat-icon.teachers    { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-icon.students    { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stat-icon.performance { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        .stat-value  { font-size: 32px; font-weight: 800; margin-bottom: 10px; color: #1e293b; }
+        .stat-change { font-size: 14px; display: flex; align-items: center; gap: 5px; color: #64748b; font-weight: 500; }
+
+        /* ====== CAROUSEL DOTS ====== */
+        .carousel-dots {
+            display: none; justify-content: center;
+            gap: 6px; margin-top: 2px; margin-bottom: 24px;
+        }
+        .carousel-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #cbd5e1; transition: background 0.2s, width 0.25s; cursor: pointer;
+        }
+        .carousel-dot.active { background: #3b82f6; width: 20px; border-radius: 3px; }
+
+        /* ====== DASHBOARD GRID ====== */
+        .dashboard-grid {
+            display: grid; grid-template-columns: 2fr 1fr;
+            gap: 30px; margin-bottom: 40px;
+        }
+        .section {
+            background: white; border-radius: 16px; padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0; transition: all 0.3s ease;
+        }
+        .section:hover { box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1); }
+        .section + .section { margin-top: 30px; }
+
+        .section-title {
+            font-size: 18px; font-weight: 700; margin-bottom: 25px; color: #1e293b;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;
+        }
+        .view-link {
+            font-size: 14px; color: #3b82f6; text-decoration: none;
+            display: flex; align-items: center; gap: 4px;
+            font-weight: 600; transition: color 0.2s; white-space: nowrap;
+        }
+        .view-link:hover { color: #2563eb; text-decoration: underline; }
+
+        .alerts-list { display: flex; flex-direction: column; gap: 15px; }
+        .alert-item {
+            display: flex; align-items: flex-start; gap: 15px; padding: 20px;
+            border-radius: 12px; background-color: #f8fafc;
+            border-left: 4px solid #cbd5e1; transition: transform 0.2s;
+        }
+        .alert-item:hover { transform: translateX(5px); }
+        .alert-item.info    { background-color: #eff6ff; border-left-color: #3b82f6; }
+        .alert-item.warning { background-color: #fef9c3; border-left-color: #f59e0b; }
+        .alert-item.good    { background-color: #f0fdf4; border-left-color: #10b981; }
+        .alert-icon { font-size: 20px; margin-top: 2px; }
+        .alert-item.info    .alert-icon { color: #3b82f6; }
+        .alert-item.warning .alert-icon { color: #f59e0b; }
+        .alert-item.good    .alert-icon { color: #10b981; }
+        .alert-content h4 { font-size: 15px; font-weight: 600; margin-bottom: 5px; color: #1e293b; }
+        .alert-content p  { font-size: 14px; color: #64748b; line-height: 1.5; }
+
+        .teachers-list { display: flex; flex-direction: column; gap: 12px; }
+        .teacher-item {
+            display: flex; align-items: center; gap: 15px; padding: 12px 15px;
+            background-color: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;
             transition: all 0.2s;
-            text-decoration: none;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(59,130,246,0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            border: 1px solid #e2e8f0;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 500;
-            color: #475569;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            text-decoration: none;
-        }
-
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-            min-height: 300px;
-        }
-
-        /* --- Styles des cartes --- */
-        .class-card {
-            position: relative;
-            background: white;
-            border-radius: 28px;
-            padding: 30px 20px;
-            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 15px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .class-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
-        }
-
-        .edit-btn, .delete-btn {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.2s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .edit-btn {
-            top: 12px;
-            right: 12px;
-            gap: 4px;
+        .teacher-item:hover { background-color: #f1f5f9; border-color: #cbd5e1; }
+        .teacher-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 16px; flex-shrink: 0;
         }
+        .teacher-info { flex: 1; min-width: 0; }
+        .teacher-name    { font-weight: 600; margin-bottom: 4px; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .teacher-subject { font-size: 13px; color: #64748b; }
 
-        .delete-btn {
-            top: 12px;
-            left: 12px;
-            background: #ef4444;
-            color: white;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
+        .students-metrics {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 20px; margin-bottom: 25px;
         }
+        .metric {
+            text-align: center; padding: 25px 20px; border-radius: 12px;
+            background-color: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.2s;
+        }
+        .metric:hover { background-color: #f1f5f9; border-color: #cbd5e1; }
+        .metric-value { font-size: 28px; font-weight: 800; margin-bottom: 5px; color: #1e293b; }
+        .metric-label { font-size: 14px; color: #64748b; font-weight: 500; }
 
-        /* Sur desktop : boutons cachés jusqu'au hover */
-        @media (min-width: 769px) {
-            .edit-btn, .delete-btn {
-                opacity: 0;
-                pointer-events: none;
-            }
-            .class-card:hover .edit-btn,
-            .class-card:hover .delete-btn {
-                opacity: 1;
-                pointer-events: auto;
-                transform: scale(1.05);
-            }
+        .quick-actions-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;
         }
-
-        .edit-btn:hover {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+        .action-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 25px 15px; background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer;
+            transition: all 0.3s; text-decoration: none; color: #1e293b;
+            box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05);
         }
-        .delete-btn:hover {
-            background: #dc2626;
+        .action-btn:hover {
+            background: white; border-color: #3b82f6;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(59,130,246,0.2);
         }
-
-        .created-at {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
+        .action-icon  { font-size: 32px; color: #3b82f6; margin-bottom: 10px; }
+        .action-label { font-size: 14px; font-weight: 600; text-align: center; }
 
         .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
-
-        .empty-state .material-icons {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-state p {
-            font-size: 1.2rem;
-            margin-bottom: 24px;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 60px;
-            color: #3b82f6;
-        }
-
-        /* Alertes */
-        .alert {
-            padding: 16px 24px;
+            text-align: center; padding: 60px 40px; background: white;
             border-radius: 16px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            animation: slideIn 0.2s ease;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0; margin-bottom: 40px;
         }
+        .empty-icon  { font-size: 64px; color: #cbd5e1; margin-bottom: 20px; }
+        .empty-title { font-size: 24px; font-weight: 700; margin-bottom: 15px; color: #1e293b; }
+        .empty-text  { font-size: 16px; color: #64748b; margin-bottom: 30px; max-width: 500px; margin: 0 auto 30px; line-height: 1.6; }
+        .empty-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .data-status       { text-align: center; padding: 40px 20px; color: #64748b; }
+        .data-status-icon  { font-size: 48px; margin-bottom: 20px; opacity: 0.5; color: #94a3b8; }
+        .data-status-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #1e293b; }
+        .data-status-text  { font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
 
-        .alert-error {
-            background: #fee2e2;
-            border-left: 6px solid #ef4444;
-            color: #7f1d1d;
-        }
+        .hidden { display: none !important; }
 
-        .alert-warning {
-            background: #fef9c3;
-            border-left: 6px solid #f59e0b;
-            color: #92400e;
-        }
+        /* ====== RESPONSIVE (fusionné avec celui de classes.html) ====== */
+        @media (max-width: 1200px) { .stats-cards { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
-        .alert-success {
-            background: #d1fae5;
-            border-left: 6px solid #10b981;
-            color: #065f46;
-        }
-
-        .alert .material-icons {
-            font-size: 1.8rem;
-        }
-
-        .confirm-actions {
-            display: flex;
-            gap: 12px;
-            margin-left: auto;
-        }
-
-        .confirm-actions .btn-primary,
-        .confirm-actions .btn-secondary {
-            padding: 8px 20px;
-            font-size: 0.95rem;
-        }
-
-        /* ---------- RESPONSIVE MOBILE ---------- */
         @media (max-width: 768px) {
+            /* Sidebar mobile */
             .sidebar {
                 transform: translateX(-100%);
                 width: 280px !important;
                 transition: transform 0.3s ease;
             }
-
             .sidebar.mobile-open {
                 transform: translateX(0);
             }
-
             .sidebar-overlay {
                 display: block;
             }
-
             .page-wrapper {
                 margin-left: 0 !important;
             }
-
             .mobile-topbar {
                 display: flex;
             }
-
             .main-content {
                 padding: 20px 16px 32px;
             }
-
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
-                margin-bottom: 20px;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-                margin-top: 0;
-            }
-
-            .btn-primary {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .table-container {
-                padding: 16px;
-                border-radius: 28px;
-            }
-
-            /* Grille des cartes */
-            #classesTableContainer > div {
-                gap: 16px !important;
-            }
-
-            .class-card {
-                border-radius: 32px;
-                padding: 26px 16px;
-                background: #ffffff;
-                box-shadow: 0 12px 30px -8px rgba(0,0,0,0.1);
-                border: 1px solid rgba(226, 232, 240, 0.8);
-                transition: transform 0.15s ease;
-            }
-
-            .class-card:active {
-                transform: scale(0.98);
-            }
-
-            .edit-btn, .delete-btn {
-                opacity: 1;
-                pointer-events: auto;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            }
-
-            .edit-btn {
-                top: 10px;
-                right: 10px;
-                padding: 5px 12px;
-                font-size: 0.85rem;
-            }
-
-            .delete-btn {
-                top: 10px;
-                left: 10px;
-                width: 36px;
-                height: 36px;
-            }
-
-            .class-card h2 {
-                font-size: 1.6rem !important;
-                font-weight: 600;
-                margin-top: 30px;
-                color: #0f172a;
-            }
-
-            .class-card div[style*="color: #64748b"] {
-                font-size: 1rem !important;
-                font-weight: 500;
-            }
-
-            .created-at {
-                font-size: 0.85rem;
-                color: #94a3b8;
-                border-top: 1px dashed #e2e8f0;
-                padding-top: 12px;
-                margin-top: 8px;
-            }
+            /* Ajustements du contenu */
+            .dashboard-header { flex-direction: column; align-items: flex-start; padding: 20px; margin-bottom: 18px; gap: 0; }
+            .dashboard-title  { font-size: 20px; }
+            .current-date     { display: none; }
+            .stats-cards { display: flex !important; flex-direction: row !important; overflow-x: auto; gap: 14px; padding: 4px 2px 12px; margin-bottom: 4px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            .stats-cards::-webkit-scrollbar { display: none; }
+            .stat-card { min-width: 210px; max-width: 210px; flex-shrink: 0; scroll-snap-align: start; }
+            .stat-value { font-size: 26px; }
+            .carousel-dots { display: flex; }
+            .dashboard-grid { grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
+            .section { padding: 18px 14px; }
+            .section + .section { margin-top: 16px; }
+            .section-title { font-size: 14px; flex-wrap: wrap; gap: 6px; padding-bottom: 12px; margin-bottom: 16px; }
+            .students-metrics { gap: 8px; }
+            .metric { padding: 12px 6px; }
+            .metric-value { font-size: 18px; }
+            .metric-label { font-size: 11px; }
+            .quick-actions-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .action-btn   { padding: 16px 8px; }
+            .action-icon  { font-size: 24px; margin-bottom: 6px; }
+            .action-label { font-size: 11px; }
+            .alert-item   { padding: 12px; gap: 10px; }
+            .alert-content h4 { font-size: 13px; }
+            .alert-content p  { font-size: 12px; }
+            .icon-container   { width: 9rem; height: 9rem; }
+            .logo-text-loader { font-size: 3.6rem; }
         }
 
         @media (max-width: 480px) {
-            .page-header h1 {
-                font-size: 1.8rem;
-            }
-
-            .class-card h2 {
-                font-size: 1.4rem !important;
-            }
+            .dashboard-header { padding: 18px 14px 16px 14px; }
+            .dashboard-title  { font-size: 17px; }
+            .stat-card { min-width: 185px; max-width: 185px; padding: 18px; }
+            .stat-icon { width: 40px; height: 40px; font-size: 20px; }
+            .stat-value { font-size: 22px; }
+            .stat-title { font-size: 11px; }
+            .section    { padding: 14px 12px; }
         }
     </style>
 </head>
 <body>
 
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="logo-header">
-            <div class="logo-area">
-                <div class="logo-icon">E</div>
-                <span class="logo-text">Edu<span style="color:#3b82f6;">sen</span></span>
+    <!-- ====== LOADER PREMIUM ====== -->
+    <div class="loader-section" id="loaderSection">
+        <div class="loader-particles" id="loaderParticles"></div>
+        <div class="loader-center" id="loaderCenter">
+            <div class="loader-halo"></div>
+            <div class="loader-logo-icon">E</div>
+            <div class="loader-text" id="loaderText"></div>
+            <div class="loader-bar-wrap">
+                <div class="loader-bar"></div>
             </div>
-            <button class="toggle-btn" id="toggleSidebar">
-                <span class="material-icons" id="toggleIcon">chevron_left</span>
-            </button>
+            <div class="loader-loading-text" id="loaderLoadingText">Chargement en cours...</div>
         </div>
     </div>
 
-    <nav class="nav-menu">
-        <a href="/userdashboard.html" class="nav-item active">
-            <span class="nav-icon material-icons">dashboard</span>
-            <span>Dashboard</span>
-        </a>
-        <a href="/user-admin/assistant.html" class="nav-item">
-            <span class="nav-icon material-icons">assessment</span>
-            <span>Assistant</span>
-        </a>
-        <a href="/user-admin/rapport.html" class="nav-item">
-            <span class="nav-icon material-icons">assessment</span>
-            <span>Rapport</span>
-        </a>
-        <a href="/user-admin/classes.html" class="nav-item">
-            <span class="nav-icon material-icons">school</span>
-            <span>Classes</span>
-        </a>
-        <a href="/user-admin/professeurs.html" class="nav-item">
-            <span class="nav-icon material-icons">person</span>
-            <span>Professeurs</span>
-        </a>
-        <a href="/user-admin/eleves.html" class="nav-item">
-            <span class="nav-icon material-icons">groups</span>
-            <span>Élèves</span>
-        </a>
-        <a href="/user-admin/notes.html" class="nav-item">
-            <span class="nav-icon material-icons">assignment</span>
-            <span>Notes</span>
-        </a>
-        <a href="/user-admin/parametres.html" class="nav-item">
-            <span class="nav-icon material-icons">settings</span>
-            <span>Paramètres</span>
-        </a>
-    </nav>
-
-    <div class="sidebar-footer">
-        <div class="user-info" id="userInfo">
-            <div class="user-avatar" id="userAvatar">AD</div>
-            <div class="user-details">
-                <div class="user-name" id="userName">Admin</div>
-                <div class="user-role" id="userRole">admin</div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-header">
+                <div class="logo-area">
+                    <div class="logo-icon">E</div>
+                    <span class="logo-text">Educ<span style="color:#3b82f6;">sen</span></span>
+                </div>
+                <button class="toggle-btn" id="toggleSidebar">
+                    <span class="material-icons" id="toggleIcon">chevron_left</span>
+                </button>
             </div>
         </div>
-    </div>
-</aside>
 
-<!-- PAGE WRAPPER -->
-<div class="page-wrapper" id="pageWrapper">
+        <nav class="nav-menu">
+            <a href="/userdashboard.html" class="nav-item active">
+                <span class="nav-icon material-icons">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/user-admin/assistant.html" class="nav-item">
+                <span class="nav-icon material-icons">smart_toy</span>
+                <span>Assistant</span>
+            </a>
+            <a href="/user-admin/rapport.html" class="nav-item">
+                <span class="nav-icon material-icons">assessment</span>
+                <span>Rapport</span>
+            </a>
+            <a href="/user-admin/classes.html" class="nav-item">
+                <span class="nav-icon material-icons">school</span>
+                <span>Classes</span>
+            </a>
+            <a href="/user-admin/professeurs.html" class="nav-item">
+                <span class="nav-icon material-icons">person</span>
+                <span>Professeurs</span>
+            </a>
+            <a href="/user-admin/notes.html" class="nav-item">
+                <span class="nav-icon material-icons">assignment</span>
+                <span>Notes</span>
+            </a>
+            <a href="/user-admin/bulletin.html" class="nav-item">
+                <span class="nav-icon material-icons">receipt_long</span>
+                <span>Bulletins</span>
+            </a>
+            <a href="/user-admin/parametres.html" class="nav-item">
+                <span class="nav-icon material-icons">settings</span>
+                <span>Paramètres</span>
+            </a>
+        </nav>
 
-    <!-- TOPBAR MOBILE -->
-    <header class="mobile-topbar" id="mobileTopbar">
-        <div class="topbar-logo">
-            <div class="logo-icon">E</div>
-            <span class="topbar-logo-text">Educ<em>sen</em></span>
-        </div>
-        <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
-            <span class="material-icons">menu</span>
-        </button>
-    </header>
-
-    <main class="main-content">
-        <div class="page-header">
-            <h1>Gestion des classes</h1>
-            <a href="ajouter-classe.html" class="btn-primary">
-                <span class="material-icons">add</span> Ajouter une classe
+        <div class="sidebar-footer">
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">AD</div>
+                <div class="user-details">
+                    <div class="user-name" id="userNameDisplay">Administrateur</div>
+                    <div class="user-role" id="userRole">admin</div>
+                </div>
+            </div>
+            <a href="index.html" class="logout-btn" id="logoutBtn">
+                <span class="material-icons">logout</span>
+                <span>Déconnexion</span>
             </a>
         </div>
+    </aside>
 
-        <div id="alertContainer"></div>
+    <!-- PAGE WRAPPER -->
+    <div class="page-wrapper" id="pageWrapper">
 
-        <div class="table-container" id="classesTableContainer">
-            <div class="loading-spinner" id="loading">
-                <span class="material-icons" style="font-size:2rem; animation: spin 1s linear infinite;">sync</span>
-                <p>Chargement des classes...</p>
+        <header class="mobile-topbar" id="mobileTopbar">
+            <div class="topbar-logo">
+                <div class="logo-icon">E</div>
+                <span class="topbar-logo-text">Educ<em>sen</em></span>
             </div>
-        </div>
-    </main>
-</div>
+            <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <span class="material-icons">menu</span>
+            </button>
+        </header>
 
-<!-- Firebase Import Map (inchangé) -->
-<script type="importmap">
-    {
-        "imports": {
-            "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js",
-            "firebase/auth": "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js",
-            "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"
-        }
-    }
-</script>
+        <main class="main-content" id="mainContent">
 
-<script type="module">
-    // ---------- IMPORTS FIREBASE (inchangé) ----------
-    import { initializeApp } from 'firebase/app';
-    import { getAuth, onAuthStateChanged } from 'firebase/auth';
-    import { 
-        getFirestore, 
-        collection, 
-        query, 
-        where,
-        orderBy, 
-        getDocs, 
-        doc,
-        getDoc,
-        writeBatch
-    } from 'firebase/firestore';
-    import { checkSubscription } from './subscription.js';
-    await checkSubscription();
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Tableau de bord</h1>
+                <div class="current-date" id="currentDate"></div>
+            </div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
-        authDomain: "real-educsen.firebaseapp.com",
-        projectId: "real-educsen",
-        storageBucket: "real-educsen.firebasestorage.app",
-        messagingSenderId: "80660233362",
-        appId: "1:80660233362:web:5edf5060254170056eba4b"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // ---------- ÉLÉMENTS DOM ----------
-    const alertContainer = document.getElementById('alertContainer');
-    const loading = document.getElementById('loading');
-    const tableContainer = document.getElementById('classesTableContainer');
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const sidebar = document.getElementById('sidebar');
-    const toggleIcon = document.getElementById('toggleIcon');
-    const userAvatar = document.getElementById('userAvatar');
-    const userNameSpan = document.getElementById('userName');
-    const userRoleSpan = document.getElementById('userRole');
-
-    // Nouveaux éléments pour la topbar mobile
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    // ---------- ÉTAT GLOBAL ----------
-    let currentUser = null;
-    let userRole = null;
-    let firestoreUserId = null;
-    let classes = [];
-
-    // ---------- SYSTÈME D'ALERTES ----------
-    let alertTimeout = null;
-    let currentConfirmResolver = null;
-
-    function clearAlert() {
-        if (alertTimeout) {
-            clearTimeout(alertTimeout);
-            alertTimeout = null;
-        }
-        alertContainer.innerHTML = '';
-    }
-
-    function showAlert(message, type = 'error', duration = 5000) {
-        clearAlert();
-
-        const icons = {
-            error: 'error',
-            warning: 'warning',
-            success: 'check_circle'
-        };
-        const iconName = icons[type] || 'info';
-
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type}`;
-        alertDiv.innerHTML = `
-            <span class="material-icons">${iconName}</span>
-            <span>${message}</span>
-        `;
-
-        alertContainer.appendChild(alertDiv);
-
-        if (duration > 0) {
-            alertTimeout = setTimeout(() => {
-                alertDiv.remove();
-                alertTimeout = null;
-            }, duration);
-        }
-    }
-
-    function showConfirm(message) {
-        return new Promise((resolve) => {
-            clearAlert();
-            currentConfirmResolver = resolve;
-
-            const confirmDiv = document.createElement('div');
-            confirmDiv.className = 'alert alert-warning';
-            confirmDiv.innerHTML = `
-                <span class="material-icons">warning</span>
-                <span>${message}</span>
-                <div class="confirm-actions">
-                    <button class="btn-primary" id="confirmYes">Oui</button>
-                    <button class="btn-secondary" id="confirmNo">Non</button>
+            <div id="dashboardContent" style="display:none;">
+                <div class="stats-cards" id="statsCards">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Classes actives</div>
+                            <div class="stat-icon classes"><span class="material-icons">school</span></div>
+                        </div>
+                        <div class="stat-value" id="statClasses">0</div>
+                        <div class="stat-change"><span>Total classes</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Professeurs actifs</div>
+                            <div class="stat-icon teachers"><span class="material-icons">people</span></div>
+                        </div>
+                        <div class="stat-value" id="statTeachers">0</div>
+                        <div class="stat-change"><span>Total enseignants</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Élèves actifs</div>
+                            <div class="stat-icon students"><span class="material-icons">groups</span></div>
+                        </div>
+                        <div class="stat-value" id="statStudents">0</div>
+                        <div class="stat-change"><span>Total élèves</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Performance globale</div>
+                            <div class="stat-icon performance"><span class="material-icons">trending_up</span></div>
+                        </div>
+                        <div class="stat-value" id="statPerformance">0%</div>
+                        <div class="stat-change"><span>Moyenne générale</span></div>
+                    </div>
                 </div>
-            `;
 
-            alertContainer.appendChild(confirmDiv);
-
-            document.getElementById('confirmYes').addEventListener('click', () => {
-                clearAlert();
-                currentConfirmResolver(true);
-                currentConfirmResolver = null;
-            });
-
-            document.getElementById('confirmNo').addEventListener('click', () => {
-                clearAlert();
-                currentConfirmResolver(false);
-                currentConfirmResolver = null;
-            });
-        });
-    }
-
-    // ---------- AFFICHAGE DES CLASSES ----------
-    function renderClassesTable() {
-        if (classes.length === 0) {
-            tableContainer.innerHTML = `
-                <div class="empty-state">
-                    <span class="material-icons">school</span>
-                    <p>Aucune classe enregistrée</p>
-                    <a href="ajouter-classe.html" class="btn-primary">
-                        <span class="material-icons">add</span> Créer une classe
-                    </a>
+                <div class="carousel-dots" id="carouselDots">
+                    <div class="carousel-dot active" data-index="0"></div>
+                    <div class="carousel-dot" data-index="1"></div>
+                    <div class="carousel-dot" data-index="2"></div>
+                    <div class="carousel-dot" data-index="3"></div>
                 </div>
-            `;
-            return;
+
+                <div class="dashboard-grid">
+                    <div>
+                        <div class="section">
+                            <div class="section-title">
+                                À surveiller
+                                <a href="/user-admin/rapport.html" class="view-link">Rapport complet<span class="material-icons">chevron_right</span></a>
+                            </div>
+                            <div class="alerts-list" id="alertsList"></div>
+                        </div>
+                        <div class="section">
+                            <div class="section-title">
+                                Professeurs
+                                <a href="/user-admin/professeurs.html" class="view-link">Gérer<span class="material-icons">chevron_right</span></a>
+                            </div>
+                            <div id="teachersContainer"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="section">
+                            <div class="section-title">Élèves — Aperçu global</div>
+                            <div class="students-metrics">
+                                <div class="metric"><div class="metric-value" id="totalStudents">0</div><div class="metric-label">Inscrits</div></div>
+                                <div class="metric"><div class="metric-value" id="gradedStudents">0</div><div class="metric-label">Notés</div></div>
+                                <div class="metric"><div class="metric-value" id="avgPerformance">0%</div><div class="metric-label">Moyenne</div></div>
+                            </div>
+                            <div id="studentsEmptyMessage" class="data-status hidden">
+                                <div class="data-status-icon"><span class="material-icons">group</span></div>
+                                <div class="data-status-title">Aucun élève importé</div>
+                                <div class="data-status-text">Importez la liste des élèves pour générer des statistiques</div>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <div class="section-title">Actions rapides</div>
+                            <div class="quick-actions-grid">
+                                <a href="/user-admin/classes.html" class="action-btn">
+                                    <div class="action-icon material-icons">add</div>
+                                    <div class="action-label">Classes</div>
+                                </a>
+                                <a href="/user-admin/professeurs.html" class="action-btn">
+                                    <div class="action-icon material-icons">person_add</div>
+                                    <div class="action-label">Professeurs</div>
+                                </a>
+                                <a href="/user-admin/eleves.html" class="action-btn">
+                                    <div class="action-icon material-icons">upload</div>
+                                    <div class="action-label">Élèves</div>
+                                </a>
+                                <a href="/user-admin/notes.html" class="action-btn">
+                                    <div class="action-icon material-icons">edit_note</div>
+                                    <div class="action-label">Notes</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="emptyState" class="empty-state hidden">
+                <div class="empty-icon"><span class="material-icons">analytics</span></div>
+                <h2 class="empty-title">Bienvenue sur Educsen</h2>
+                <p class="empty-text">Commencez par configurer votre établissement. Ajoutez des classes, professeurs et élèves pour visualiser les performances.</p>
+                <div class="empty-actions">
+                    <a href="/user-admin/classes.html" class="action-btn"><div class="action-icon material-icons">add</div><div class="action-label">Classes</div></a>
+                    <a href="/user-admin/professeurs.html" class="action-btn"><div class="action-icon material-icons">person_add</div><div class="action-label">Professeurs</div></a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script loader premium -->
+    <script>
+    (function() {
+        // Skip si déjà vu cette session
+        const SKIP = sessionStorage.getItem('loaderSeen');
+
+        // Lettres du logo
+        const word = 'EDUCSEN';
+        const accents = { 4: true }; // index du 'S' en bleu (Educ|sen)
+        const container = document.getElementById('loaderText');
+        if (container) {
+            word.split('').forEach((l, i) => {
+                const span = document.createElement('span');
+                span.className = 'loader-letter' + (i >= 4 ? ' accent' : '');
+                span.textContent = l;
+                // delay: E=0.8s, d=0.9s, u=1.0s...
+                span.style.animationDelay = (0.8 + i * 0.07) + 's';
+                container.appendChild(span);
+            });
         }
 
-        let html = `
-            <div style="
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 24px;
-            ">
-        `;
-
-        classes.forEach(cls => {
-            const className = cls.nomClasse || cls.name || 'Sans nom';
-            const studentCount = cls.nombreEleves || cls.nbStudents || 0;
-
-            let createdAt = 'N/A';
-            if (cls.createdAt) {
-                if (typeof cls.createdAt.toDate === 'function') {
-                    createdAt = cls.createdAt.toDate().toLocaleDateString('fr-FR');
-                } else {
-                    const date = new Date(cls.createdAt);
-                    if (!isNaN(date)) {
-                        createdAt = date.toLocaleDateString('fr-FR');
-                    }
-                }
+        // Particules
+        const pc = document.getElementById('loaderParticles');
+        if (pc) {
+            for (let i = 0; i < 22; i++) {
+                const p = document.createElement('div');
+                p.className = 'lp';
+                const size = 2 + Math.random() * 4;
+                p.style.cssText = [
+                    'width:' + size + 'px',
+                    'height:' + size + 'px',
+                    'left:' + (Math.random() * 100) + '%',
+                    'animation-duration:' + (4 + Math.random() * 6) + 's',
+                    'animation-delay:' + (Math.random() * 4) + 's',
+                    'opacity:' + (0.1 + Math.random() * 0.35),
+                    'background:' + (Math.random() > 0.5 ? '#3b82f6' : '#8b5cf6'),
+                ].join(';');
+                pc.appendChild(p);
             }
-
-            html += `
-                <div class="class-card">
-                    <button class="delete-btn" onclick="deleteClass('${cls.id}')">
-                        <span class="material-icons" style="font-size: 1.1rem;">delete</span>
-                    </button>
-                    <button class="edit-btn" onclick="editClass('${cls.id}')">
-                        <span class="material-icons" style="font-size: 1.1rem;">edit</span>
-                        Modifier
-                    </button>
-                    <h2 style="font-size: 1.4rem; font-weight: 600;">
-                        ${className}
-                    </h2>
-                    <div style="color: #64748b; font-size: 0.9rem;">
-                        ${studentCount} élève${studentCount > 1 ? 's' : ''}
-                    </div>
-                    <div class="created-at">
-                        Créée le ${createdAt}
-                    </div>
-                </div>
-            `;
-        });
-
-        html += `</div>`;
-        tableContainer.innerHTML = html;
-    }
-
-    // ---------- CHARGEMENT DES CLASSES ----------
-    async function loadClasses() {
-        if (!currentUser || !firestoreUserId) return;
-        
-        clearAlert();
-        loading.style.display = 'block';
-        tableContainer.innerHTML = '';
-        tableContainer.appendChild(loading);
-
-        try {
-            const classesRef = collection(db, 'classes');
-            const q = query(
-                classesRef,
-                where('createdBy', '==', firestoreUserId),
-                orderBy('createdAt', 'desc')
-            );
-
-            const snapshot = await getDocs(q);
-            
-            classes = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-
-            loading.style.display = 'none';
-            renderClassesTable();
-
-        } catch (error) {
-            console.error('Erreur chargement classes:', error);
-            loading.style.display = 'none';
-            showAlert('Erreur lors du chargement des classes.', 'error');
-        }
-    }
-
-    // ---------- MODIFICATION ----------
-    window.editClass = function(classId) {
-        window.location.href = `ajouter-classe.html?id=${classId}`;
-    };
-
-    // ---------- SUPPRESSION ----------
-    window.deleteClass = async function(classId) {
-        const confirmed = await showConfirm('⚠️ Cette action est irréversible. Voulez-vous continuer ?');
-        
-        if (!confirmed) {
-            return;
         }
 
-        try {
-            const elevesRef = collection(db, 'classes', classId, 'eleves');
-            const elevesSnap = await getDocs(elevesRef);
+        // Messages rotatifs
+        const msgs = [
+            'Chargement en cours...',
+            'Initialisation de votre espace...',
+            'Préparation des données...',
+            'Presque terminé...'
+        ];
+        const txtEl = document.getElementById('loaderLoadingText');
+        let msgIdx = 0;
+        const msgInterval = setInterval(() => {
+            msgIdx = (msgIdx + 1) % msgs.length;
+            if (txtEl) {
+                txtEl.style.opacity = '0';
+                setTimeout(() => {
+                    txtEl.textContent = msgs[msgIdx];
+                    txtEl.style.opacity = '1';
+                }, 200);
+            }
+        }, 900);
 
-            const batch = writeBatch(db);
+        // Fonction de sortie avec animation exit
+        window.__hideLoader = function() {
+            clearInterval(msgInterval);
+            const section = document.getElementById('loaderSection');
+            if (!section) return;
+            section.classList.add('exit');
+            setTimeout(() => {
+                section.classList.add('hidden');
+                sessionStorage.setItem('loaderSeen', '1');
+            }, 500);
+        };
 
-            elevesSnap.docs.forEach(doc => {
-                batch.delete(doc.ref);
-            });
-
-            const classRef = doc(db, 'classes', classId);
-            batch.delete(classRef);
-
-            await batch.commit();
-
-            showAlert('Classe supprimée avec succès.', 'success');
-            await loadClasses();
-
-        } catch (error) {
-            console.error('Erreur suppression classe:', error);
-            showAlert('Erreur lors de la suppression de la classe.', 'error');
+        // Si déjà vu → skip direct
+        if (SKIP) {
+            const section = document.getElementById('loaderSection');
+            if (section) section.classList.add('hidden');
+            window.__hideLoader = function() {};
         }
-    };
+    })();
+    </script>
 
-    // ---------- AUTH ----------
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.replace('login.html');
-            return;
+    <!-- Firebase v9 module -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+            authDomain:        "real-educsen.firebaseapp.com",
+            projectId:         "real-educsen",
+            storageBucket:     "real-educsen.firebasestorage.app",
+            messagingSenderId: "80660233362",
+            appId:             "1:80660233362:web:5edf5060254170056eba4b"
+        };
+
+        const app  = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db   = getFirestore(app);
+
+        // DOM
+        const loaderSection        = document.getElementById('loaderSection');
+        const dashboardContent     = document.getElementById('dashboardContent');
+        const emptyState           = document.getElementById('emptyState');
+        const statClasses          = document.getElementById('statClasses');
+        const statTeachers         = document.getElementById('statTeachers');
+        const statStudents         = document.getElementById('statStudents');
+        const statPerformance      = document.getElementById('statPerformance');
+        const teachersContainer    = document.getElementById('teachersContainer');
+        const totalStudentsEl      = document.getElementById('totalStudents');
+        const gradedStudentsEl     = document.getElementById('gradedStudents');
+        const avgPerformanceEl     = document.getElementById('avgPerformance');
+        const studentsEmptyMessage = document.getElementById('studentsEmptyMessage');
+        const alertsList           = document.getElementById('alertsList');
+        const currentDateEl        = document.getElementById('currentDate');
+
+        // Attendre 4.5s minimum pour l'animation
+        const animationComplete = new Promise(resolve => setTimeout(resolve, 3200));
+
+        function hideLoader() { window.__hideLoader ? window.__hideLoader() : loaderSection.classList.add('hidden'); }
+
+        function updateDate() {
+            const now = new Date();
+            const s = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+            currentDateEl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
         }
 
-        currentUser = user;
+        async function loadDashboardData(uid) {
+            try {
+                // Requête filtrée par uid — respecte les règles Firestore
+                const classesQ = query(collection(db, 'classes'), where('createdBy', '==', uid));
+                const classesSnap = await getDocs(classesQ);
+                const classes = classesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        try {
-            const usersQuery = query(collection(db, 'users'), where('email', '==', user.email));
-            const usersSnapshot = await getDocs(usersQuery);
+                const profQ = query(collection(db, 'professeurs'), where('createdBy', '==', uid));
+                const profSnap = await getDocs(profQ);
+                const professeurs = profSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-            if (usersSnapshot.empty) {
-                window.location.replace('createCodeUser.html');
+                let totalStudents = 0, totalPerfSum = 0, totalPerfCount = 0, studentsWithGrade = 0;
+
+                await Promise.all(classes.map(async (cl) => {
+                    const snap = await getDocs(collection(db, 'classes', cl.id, 'eleves'));
+                    snap.docs.forEach(d => {
+                        totalStudents++;
+                        const perf = parseFloat(d.data().performance);
+                        if (!isNaN(perf)) { totalPerfSum += perf; totalPerfCount++; studentsWithGrade++; }
+                    });
+                }));
+
+                const avgPerf = totalPerfCount > 0 ? (totalPerfSum / totalPerfCount).toFixed(1) : 0;
+
+                statClasses.textContent      = classes.length;
+                statTeachers.textContent     = professeurs.length;
+                statStudents.textContent     = totalStudents;
+                statPerformance.textContent  = avgPerf + '%';
+                totalStudentsEl.textContent  = totalStudents;
+                gradedStudentsEl.textContent = studentsWithGrade;
+                avgPerformanceEl.textContent = avgPerf + '%';
+
+                studentsEmptyMessage.classList.toggle('hidden', totalStudents > 0);
+                generateAlerts(classes, professeurs, totalStudents, studentsWithGrade, avgPerf);
+                renderTeachers(professeurs);
+
+                const hasData = classes.length > 0 || professeurs.length > 0 || totalStudents > 0;
+                emptyState.classList.toggle('hidden', hasData);
+                dashboardContent.style.display = hasData ? 'block' : 'none';
+                if (!hasData) emptyState.classList.remove('hidden');
+
+                if (hasData) setTimeout(initCarouselDots, 100);
+
+            } catch (err) {
+                console.error('Erreur Firebase:', err);
+                // Afficher quand même le dashboard avec erreur
+                dashboardContent.style.display = 'block';
+                emptyState.classList.add('hidden');
+                alertsList.innerHTML = `
+                    <div class="alert-item warning">
+                        <div class="alert-icon"><span class="material-icons">error</span></div>
+                        <div class="alert-content">
+                            <h4>Erreur de chargement</h4>
+                            <p>${err.message}</p>
+                        </div>
+                    </div>`;
+            }
+        }
+
+        function generateAlerts(classes, professeurs, totalStudents, studentsWithGrade, avgPerf) {
+            const alerts = [];
+            if (classes.length > 0 && professeurs.length === 0)
+                alerts.push({ type:'warning', icon:'warning', title:'Aucun professeur assigné', msg:"Des classes existent mais aucun professeur n'est enregistré." });
+            if (totalStudents > 0 && studentsWithGrade < totalStudents)
+                alerts.push({ type:'info', icon:'info', title:'Notes manquantes', msg:`${totalStudents - studentsWithGrade} élève(s) sans notes saisies.` });
+            if (parseFloat(avgPerf) < 50 && totalStudents > 0)
+                alerts.push({ type:'warning', icon:'trending_down', title:'Performance en baisse', msg:'La moyenne générale est inférieure à 50%.' });
+            if (alerts.length === 0 && totalStudents > 0)
+                alerts.push({ type:'good', icon:'check_circle', title:'Tout est en ordre', msg:'Aucune alerte particulière. Continuez à suivre les performances.' });
+            if (alerts.length === 0)
+                alerts.push({ type:'info', icon:'info', title:'Démarrez', msg:'Ajoutez vos classes et élèves pour voir les alertes ici.' });
+
+            alertsList.innerHTML = alerts.map(a =>
+                `<div class="alert-item ${a.type}">
+                    <div class="alert-icon"><span class="material-icons">${a.icon}</span></div>
+                    <div class="alert-content"><h4>${a.title}</h4><p>${a.msg}</p></div>
+                </div>`
+            ).join('');
+        }
+
+        function renderTeachers(professeurs) {
+            if (professeurs.length === 0) {
+                teachersContainer.innerHTML = `
+                    <div class="data-status">
+                        <div class="data-status-icon"><span class="material-icons">person</span></div>
+                        <div class="data-status-title">Aucun professeur enregistré</div>
+                        <div class="data-status-text">Ajoutez vos professeurs pour commencer l'analyse</div>
+                    </div>`;
                 return;
             }
-
-            const userDoc = usersSnapshot.docs[0];
-            firestoreUserId = userDoc.id;
-            const userData = userDoc.data();
-            userRole = userData.role || 'user';
-
-            userNameSpan.textContent = user.displayName || user.email || 'Utilisateur';
-            userRoleSpan.textContent = userRole;
-            userAvatar.textContent = (user.displayName?.charAt(0) || user.email?.charAt(0) || 'U').toUpperCase();
-
-            await loadClasses();
-
-        } catch (error) {
-            console.error('Erreur récupération utilisateur:', error);
-            showAlert('Erreur de connexion. Veuillez rafraîchir.', 'error');
+            let html = '<div class="teachers-list">';
+            professeurs.slice(0, 3).forEach(p => {
+                const name     = ((p.prenom||'') + ' ' + (p.nom||'')).trim() || 'Professeur';
+                const initials = ((p.prenom?.[0]||'') + (p.nom?.[0]||'')).toUpperCase() || 'P';
+                html += `<div class="teacher-item">
+                    <div class="teacher-avatar">${initials}</div>
+                    <div class="teacher-info">
+                        <div class="teacher-name">${name}</div>
+                        <div class="teacher-subject">${p.matiere || 'Matière non renseignée'}</div>
+                    </div>
+                </div>`;
+            });
+            if (professeurs.length > 3)
+                html += `<div style="text-align:center;margin-top:10px"><a href="/user-admin/professeurs.html" class="view-link">Voir tous (${professeurs.length}) <span class="material-icons">chevron_right</span></a></div>`;
+            html += '</div>';
+            teachersContainer.innerHTML = html;
         }
-    });
 
-    // ---------- SIDEBAR TOGGLE (adapté pour mobile avec topbar) ----------
-    function openMobileSidebar() {
-        sidebar.classList.add('mobile-open');
-        sidebarOverlay.classList.add('active');
-    }
-
-    function closeMobileSidebar() {
-        sidebar.classList.remove('mobile-open');
-        sidebarOverlay.classList.remove('active');
-    }
-
-    // Toggle sur desktop (flèche dans la sidebar)
-    toggleBtn.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-            sidebar.classList.contains('mobile-open') ? closeMobileSidebar() : openMobileSidebar();
-        } else {
-            sidebar.classList.toggle('collapsed');
-            toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+        function initCarouselDots() {
+            if (window.innerWidth > 768) return;
+            const statsCards   = document.getElementById('statsCards');
+            const carouselDots = document.getElementById('carouselDots');
+            if (!statsCards || !carouselDots) return;
+            const cards = statsCards.querySelectorAll('.stat-card');
+            const dots  = carouselDots.querySelectorAll('.carousel-dot');
+            if (!cards.length || !dots.length) return;
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    const cardW = cards[0].offsetWidth + 14;
+                    statsCards.scrollTo({ left: i * cardW, behavior: 'smooth' });
+                });
+            });
+            statsCards.addEventListener('scroll', () => {
+                const cardW = cards[0].offsetWidth + 14;
+                const idx   = Math.round(statsCards.scrollLeft / cardW);
+                dots.forEach((d, i) => d.classList.toggle('active', i === Math.min(idx, dots.length - 1)));
+            }, { passive: true });
         }
-    });
 
-    // Bouton menu dans la topbar mobile
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', () => {
-            if (sidebar.classList.contains('mobile-open')) {
-                closeMobileSidebar();
+        // ── SIDEBAR ── (gardé du dashboard original, il fonctionne avec les nouvelles classes)
+        const sidebar        = document.getElementById('sidebar');
+        const toggleBtn      = document.getElementById('toggleSidebar');
+        const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+        const toggleIcon     = document.getElementById('toggleIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        const openMobile  = () => { sidebar.classList.add('mobile-open');    sidebarOverlay?.classList.add('active'); };
+        const closeMobile = () => { sidebar.classList.remove('mobile-open'); sidebarOverlay?.classList.remove('active'); };
+
+        toggleBtn?.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
             } else {
-                openMobileSidebar();
-                // Sur mobile, on désactive l'état collapsed
-                if (sidebar.classList.contains('collapsed')) {
-                    sidebar.classList.remove('collapsed');
-                    toggleIcon.textContent = 'chevron_left';
-                }
+                sidebar.classList.toggle('collapsed');
+                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
             }
         });
-    }
+        mobileMenuBtn?.addEventListener('click', () => sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile());
+        sidebarOverlay?.addEventListener('click', closeMobile);
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && mobileMenuBtn && !mobileMenuBtn.contains(e.target)) closeMobile();
+        });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 768) { sidebar.classList.remove('collapsed'); toggleIcon.textContent = 'chevron_left'; closeMobile(); }
+            else closeMobile();
+        });
 
-    // Fermer en cliquant sur l'overlay
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeMobileSidebar);
-    }
+        // ── AUTH + INIT ──
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDate();
 
-    // Fermer si on clique ailleurs (hors sidebar et bouton)
-    document.addEventListener('click', e => {
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
-                closeMobileSidebar();
-            }
-        }
-    });
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    window.location.href = '/connexion.html';
+                    return;
+                }
 
-    function handleResize() {
-        if (window.innerWidth <= 768) {
-            sidebar.classList.remove('collapsed');
-            toggleIcon.textContent = 'chevron_left';
-            closeMobileSidebar();
-        } else {
-            // Sur desktop, on ferme le mode mobile
-            closeMobileSidebar();
-        }
-    }
-    window.addEventListener('resize', handleResize);
-    handleResize();
-</script>
+                // Afficher le nom dans la sidebar
+                const nameEl   = document.getElementById('userNameDisplay');
+                const avatarEl = document.getElementById('userAvatar');
+                const roleEl   = document.getElementById('userRole');
+                if (nameEl)   nameEl.textContent   = user.displayName || user.email || 'Administrateur';
+                if (avatarEl) avatarEl.textContent  = (user.displayName?.[0] || user.email?.[0] || 'A').toUpperCase();
+                if (roleEl)   roleEl.textContent    = 'admin';
+
+                // Charger les données + attendre l'animation
+                const dataPromise = loadDashboardData(user.uid);
+                await Promise.all([animationComplete, dataPromise]);
+                hideLoader();
+            });
+        });
+    </script>
 </body>
 </html>
