@@ -1,3 +1,4 @@
+
 /**
  * subscription-compat.js — EduMetrics
  * Version COMPAT — pour les pages Firebase compat (bulletin.html)
