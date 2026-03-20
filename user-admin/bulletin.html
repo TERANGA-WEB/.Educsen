@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8"/>
+  <link rel="icon" href="/images/icon-192x192.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bulletins de Notes | Educsen</title>
 
@@ -32,139 +33,132 @@
       color: #1e293b;
     }
 
-    /* ========== NOUVELLE SIDEBAR ========== */
-    .sidebar {
-      width: var(--sidebar-w);
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      position: fixed;
-      left: 0; top: 0;
-      overflow-y: auto;
-      z-index: 1000;
-      transition: width .3s ease, transform .3s ease;
-      box-shadow: 4px 0 16px rgba(0,0,0,.12);
-    }
-    .sidebar.collapsed { width: var(--sidebar-coll); }
-
-    .sidebar-header {
-      padding: 20px 16px;
-      border-bottom: 1px solid #334155;
-      flex-shrink: 0;
-    }
-    .logo-header { display: flex; align-items: center; justify-content: space-between; }
-    .logo-area   { display: flex; align-items: center; gap: 12px; overflow: hidden; }
-    .logo-icon {
-      width: 42px; height: 42px; flex-shrink: 0;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; font-weight: 700; color: #fff;
-    }
-    .logo-text {
-      font-size: 1.25rem; font-weight: 700; white-space: nowrap;
-      transition: opacity .2s, width .2s; color: #fff;
-    }
-    .logo-text span { color: #3b82f6; }
-    .sidebar.collapsed .logo-text { opacity: 0; width: 0; overflow: hidden; }
-
-    .toggle-btn {
-      background: rgba(255,255,255,.08); border: 1px solid #4b5563;
-      border-radius: 50%; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #e2e8f0; transition: all .2s; flex-shrink: 0;
-    }
-    .toggle-btn:hover { background: rgba(255,255,255,.18); border-color: #3b82f6; }
-
-    .nav-menu {
-      flex: 1; padding: 20px 0;
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    .nav-item {
-      display: flex; align-items: center; gap: 16px;
-      padding: 13px 24px; margin: 0 12px;
-      border-radius: 12px; color: #cbd5e1;
-      text-decoration: none; transition: all .2s; white-space: nowrap;
-    }
-    .nav-item .nav-icon { font-size: 1.4rem; width: 24px; text-align: center; flex-shrink: 0; }
-    .sidebar.collapsed .nav-item span:last-child { display: none; }
-    .nav-item.active { background: #3b82f6; color: #fff; box-shadow: 0 8px 16px -4px rgba(59,130,246,.3); }
-    .nav-item:hover:not(.active) { background: #334155; color: #fff; }
-
-    .sidebar-footer { padding: 20px; border-top: 1px solid #334155; flex-shrink: 0; }
-    .user-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .user-avatar {
-      width: 42px; height: 42px; background: #3b82f6;
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
-    }
-    .user-details { overflow: hidden; }
-    .user-name { font-weight: 600; font-size: .95rem; white-space: nowrap; }
-    .user-role  { font-size: .78rem; color: #94a3b8; }
-    .sidebar.collapsed .user-details { display: none; }
-    .logout-btn {
-      width: 100%; padding: 10px; background: rgba(255,255,255,.08);
-      color: #94a3b8; border: none; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      font-size: 14px; cursor: pointer; transition: all .2s; text-decoration: none;
-    }
-    .logout-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
-    .sidebar.collapsed .logout-btn span:last-child { display: none; }
-
-    /* ========== OVERLAY MOBILE ========== */
+    /* ====== OVERLAY MOBILE ====== */
     .sidebar-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.5); z-index: 999;
-      opacity: 0; transition: opacity .3s; pointer-events: none;
+      background: rgba(0,0,0,0.52);
+      z-index: 999; opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
     }
     .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-    /* ========== TOPBAR MOBILE ========== */
+    /* ====== SIDEBAR — identique dashboard ====== */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      color: white;
+      display: flex; flex-direction: column;
+      transition: width 0.3s ease;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      height: 100vh;
+      position: fixed; left: 0; top: 0;
+      overflow-y: auto; z-index: 1000;
+    }
+    .sidebar.collapsed { width: 80px; }
+
+    .sidebar-header { padding: 20px 16px; border-bottom: 1px solid #334155; }
+    .logo-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+    .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+
+    .sidebar .logo-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 600; color: white; flex-shrink: 0;
+    }
+    .sidebar .logo-text {
+      font-size: 1.3rem; font-weight: 600;
+      white-space: nowrap; overflow: hidden;
+      transition: opacity 0.2s; color: white;
+    }
+    .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
+    .sidebar .logo-text span { color: #3b82f6; }
+
+    .toggle-btn {
+      background: rgba(255,255,255,0.1); border: 1px solid #4b5563;
+      border-radius: 50%; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; color: #e2e8f0; flex-shrink: 0;
+    }
+    .toggle-btn:hover { background: rgba(255,255,255,0.2); border-color: #3b82f6; color: white; }
+
+    .nav-menu { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 4px; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 24px; margin: 0 12px; border-radius: 12px;
+      color: #cbd5e1; text-decoration: none;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-item .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
+    .nav-item span:last-child { transition: opacity 0.2s; }
+    .sidebar.collapsed .nav-item span:last-child { opacity: 0; width: 0; display: none; }
+    .sidebar.collapsed .nav-item { padding: 14px 0; margin: 0 8px; justify-content: center; gap: 0; }
+    .sidebar.collapsed .nav-item .nav-icon { width: 24px; text-align: center; }
+    .nav-item.active { background: #3b82f6; color: white; box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3); }
+    .nav-item:hover:not(.active) { background: #334155; color: white; }
+
+    .sidebar-footer { padding: 20px; border-top: 1px solid #334155; }
+    .user-info { display: flex; align-items: center; gap: 12px; white-space: nowrap; margin-bottom: 12px; }
+    .user-avatar {
+      width: 42px; height: 42px; background: #3b82f6; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .user-details { overflow: hidden; }
+    .user-name { font-weight: 500; font-size: 0.95rem; }
+    .user-role  { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
+    .sidebar.collapsed .user-details { opacity: 0; width: 0; }
+
+    .logout-btn {
+      width: 100%; padding: 10px;
+      background-color: rgba(255,255,255,0.1); color: #94a3b8;
+      border: none; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; font-size: 14px; transition: all 0.2s;
+      white-space: nowrap; text-decoration: none;
+    }
+    .logout-btn:hover { background-color: rgba(255,255,255,0.2); color: white; }
+
+    /* ====== TOPBAR MOBILE ====== */
     .mobile-topbar {
       display: none;
-      position: sticky;
-      top: 0;
-      z-index: 998;
-      background: #fff;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 0 16px;
-      height: var(--topbar-h);
-      align-items: center;
-      justify-content: space-between;
+      position: sticky; top: 0; z-index: 998;
+      background: #fff; border-bottom: 1px solid #e2e8f0;
+      padding: 0 16px; height: 60px;
+      align-items: center; justify-content: space-between;
       box-shadow: 0 2px 8px rgba(0,0,0,.07);
     }
     .topbar-logo { display: flex; align-items: center; gap: 10px; }
-    .topbar-logo .logo-icon { width: 34px; height: 34px; font-size: 1.05rem; }
+    .topbar-logo .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem; font-weight: 700; color: #fff;
+    }
     .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
     .topbar-logo-text em { color: #3b82f6; font-style: normal; }
     .topbar-menu-btn {
-      background: none; border: none;
-      width: 40px; height: 40px;
+      background: none; border: none; width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #334155; border-radius: 8px;
-      transition: background .2s;
+      cursor: pointer; color: #334155; border-radius: 8px; transition: background .2s;
     }
     .topbar-menu-btn:hover { background: #f1f5f9; }
 
-    /* ========== PAGE WRAPPER ========== */
+    /* ====== PAGE WRAPPER ====== */
     .page-wrapper {
-      flex: 1;
-      margin-left: var(--sidebar-w);
-      display: flex;
-      flex-direction: column;
-      transition: margin-left .3s ease;
-      min-width: 0;
+      flex: 1; margin-left: 280px;
+      transition: margin-left 0.3s ease;
+      min-width: 0; display: flex; flex-direction: column;
     }
-    .sidebar.collapsed ~ .page-wrapper { margin-left: var(--sidebar-coll); }
+    .sidebar.collapsed ~ .page-wrapper { margin-left: 80px; }
 
-    .main-content {
-      padding: 30px;
-      width: 100%;
-    }
+    .main-content { padding: 30px; width: 100%; }
 
-    /* ========== STYLES ORIGINAUX (conservés) ========== */
+    /* ====== STYLES PAGE (conservés) ====== */
     .page-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 28px; background: white; padding: 25px 30px;
@@ -196,10 +190,7 @@
     .fields-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
     .field-full { grid-column: 1 / -1; }
     .fld { display: flex; flex-direction: column; gap: 7px; }
-    .fld label {
-      font-size: 11px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; color: #64748b;
-    }
+    .fld label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #64748b; }
 
     .input-wrapper { position: relative; }
     .input-wrapper input { width: 100%; padding-right: 44px; }
@@ -209,14 +200,11 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; display: none;
     }
-    .input-status.ok    { background: #d1fae5; color: #059669; display: flex; }
-    .input-status.err   { background: #fee2e2; color: #dc2626; display: flex; }
+    .input-status.ok      { background: #d1fae5; color: #059669; display: flex; }
+    .input-status.err     { background: #fee2e2; color: #dc2626; display: flex; }
     .input-status.loading { background: #dbeafe; color: #3b82f6; display: flex; }
 
-    .class-hint {
-      font-size: 11px; margin-top: 4px; min-height: 16px;
-      display: flex; align-items: center; gap: 5px;
-    }
+    .class-hint { font-size: 11px; margin-top: 4px; min-height: 16px; display: flex; align-items: center; gap: 5px; }
     .class-hint.ok   { color: #059669; }
     .class-hint.err  { color: #dc2626; }
     .class-hint.info { color: #64748b; }
@@ -258,7 +246,7 @@
       font-size: 12px; color: #a8ffb0; max-height: 200px;
       overflow-y: auto; display: none; border: 1px solid #1e293b;
     }
-    .log-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .log-line  { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .log-error { color: #f87171; } .log-warn { color: #fbbf24; } .log-info { color: #60a5fa; }
 
     #btn-pdf-container { display: none; margin-bottom: 24px; }
@@ -273,9 +261,7 @@
     .pdf-info-title { font-size: 14px; font-weight: 700; color: #1e293b; }
     .pdf-info-sub   { font-size: 12px; color: #64748b; margin-top: 2px; }
 
-    #bulletins-container {
-      display: flex; flex-direction: column; align-items: center; gap: 32px; padding-bottom: 60px;
-    }
+    #bulletins-container { display: flex; flex-direction: column; align-items: center; gap: 32px; padding-bottom: 60px; }
 
     .spinner {
       display: inline-block; width: 14px; height: 14px;
@@ -289,15 +275,8 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Styles du bulletin (inchangés) */
-    .bulletin {
-      width: 794px; height: 1122px; overflow: hidden;
-      background: #fff; border: 1px solid #cbd5e1;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
-      padding: 24px 40px 50px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 12px; color: #000; position: relative;
-    }
+    /* Styles bulletin (inchangés) */
+    .bulletin { width: 794px; height: 1122px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1; box-shadow: 0 8px 40px rgba(0,0,0,0.12); padding: 24px 40px 50px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; position: relative; }
     .watermark { position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%) rotate(-35deg); font-size: 90px; font-weight: 900; color: rgba(0,0,0,0.025); white-space: nowrap; pointer-events: none; z-index: 0; }
     .bul-content { position: relative; z-index: 1; }
     .bul-topbar { display: table; width: 100%; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 28px; }
@@ -358,20 +337,14 @@
     .parents-block { border: 1px solid #ccc; padding: 8px 10px; }
     .bul-footer { margin-top: 250px; border-top: 2px solid #000; padding-top: 6px; font-size: 9px; color: #333; text-align: center; font-style: italic; line-height: 1.4; }
 
-    /* Responsive */
-    @media (max-width: 860px) {
-      .bulletin { transform: scale(.88); transform-origin: top center; margin-bottom: -80px; }
-    }
-    @media (max-width: 660px) {
-      .bulletin { transform: scale(.64); transform-origin: top center; margin-bottom: -230px; }
-    }
+    @media (max-width: 860px) { .bulletin { transform: scale(.88); transform-origin: top center; margin-bottom: -80px; } }
+    @media (max-width: 660px) { .bulletin { transform: scale(.64); transform-origin: top center; margin-bottom: -230px; } }
+
     @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-        width: var(--sidebar-w) !important;
-        transition: transform .3s ease;
-      }
+      .sidebar { transform: translateX(-100%); width: 280px !important; transition: transform 0.3s ease; }
       .sidebar.mobile-open { transform: translateX(0); }
+      .sidebar.collapsed { width: 280px !important; transform: translateX(-100%); }
+      .sidebar.collapsed.mobile-open { transform: translateX(0); }
       .sidebar-overlay { display: block; }
       .mobile-topbar { display: flex; }
       .page-wrapper { margin-left: 0 !important; width: 100%; }
@@ -382,10 +355,9 @@
 </head>
 <body>
 
-<!-- Overlay mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- SIDEBAR -->
+<!-- ====== SIDEBAR ====== -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="logo-header">
@@ -435,11 +407,11 @@
   </nav>
 
   <div class="sidebar-footer">
-    <div class="user-info">
-      <div class="user-avatar">AD</div>
+    <div class="user-info" id="userInfo">
+      <div class="user-avatar" id="userAvatar">AD</div>
       <div class="user-details">
-        <div class="user-name">Administrateur</div>
-        <div class="user-role">admin</div>
+        <div class="user-name" id="userNameDisplay">Administrateur</div>
+        <div class="user-role" id="userRole">admin</div>
       </div>
     </div>
     <a href="/index.html" class="logout-btn">
@@ -449,7 +421,7 @@
   </div>
 </aside>
 
-<!-- PAGE WRAPPER (contient topbar mobile + contenu) -->
+<!-- ====== PAGE WRAPPER ====== -->
 <div class="page-wrapper" id="pageWrapper">
 
   <!-- TOPBAR MOBILE -->
@@ -479,7 +451,6 @@
         <span class="material-icons">tune</span>
         Paramètres de génération
       </div>
-
       <div class="fields-grid">
         <div class="fld">
           <label for="nomEcole">Nom de l'École</label>
@@ -493,7 +464,6 @@
           <label for="telEcole">Contact de l'École</label>
           <input type="text" id="telEcole" placeholder="ex: +221 33 820 00 00"/>
         </div>
-
         <div class="fld field-full">
           <label for="nomClasse">Nom de la Classe</label>
           <div class="input-wrapper">
@@ -509,7 +479,6 @@
           </div>
         </div>
       </div>
-
       <button class="btn-primary" id="btn-generer" onclick="lancerGeneration()">
         <span class="material-icons" style="font-size:18px">play_arrow</span>
         Générer les Bulletins
@@ -538,9 +507,7 @@
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-//  NOUVELLE GESTION DE LA SIDEBAR (mobile & toggle)
-// ═══════════════════════════════════════════
+// ====== SIDEBAR JS — identique dashboard ======
 (function() {
   const sidebar        = document.getElementById('sidebar');
   const toggleBtn      = document.getElementById('toggleSidebar');
@@ -548,52 +515,51 @@
   const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-  const openMobile  = () => { sidebar.classList.add('mobile-open'); sidebarOverlay.classList.add('active'); };
+  const openMobile  = () => { sidebar.classList.add('mobile-open');    sidebarOverlay.classList.add('active'); };
   const closeMobile = () => { sidebar.classList.remove('mobile-open'); sidebarOverlay.classList.remove('active'); };
 
-  // Toggle sidebar (desktop)
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
+  toggleBtn.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
+    } else {
       sidebar.classList.toggle('collapsed');
       toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
-    });
-  }
-
-  // Ouvrir le menu mobile
-  if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', () => {
-      sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
-    });
-  }
-
-  // Fermer via overlay
-  if (sidebarOverlay) {
-    sidebarOverlay.addEventListener('click', closeMobile);
-  }
-
-  // Fermer si on clique en dehors (mobile)
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-      closeMobile();
     }
   });
 
-  // Réinitialiser au redimensionnement
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
+  mobileMenuBtn.addEventListener('click', () => {
+    sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
+  });
+
+  sidebarOverlay.addEventListener('click', closeMobile);
+
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target))
       closeMobile();
-      // Sur desktop, on garde l'état collapsed défini par l'utilisateur
-    } else {
-      // Sur mobile, on enlève la classe collapsed pour que la sidebar soit pleine largeur quand ouverte
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth <= 768) {
       sidebar.classList.remove('collapsed');
       toggleIcon.textContent = 'chevron_left';
+      closeMobile();
+    } else {
+      closeMobile();
     }
   });
 })();
 
-// ═══════════════════════════════════════════
-//  CODE EXISTANT POUR LES BULLETINS (inchangé)
-// ═══════════════════════════════════════════
+// ====== AUTH — mise à jour infos user sidebar ======
+document.addEventListener('DOMContentLoaded', () => {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) { window.location.href = '/connexion.html'; return; }
+    const name = user.displayName || user.email || 'Administrateur';
+    document.getElementById('userNameDisplay').textContent = name;
+    document.getElementById('userAvatar').textContent      = name[0].toUpperCase();
+  });
+});
+
+// ====== CODE BULLETINS (inchangé) ======
 const firebaseConfig = {
   apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
   authDomain:        "real-educsen.firebaseapp.com",
@@ -605,7 +571,6 @@ const firebaseConfig = {
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.firestore();
 
-// Logger
 const logZone = document.getElementById('log-zone');
 function log(msg, type='ok') {
   logZone.style.display = 'block';
@@ -640,9 +605,7 @@ async function rechercherClasseParNom(nomSaisi) {
   for (const doc of snapshot.docs) {
     const data  = doc.data();
     const champ = (data.nomClasse || data.nom || '').trim().toLowerCase();
-    if (champ === nom) {
-      return { id: doc.id, ...data };
-    }
+    if (champ === nom) return { id: doc.id, ...data };
   }
   return null;
 }
@@ -650,27 +613,22 @@ async function rechercherClasseParNom(nomSaisi) {
 async function onClasseInput() {
   clearTimeout(_debounceTimer);
   _classeIdResolu = null;
-
   const input  = document.getElementById('nomClasse');
   const status = document.getElementById('classeStatus');
   const hint   = document.getElementById('classeHint');
   const val    = input.value.trim();
-
   input.className = '';
   status.className = 'input-status';
   status.innerHTML = '';
-
   if (!val) {
     hint.className   = 'class-hint info';
     hint.innerHTML   = '<span class="material-icons" style="font-size:13px">info</span> Tapez le nom exact de la classe — l\'ID Firestore sera trouvé automatiquement';
     return;
   }
-
   status.className = 'input-status loading';
   status.innerHTML = '<span class="spinner-dark"></span>';
   hint.className   = 'class-hint info';
   hint.textContent = 'Recherche en cours…';
-
   _debounceTimer = setTimeout(async () => {
     try {
       const classe = await rechercherClasseParNom(val);
@@ -699,23 +657,23 @@ async function onClasseInput() {
 }
 
 async function fetchEleves(classeId) {
-  log('👥 Chargement élèves…', 'info');
+  log('Chargement élèves…', 'info');
   try {
     const s = await db.collection('classes').doc(classeId).collection('eleves').get();
-    if (s.empty) { log('⚠️ Aucun élève', 'warn'); return []; }
-    log(`✅ ${s.size} élève(s)`);
+    if (s.empty) { log('Aucun élève', 'warn'); return []; }
+    log(`${s.size} élève(s)`);
     return s.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { log(`❌ ${e.message}`, 'error'); return []; }
+  } catch(e) { log(`${e.message}`, 'error'); return []; }
 }
 
 async function fetchEvals(classeId) {
-  log('📝 Chargement évaluations…', 'info');
+  log('Chargement évaluations…', 'info');
   try {
     const s = await db.collection('evaluations').where('classeId', '==', classeId).get();
-    if (s.empty) { log('⚠️ Aucune évaluation', 'warn'); return []; }
-    log(`✅ ${s.size} évaluation(s)`);
+    if (s.empty) { log('Aucune évaluation', 'warn'); return []; }
+    log(`${s.size} évaluation(s)`);
     return s.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { log(`❌ ${e.message}`, 'error'); return []; }
+  } catch(e) { log(`${e.message}`, 'error'); return []; }
 }
 
 async function fetchNotes(evalId) {
@@ -726,7 +684,7 @@ async function fetchNotes(evalId) {
 }
 
 function calculer(eleves, evals, notesMap) {
-  log('🔢 Calcul des moyennes…', 'info');
+  log('Calcul des moyennes…', 'info');
   const resultats = eleves.map(eleve => {
     const matieres = {};
     evals.forEach(ev => {
@@ -763,7 +721,7 @@ function calculer(eleves, evals, notesMap) {
     .forEach((r,i) => r.rang = i+1);
   const ms = resultats.map(r=>r.mg).filter(v=>v!==null);
   const mc = ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null;
-  log(`✅ Moy. classe : ${fmt(mc)}`);
+  log(`Moy. classe : ${fmt(mc)}`);
   return { resultats, mc };
 }
 
@@ -776,30 +734,20 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
   const mgv       = mg !== null ? mg : -1;
   const nomClasse = classe.nomClasse || classe.nom || '—';
   const effectif  = classe._effectif || '—';
-
   const lignes = Object.entries(matieres).map(([n,m]) => {
     const ap = getAppr(m.moy);
-    return `<tr>
-      <td>${n}</td><td>${fmt(m.moyD)}</td><td>${fmt(m.moyC)}</td>
-      <td class="moy-cell">${fmt(m.moy)}</td>
-      <td>${m.coeff}</td>
-      <td>${m.pts!==null ? fmt(m.pts) : '—'}</td>
-      <td><span class="appr-tb">${ap.label}</span></td>
-    </tr>`;
+    return `<tr><td>${n}</td><td>${fmt(m.moyD)}</td><td>${fmt(m.moyC)}</td><td class="moy-cell">${fmt(m.moy)}</td><td>${m.coeff}</td><td>${m.pts!==null ? fmt(m.pts) : '—'}</td><td><span class="appr-tb">${ap.label}</span></td></tr>`;
   }).join('');
-
   const obs =
     apGen.label==='Très Bien'  ? 'Excellent travail. Continuez ainsi sur cette belle lancée.' :
     apGen.label==='Bien'       ? 'Bon travail. Persévérez dans vos efforts.' :
     apGen.label==='Assez Bien' ? 'Travail satisfaisant. Des progrès sont encore possibles.' :
     apGen.label==='Passable'   ? 'Des lacunes persistent. Un travail régulier est nécessaire.' :
     'Des difficultés importantes ont été relevées. Un suivi est vivement recommandé.';
-
   return `
 <div class="bulletin" id="bul-${eleve.id}">
   <div class="watermark">OFFICIEL</div>
   <div class="bul-content">
-
     <div class="bul-topbar">
       <div class="bt-left">
         <div class="school-name">${nomEcole}</div>
@@ -811,59 +759,35 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
         <div class="annee-value">${annee}</div>
       </div>
     </div>
-
     <div class="bul-title"><div class="bul-title-main">Bulletin de Notes</div></div>
-
     <div class="bul-header">
-      <div class="bh-left">
-        <div class="rep-name">République du Sénégal</div>
-        <div class="rep-min">Ministère de l'Éducation Nationale</div>
-      </div>
+      <div class="bh-left"><div class="rep-name">République du Sénégal</div><div class="rep-min">Ministère de l'Éducation Nationale</div></div>
       <div class="bh-center"><div class="semestre-val">${semestre}</div></div>
-      <div class="bh-right">
-        <div class="header-meta">
-          Classe&nbsp;: <strong>${nomClasse}</strong><br>
-          Effectif&nbsp;: <strong>${effectif}</strong><br>
-          Moy. classe&nbsp;: <strong>${fmt(mc)}</strong>
-        </div>
-      </div>
+      <div class="bh-right"><div class="header-meta">Classe&nbsp;: <strong>${nomClasse}</strong><br>Effectif&nbsp;: <strong>${effectif}</strong><br>Moy. classe&nbsp;: <strong>${fmt(mc)}</strong></div></div>
     </div>
-
     <div class="eleve-band">
       <div class="eleve-cell"><div class="ef-label">Prénom &amp; Nom</div><div class="ef-value">${nom}</div></div>
       <div class="eleve-cell"><div class="ef-label">Matricule</div><div class="ef-value">${matricule}</div></div>
       <div class="eleve-cell"><div class="ef-label">Classe</div><div class="ef-value">${nomClasse}</div></div>
       <div class="eleve-cell"><div class="ef-label">Statut</div><div class="ef-value">${eleve.redoublant ? 'Redoublant' : 'Nouveau'}</div></div>
     </div>
-
     <table class="notes-table">
-      <thead><tr>
-        <th style="width:22%">Matière</th><th>Moy. Devoirs</th><th>Moy. Compos.</th>
-        <th>Moy. Matière</th><th>Coeff.</th><th>Points</th><th>Appréciation</th>
-      </tr></thead>
-      <tbody>
-        ${lignes || '<tr><td colspan="7" style="text-align:center;color:#999;font-style:italic;padding:12px">Aucune note disponible</td></tr>'}
-      </tbody>
+      <thead><tr><th style="width:22%">Matière</th><th>Moy. Devoirs</th><th>Moy. Compos.</th><th>Moy. Matière</th><th>Coeff.</th><th>Points</th><th>Appréciation</th></tr></thead>
+      <tbody>${lignes || '<tr><td colspan="7" style="text-align:center;color:#999;font-style:italic;padding:12px">Aucune note disponible</td></tr>'}</tbody>
     </table>
-
     <div class="recap-row">
       <div class="recap-cell"><span class="rc-label">Moy. Classe</span><span class="rc-value">${fmt(mc)}</span></div>
       <div class="recap-cell"><span class="rc-label">Total Coefficients</span><span class="rc-value">${tc}</span></div>
       <div class="recap-cell"><span class="rc-label">Total Points</span><span class="rc-value">${fmt(tp)}</span></div>
       <div class="recap-cell hi"><span class="rc-label">Moyenne Générale</span><span class="rc-value">${fmt(mg)}<span style="font-size:11px;font-weight:400"> /20</span></span></div>
     </div>
-
     <div class="rang-ligne">
       <div class="rang-left">Rang&nbsp;: <span class="rang-val">${rang}<sup>${sfx}</sup></span> / ${effectif}</div>
       <div class="rang-right">Appréciation&nbsp;: <span class="appr-gen">${apGen.label}</span></div>
     </div>
-
     <div class="bottom-section">
       <div class="bottom-left">
-        <div class="obs-block">
-          <div class="obs-title">Observations du Conseil des Professeurs</div>
-          <div class="obs-content">${obs}</div>
-        </div>
+        <div class="obs-block"><div class="obs-title">Observations du Conseil des Professeurs</div><div class="obs-content">${obs}</div></div>
         <div class="obs-block">
           <div class="obs-title">Distinctions</div>
           <table class="distinctions-table">
@@ -874,23 +798,11 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
         </div>
       </div>
       <div class="bottom-right">
-        <div class="sign-block">
-          <div class="sign-title">Visa du Chef d'Établissement</div>
-          <div class="sign-line"></div>
-          <div class="sign-name">Signature &amp; Cachet</div>
-        </div>
-        <div class="parents-block">
-          <div class="obs-title">Visa des Parents / Tuteur</div>
-          <div style="min-height:44px"></div>
-        </div>
+        <div class="sign-block"><div class="sign-title">Visa du Chef d'Établissement</div><div class="sign-line"></div><div class="sign-name">Signature &amp; Cachet</div></div>
+        <div class="parents-block"><div class="obs-title">Visa des Parents / Tuteur</div><div style="min-height:44px"></div></div>
       </div>
     </div>
-
-    <div class="bul-footer">
-      Ce bulletin est un document officiel délivré par l'établissement scolaire.
-      Toute modification non autorisée est passible de sanctions. Veuillez en conserver une photocopie.
-    </div>
-
+    <div class="bul-footer">Ce bulletin est un document officiel délivré par l'établissement scolaire. Toute modification non autorisée est passible de sanctions. Veuillez en conserver une photocopie.</div>
   </div>
 </div>`;
 }
@@ -900,134 +812,87 @@ async function lancerGeneration() {
   const nomEcole     = document.getElementById('nomEcole').value.trim()     || 'Établissement Scolaire';
   const adresseEcole = document.getElementById('adresseEcole').value.trim() || '';
   const telEcole     = document.getElementById('telEcole').value.trim()     || '';
-
-  if (!nomSaisi) {
-    log('⚠️ Veuillez saisir le nom de la classe', 'warn');
-    return;
-  }
-
+  if (!nomSaisi) { log('Veuillez saisir le nom de la classe', 'warn'); return; }
   const btn = document.getElementById('btn-generer');
   btn.disabled  = true;
   btn.innerHTML = '<span class="spinner"></span> Recherche de la classe…';
   document.getElementById('bulletins-container').innerHTML = '';
   document.getElementById('btn-pdf-container').style.display = 'none';
-
   try {
-    log(`🔍 Recherche de la classe "${nomSaisi}" dans Firestore…`, 'info');
+    log(`Recherche de la classe "${nomSaisi}"…`, 'info');
     const classe = await rechercherClasseParNom(nomSaisi);
-
     if (!classe) {
-      log(`❌ Aucune classe trouvée avec le nom "${nomSaisi}"`, 'error');
-      log('💡 Vérifiez l\'orthographe exacte du champ "nomClasse" dans Firestore', 'warn');
+      log(`Aucune classe trouvée avec le nom "${nomSaisi}"`, 'error');
       btn.disabled  = false;
       btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
       return;
     }
-
     const classeId = classe.id;
-    log(`✅ Classe trouvée : "${classe.nomClasse || classe.nom}" → ID : ${classeId}`);
-
+    log(`Classe trouvée : "${classe.nomClasse || classe.nom}" — ID : ${classeId}`);
     _classeIdResolu = classeId;
     document.getElementById('classeStatus').className = 'input-status ok';
     document.getElementById('classeStatus').innerHTML = '✓';
-
     btn.innerHTML = '<span class="spinner"></span> Chargement des données…';
-
     const eleves = await fetchEleves(classeId);
-    if (!eleves.length) {
-      btn.disabled  = false;
-      btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
-      return;
-    }
-
+    if (!eleves.length) { btn.disabled = false; btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins'; return; }
     const evals = await fetchEvals(classeId);
-    if (!evals.length) log("⚠️ Pas d'évaluations — les tableaux seront vides", 'warn');
-
-    log(`📊 Récupération des notes (${evals.length} éval.)…`, 'info');
+    if (!evals.length) log("Pas d'évaluations — les tableaux seront vides", 'warn');
+    log(`Récupération des notes (${evals.length} éval.)…`, 'info');
     const notesMap = {};
     await Promise.all(evals.map(async ev => {
       notesMap[ev.id] = await fetchNotes(ev.id);
-      log(`  → ${ev.matiere||ev.id} | coeff: ${ev.coefficients||ev.coefficient||'?'} | ${notesMap[ev.id].length} note(s)`);
+      log(`  ${ev.matiere||ev.id} | coeff: ${ev.coefficients||ev.coefficient||'?'} | ${notesMap[ev.id].length} note(s)`);
     }));
-
     const annee    = classe.annee    || `${new Date().getFullYear()}–${new Date().getFullYear()+1}`;
     const semestre = classe.semestre || '1er Semestre';
     classe._effectif = eleves.length;
-
     const { resultats, mc } = calculer(eleves, evals, notesMap);
-
-    log('🖨️ Rendu des bulletins…', 'info');
+    log('Rendu des bulletins…', 'info');
     const container = document.getElementById('bulletins-container');
     resultats.forEach(res => {
       const div = document.createElement('div');
       div.innerHTML = renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole);
       container.appendChild(div.firstElementChild);
     });
-
-    log(`🎉 ${resultats.length} bulletin(s) généré(s) avec succès !`);
+    log(`${resultats.length} bulletin(s) généré(s) avec succès !`);
     document.getElementById('btn-pdf-container').style.display = 'block';
-
   } catch(e) {
-    log(`❌ Erreur inattendue : ${e.message}`, 'error');
+    log(`Erreur : ${e.message}`, 'error');
     console.error(e);
   }
-
   btn.disabled  = false;
   btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
 }
 
 async function exporterPDF() {
   const bulletins = Array.from(document.querySelectorAll('.bulletin'));
-  if (!bulletins.length) { log('⚠️ Aucun bulletin à exporter', 'warn'); return; }
-
+  if (!bulletins.length) { log('Aucun bulletin à exporter', 'warn'); return; }
   const btnPdf = document.getElementById('btn-pdf');
   btnPdf.innerHTML = '<span class="spinner"></span> Export en cours…';
   btnPdf.disabled  = true;
-
   const nomSaisi = document.getElementById('nomClasse').value.trim().replace(/\s+/g,'_');
   const filename  = `Bulletins_${nomSaisi}_${new Date().toISOString().slice(0,10)}.pdf`;
-  log(`📄 Export PDF — ${bulletins.length} page(s)…`, 'info');
-
+  log(`Export PDF — ${bulletins.length} page(s)…`, 'info');
   try {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
-
     for (let i = 0; i < bulletins.length; i++) {
       const bul = bulletins[i];
-      log(`  → Page ${i+1}/${bulletins.length}…`, 'info');
-
-      const saved = {
-        transform: bul.style.transform, marginBottom: bul.style.marginBottom,
-        width: bul.style.width, height: bul.style.height,
-        overflow: bul.style.overflow, boxShadow: bul.style.boxShadow, border: bul.style.border,
-      };
-      bul.style.transform    = 'none';
-      bul.style.marginBottom = '0';
-      bul.style.width        = '794px';
-      bul.style.height       = '1122px';
-      bul.style.overflow     = 'hidden';
-      bul.style.boxShadow    = 'none';
-      bul.style.border       = 'none';
-
-      const canvas = await html2canvas(bul, {
-        scale: 2, useCORS: true, allowTaint: true, logging: false,
-        backgroundColor: '#ffffff', width: 794, height: 1122,
-        windowWidth: 794, windowHeight: 1122,
-      });
+      log(`  Page ${i+1}/${bulletins.length}…`, 'info');
+      const saved = { transform: bul.style.transform, marginBottom: bul.style.marginBottom, width: bul.style.width, height: bul.style.height, overflow: bul.style.overflow, boxShadow: bul.style.boxShadow, border: bul.style.border };
+      bul.style.transform = 'none'; bul.style.marginBottom = '0'; bul.style.width = '794px'; bul.style.height = '1122px'; bul.style.overflow = 'hidden'; bul.style.boxShadow = 'none'; bul.style.border = 'none';
+      const canvas = await html2canvas(bul, { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff', width: 794, height: 1122, windowWidth: 794, windowHeight: 1122 });
       Object.assign(bul.style, saved);
-
       if (i > 0) pdf.addPage();
       pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
-      log(`  ✅ Page ${i+1} OK`);
+      log(`  Page ${i+1} OK`);
     }
-
     pdf.save(filename);
-    log(`✅ "${filename}" téléchargé avec succès !`);
+    log(`"${filename}" téléchargé avec succès !`);
   } catch(e) {
-    log(`❌ Erreur PDF : ${e.message}`, 'error');
+    log(`Erreur PDF : ${e.message}`, 'error');
     console.error(e);
   }
-
   btnPdf.innerHTML = '<span class="material-icons" style="font-size:18px">download</span> Télécharger le PDF';
   btnPdf.disabled  = false;
 }
