@@ -2,17 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="/images/icon-192x192.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professeurs · Educsen</title>
     <!-- Material Icons & Google Fonts -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -22,7 +19,7 @@
             min-height: 100vh;
         }
 
-        /* ========== SIDEBAR (inchangée, mais avec largeur variable) ========== */
+        /* ========== SIDEBAR HARMONISÉE (identique à classes.html) ========== */
         .sidebar {
             width: 280px;
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -141,15 +138,6 @@
             text-align: center;
         }
 
-        .nav-item span:last-child {
-            transition: opacity 0.2s;
-        }
-
-        .sidebar.collapsed .nav-item span:last-child {
-            opacity: 0;
-            width: 0;
-            display: none;
-        }
         .sidebar.collapsed .nav-item {
             padding: 14px 0;
             margin: 0 8px;
@@ -162,21 +150,9 @@
             text-align: center;
         }
 
-        .sidebar.collapsed .sidebar-footer {
-            padding: 16px 8px;
-        }
-
-        .sidebar.collapsed .user-info {
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .logout-btn {
-            padding: 10px 0;
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .logout-btn span:last-child,
-        .sidebar.collapsed .logout-btn .logout-text {
+        .sidebar.collapsed .nav-item span:last-child {
+            opacity: 0;
+            width: 0;
             display: none;
         }
 
@@ -240,7 +216,7 @@
         .logout-btn {
             width: 100%;
             padding: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255,255,255,0.1);
             color: #94a3b8;
             border: none;
             border-radius: 6px;
@@ -256,18 +232,16 @@
         }
 
         .logout-btn:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255,255,255,0.2);
             color: white;
         }
 
-        /* ========== OVERLAY MOBILE ========== */
+        /* ---------- OVERLAY MOBILE ---------- */
         .sidebar-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             z-index: 999;
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -279,7 +253,7 @@
             pointer-events: auto;
         }
 
-        /* ========== TOPBAR MOBILE (sticky, inspirée de la page Rapport) ========== */
+        /* ---------- TOPBAR MOBILE ---------- */
         .mobile-topbar {
             display: none;
             position: sticky;
@@ -335,7 +309,7 @@
             background: #f1f5f9;
         }
 
-        /* ========== PAGE WRAPPER (comme dans Rapport) ========== */
+        /* ---------- PAGE WRAPPER ---------- */
         .page-wrapper {
             flex: 1;
             margin-left: 280px;
@@ -362,7 +336,6 @@
             gap: 20px;
         }
 
-        /* ========== TITRE AMÉLIORÉ ========== */
         .page-header h1 {
             font-size: 2.5rem;
             font-weight: 700;
@@ -374,7 +347,7 @@
             line-height: 1.2;
         }
 
-        /* ========== GRILLE DES PROFESSEURS ========== */
+        /* ========== STYLES SPÉCIFIQUES À LA PAGE PROFESSEURS ========== */
         .professeurs-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -508,7 +481,6 @@
         .fill-faible { background-color: #ef4444; }
         .fill-aucune { background-color: #94a3b8; }
 
-        /* ========== SECTIONS PAR CATÉGORIE ========== */
         .category-section {
             margin-bottom: 32px;
         }
@@ -679,13 +651,13 @@
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- SIDEBAR (identique) -->
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo-header">
             <div class="logo-area">
                 <div class="logo-icon">E</div>
-                <span class="logo-text">Edu<span style="color:#3b82f6;">sen</span></span>
+                <span class="logo-text">Educ<span>sen</span></span>
             </div>
             <button class="toggle-btn" id="toggleSidebar">
                 <span class="material-icons" id="toggleIcon">chevron_left</span>
@@ -694,12 +666,12 @@
     </div>
 
     <nav class="nav-menu">
-        <a href="/userdashboard.html" class="nav-item active">
+        <a href="/userdashboard.html" class="nav-item">
             <span class="nav-icon material-icons">dashboard</span>
             <span>Dashboard</span>
         </a>
         <a href="/user-admin/assistant.html" class="nav-item">
-            <span class="nav-icon material-icons">assessment</span>
+            <span class="nav-icon material-icons">smart_toy</span>
             <span>Assistant</span>
         </a>
         <a href="/user-admin/rapport.html" class="nav-item">
@@ -710,7 +682,7 @@
             <span class="nav-icon material-icons">school</span>
             <span>Classes</span>
         </a>
-        <a href="/user-admin/professeurs.html" class="nav-item">
+        <a href="/user-admin/professeurs.html" class="nav-item active">
             <span class="nav-icon material-icons">person</span>
             <span>Professeurs</span>
         </a>
@@ -743,10 +715,10 @@
     </div>
 </aside>
 
-<!-- PAGE WRAPPER (contient topbar + contenu) -->
+<!-- PAGE WRAPPER -->
 <div class="page-wrapper" id="pageWrapper">
 
-    <!-- TOPBAR MOBILE (sticky) -->
+    <!-- TOPBAR MOBILE -->
     <header class="mobile-topbar" id="mobileTopbar">
         <div class="topbar-logo">
             <div class="logo-icon">E</div>
@@ -777,7 +749,7 @@
     </main>
 </div>
 
-<!-- Firebase Import Map (inchangé) -->
+<!-- Firebase Import Map -->
 <script type="importmap">
     {
         "imports": {
@@ -829,8 +801,6 @@
     const userAvatar = document.getElementById('userAvatar');
     const userNameSpan = document.getElementById('userName');
     const userRoleSpan = document.getElementById('userRole');
-
-    // Nouveaux éléments pour la topbar mobile
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
 
@@ -1180,7 +1150,7 @@
         loadProfesseursWithCache();
     });
 
-    // ---------- SIDEBAR TOGGLE (adapté pour mobile avec topbar) ----------
+    // ---------- SIDEBAR TOGGLE (adapté pour mobile) ----------
     function openMobileSidebar() {
         sidebar.classList.add('mobile-open');
         sidebarOverlay.classList.add('active');
@@ -1191,22 +1161,23 @@
         sidebarOverlay.classList.remove('active');
     }
 
-    // Toggle sur desktop (flèche dans la sidebar)
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+            if (window.innerWidth <= 768) {
+                sidebar.classList.contains('mobile-open') ? closeMobileSidebar() : openMobileSidebar();
+            } else {
+                sidebar.classList.toggle('collapsed');
+                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+            }
         });
     }
 
-    // Bouton menu dans la topbar mobile
     if (mobileMenuBtn) {
         mobileMenuBtn.addEventListener('click', () => {
             if (sidebar.classList.contains('mobile-open')) {
                 closeMobileSidebar();
             } else {
                 openMobileSidebar();
-                // Sur mobile, on désactive l'état collapsed
                 if (sidebar.classList.contains('collapsed')) {
                     sidebar.classList.remove('collapsed');
                     toggleIcon.textContent = 'chevron_left';
@@ -1215,12 +1186,10 @@
         });
     }
 
-    // Fermer en cliquant sur l'overlay
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', closeMobileSidebar);
     }
 
-    // Fermer si on clique ailleurs (hors sidebar et bouton)
     document.addEventListener('click', (e) => {
         if (window.innerWidth <= 768) {
             if (!sidebar.contains(e.target) && mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
@@ -1229,14 +1198,12 @@
         }
     });
 
-    // Gestion du redimensionnement
     function handleResize() {
         if (window.innerWidth <= 768) {
             sidebar.classList.remove('collapsed');
             toggleIcon.textContent = 'chevron_left';
             closeMobileSidebar();
         } else {
-            // Sur desktop, on ferme le mode mobile
             closeMobileSidebar();
         }
     }
