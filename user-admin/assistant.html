@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="/images/icon-192x192.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZeynIA · Assistant pédagogique</title>
+    <title>Educsen IA · Assistant pédagogique</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
@@ -57,75 +58,76 @@
             overflow: hidden;
         }
 
-        /* ═══ OVERLAY MOBILE ═══ */
+        /* ===== OVERLAY MOBILE ===== */
         .sidebar-overlay {
             display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            opacity: 0;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.52);
+            z-index: 999; opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
         }
-        .sidebar-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-        /* ═══ SIDEBAR ═══ */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             color: white;
-            display: flex;
-            flex-direction: column;
-            transition: width 0.3s ease, transform 0.3s ease;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
             height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            z-index: 1000;
+            position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000;
         }
         .sidebar.collapsed { width: 80px; }
+
         .sidebar-header { padding: 20px 16px; border-bottom: 1px solid #334155; }
         .logo-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; }
-        .logo-icon {
+
+        .sidebar .logo-icon {
             width: 42px; height: 42px;
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-size: 1.3rem; font-weight: 700;
-            color: white; flex-shrink: 0;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 600; color: white; flex-shrink: 0;
         }
-        .logo-txt {
-            font-size: 1.3rem; font-weight: 600; white-space: nowrap;
-            overflow: hidden; transition: opacity 0.2s; color: white;
+        .sidebar .logo-text {
+            font-size: 1.3rem; font-weight: 600;
+            white-space: nowrap; overflow: hidden;
+            transition: opacity 0.2s; color: white;
         }
-        .sidebar.collapsed .logo-txt { opacity: 0; width: 0; }
-        .logo-txt span { color: #3b82f6; }
+        .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
+        .sidebar .logo-text span { color: #3b82f6; }
+
         .toggle-btn {
             background: rgba(255,255,255,0.1); border: 1px solid #4b5563;
             border-radius: 50%; width: 32px; height: 32px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.2s; color: #e2e8f0; flex-shrink: 0;
         }
-        .toggle-btn:hover { background: rgba(255,255,255,0.2); border-color: var(--accent); color: white; }
+        .toggle-btn:hover { background: rgba(255,255,255,0.2); border-color: #3b82f6; color: white; }
+
         .nav-menu { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 4px; }
+
         .nav-item {
             display: flex; align-items: center; gap: 16px;
             padding: 14px 24px; margin: 0 12px; border-radius: 12px;
-            color: #cbd5e1; text-decoration: none; transition: all 0.2s; white-space: nowrap;
+            color: #cbd5e1; text-decoration: none;
+            transition: all 0.2s; white-space: nowrap;
         }
-        .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
-        .nav-lbl { transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-lbl { opacity: 0; width: 0; display: none; }
+        .nav-item .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
+        .nav-item span:last-child { transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item span:last-child { opacity: 0; width: 0; display: none; }
+        .sidebar.collapsed .nav-item { padding: 14px 0; margin: 0 8px; justify-content: center; gap: 0; }
+        .sidebar.collapsed .nav-item .nav-icon { width: 24px; text-align: center; }
         .nav-item.active { background: #3b82f6; color: white; box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3); }
         .nav-item:hover:not(.active) { background: #334155; color: white; }
+
         .sidebar-footer { padding: 20px; border-top: 1px solid #334155; }
-        .user-info { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+        .user-info { display: flex; align-items: center; gap: 12px; white-space: nowrap; margin-bottom: 12px; }
         .user-avatar {
             width: 42px; height: 42px; background: #3b82f6; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
@@ -136,19 +138,24 @@
         .user-role { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
         .sidebar.collapsed .user-details { opacity: 0; width: 0; }
 
-        /* ═══ TOPBAR MOBILE (sticky) ═══ */
+        .logout-btn {
+            width: 100%; padding: 10px;
+            background-color: rgba(255,255,255,0.1); color: #94a3b8;
+            border: none; border-radius: 6px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; font-size: 14px; transition: all 0.2s;
+            white-space: nowrap; text-decoration: none;
+        }
+        .logout-btn:hover { background-color: rgba(255,255,255,0.2); color: white; }
+
+        /* ===== TOPBAR MOBILE ===== */
         .mobile-topbar {
             display: none;
-            position: sticky;
-            top: 0;
-            z-index: 998;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0 16px;
-            height: 60px;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            position: sticky; top: 0; z-index: 998;
+            background: #1e293b; border-bottom: 1px solid #334155;
+            padding: 0 16px; height: 60px;
+            align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
         }
         .topbar-logo { display: flex; align-items: center; gap: 10px; }
         .topbar-logo .logo-icon {
@@ -158,39 +165,31 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 1.05rem; font-weight: 700; color: #fff;
         }
-        .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+        .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
         .topbar-logo-text em { color: #3b82f6; font-style: normal; }
         .topbar-menu-btn {
-            background: none; border: none;
-            width: 40px; height: 40px;
+            background: none; border: none; width: 40px; height: 40px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #334155; border-radius: 8px;
-            transition: background .2s;
+            cursor: pointer; color: #cbd5e1; border-radius: 8px; transition: background .2s;
         }
-        .topbar-menu-btn:hover { background: #f1f5f9; }
+        .topbar-menu-btn:hover { background: #334155; }
 
-        /* ═══ PAGE WRAPPER (contenu principal) ═══ */
+        /* ===== PAGE WRAPPER ===== */
         .page-wrapper {
-            flex: 1;
-            margin-left: 280px;  /* largeur de la sidebar */
+            flex: 1; margin-left: 280px;
             transition: margin-left 0.3s ease;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            min-width: 0; display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
         }
-        .sidebar.collapsed ~ .page-wrapper {
-            margin-left: 80px;
-        }
+        .sidebar.collapsed ~ .page-wrapper { margin-left: 80px; }
 
+        /* ===== HEADER ===== */
         .app-header {
             padding: 20px 32px;
             border-bottom: 1px solid var(--border-subtle);
             display: flex; align-items: center; justify-content: space-between;
             background-color: var(--bg-header);
-            transition: var(--transition);
-            flex-shrink: 0;
+            transition: var(--transition); flex-shrink: 0;
         }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .app-header h1 { font-weight: 500; font-size: 1.6rem; letter-spacing: -0.02em; }
@@ -203,6 +202,7 @@
         }
         .theme-toggle:hover { background-color: var(--bg-input); color: var(--accent); border-color: var(--accent); }
 
+        /* ===== CHAT ===== */
         .chat-container {
             flex: 1; overflow-y: auto; padding: 24px 0;
             display: flex; flex-direction: column; align-items: center;
@@ -222,17 +222,13 @@
             white-space: pre-wrap; word-break: break-word;
             box-shadow: var(--shadow-sm); transition: var(--transition);
         }
-        .message-row.user .message-bubble {
-            background-color: var(--bg-user-message);
-            border-bottom-right-radius: 4px;
-        }
-        .message-row.assistant .message-bubble {
-            background-color: var(--bg-assistant-message);
-            border-bottom-left-radius: 4px;
-        }
+        .message-bubble.html-content { white-space: normal; }
+        .message-row.user .message-bubble { background-color: var(--bg-user-message); border-bottom-right-radius: 4px; }
+        .message-row.assistant .message-bubble { background-color: var(--bg-assistant-message); border-bottom-left-radius: 4px; }
         .message-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; padding-left: 4px; }
         .message-row.user .message-time { text-align: right; }
 
+        /* ===== TYPING ===== */
         .typing-indicator { display: flex; gap: 6px; padding: 16px 0; }
         .typing-indicator span {
             width: 8px; height: 8px; background-color: var(--text-muted);
@@ -245,13 +241,14 @@
 
         @keyframes typing {
             0%, 80%, 100% { transform: scale(0.6); opacity: 0.6; }
-            40% { transform: scale(1); opacity: 1; }
+            40%            { transform: scale(1);   opacity: 1; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
+        /* ===== INPUT ===== */
         .input-area {
             padding: 24px 32px 32px;
             border-top: 1px solid var(--border-subtle);
@@ -266,10 +263,7 @@
             border-radius: 999px; padding: 8px 8px 8px 20px;
             box-shadow: var(--shadow-md); transition: var(--transition);
         }
-        .input-container:focus-within {
-            box-shadow: 0 4px 28px rgba(59,130,246,0.2);
-            border-color: var(--accent);
-        }
+        .input-container:focus-within { box-shadow: 0 4px 28px rgba(59,130,246,0.2); border-color: var(--accent); }
         textarea {
             flex: 1; background: transparent; border: none; resize: none;
             padding: 12px 0; max-height: 150px;
@@ -285,11 +279,11 @@
             transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
             box-shadow: 0 2px 8px rgba(59,130,246,0.4);
         }
-        .send-btn:hover { background-color: var(--accent-hover); }
+        .send-btn:hover  { background-color: var(--accent-hover); }
         .send-btn:active { transform: scale(0.96); }
         .send-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
-        /* ═══ MODAL RAPPORT ═══ */
+        /* ===== MODAL PDF ===== */
         .report-modal {
             display: none; position: fixed; z-index: 9999;
             left: 0; top: 0; width: 100%; height: 100%;
@@ -301,10 +295,7 @@
             border-radius: 16px; text-align: center; position: relative;
             animation: fadeIn 0.3s ease; color: #1e293b;
         }
-        .report-close {
-            position: absolute; top: 10px; right: 15px;
-            font-size: 22px; cursor: pointer; color: #64748b;
-        }
+        .report-close { position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer; color: #64748b; }
         .report-close:hover { color: #ef4444; }
         .report-download-btn {
             margin-top: 20px; padding: 12px 24px;
@@ -315,48 +306,31 @@
         }
         .report-download-btn:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
 
-        /* ═══ RESPONSIVE MOBILE ═══ */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px !important;
-                transition: transform 0.3s ease;
-                position: fixed;
-            }
+            .sidebar { transform: translateX(-100%); width: 280px !important; transition: transform 0.3s ease; }
             .sidebar.mobile-open { transform: translateX(0); }
-            .sidebar.collapsed { transform: translateX(-100%); }
+            .sidebar.collapsed { width: 280px !important; transform: translateX(-100%); }
             .sidebar.collapsed.mobile-open { transform: translateX(0); }
-
             .sidebar-overlay { display: block; }
-
             .mobile-topbar { display: flex; }
-
-            .page-wrapper {
-                margin-left: 0 !important;
-                width: 100%;
-            }
-
-            .app-header {
-                padding: 16px 20px;
-            }
-            .input-area {
-                padding: 16px 20px;
-            }
+            .page-wrapper { margin-left: 0 !important; width: 100%; }
+            .app-header { padding: 16px 20px; }
+            .input-area { padding: 16px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY MOBILE -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- SIDEBAR -->
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-header">
                 <div class="logo-area">
                     <div class="logo-icon">E</div>
-                    <span class="logo-txt">Educ<span>sen</span></span>
+                    <span class="logo-text">Educ<span>sen</span></span>
                 </div>
                 <button class="toggle-btn" id="toggleSidebar">
                     <span class="material-icons" id="toggleIcon">chevron_left</span>
@@ -367,54 +341,57 @@
         <nav class="nav-menu">
             <a href="/userdashboard.html" class="nav-item">
                 <span class="nav-icon material-icons">dashboard</span>
-                <span class="nav-lbl">Dashboard</span>
+                <span>Dashboard</span>
             </a>
             <a href="/user-admin/assistant.html" class="nav-item active">
                 <span class="nav-icon material-icons">smart_toy</span>
-                <span class="nav-lbl">Assistant</span>
+                <span>Assistant</span>
             </a>
             <a href="/user-admin/rapport.html" class="nav-item">
                 <span class="nav-icon material-icons">assessment</span>
-                <span class="nav-lbl">Rapport</span>
+                <span>Rapport</span>
             </a>
             <a href="/user-admin/classes.html" class="nav-item">
                 <span class="nav-icon material-icons">school</span>
-                <span class="nav-lbl">Classes</span>
+                <span>Classes</span>
             </a>
             <a href="/user-admin/professeurs.html" class="nav-item">
                 <span class="nav-icon material-icons">person</span>
-                <span class="nav-lbl">Professeurs</span>
+                <span>Professeurs</span>
             </a>
-      
             <a href="/user-admin/notes.html" class="nav-item">
                 <span class="nav-icon material-icons">assignment</span>
-                <span class="nav-lbl">Notes</span>
+                <span>Notes</span>
             </a>
             <a href="/user-admin/bulletin.html" class="nav-item">
                 <span class="nav-icon material-icons">receipt_long</span>
-                <span class="nav-lbl">Bulletins</span>
+                <span>Bulletins</span>
             </a>
             <a href="/user-admin/parametres.html" class="nav-item">
                 <span class="nav-icon material-icons">settings</span>
-                <span class="nav-lbl">Paramètres</span>
+                <span>Paramètres</span>
             </a>
         </nav>
 
         <div class="sidebar-footer">
-            <div class="user-info">
+            <div class="user-info" id="userInfo">
                 <div class="user-avatar" id="userAvatar">AD</div>
                 <div class="user-details">
-                    <div class="user-name" id="userName">Administrateur</div>
-                    <div class="user-role">administrateur</div>
+                    <div class="user-name" id="userNameDisplay">Administrateur</div>
+                    <div class="user-role" id="userRole">admin</div>
                 </div>
             </div>
+            <a href="/index.html" class="logout-btn" id="logoutBtn">
+                <span class="material-icons">logout</span>
+                <span>Déconnexion</span>
+            </a>
         </div>
     </aside>
 
-    <!-- PAGE WRAPPER (contient topbar mobile + contenu) -->
+    <!-- ===== PAGE WRAPPER ===== -->
     <div class="page-wrapper" id="pageWrapper">
 
-        <!-- TOPBAR MOBILE -->
+        <!-- Topbar mobile -->
         <header class="mobile-topbar" id="mobileTopbar">
             <div class="topbar-logo">
                 <div class="logo-icon">E</div>
@@ -425,23 +402,25 @@
             </button>
         </header>
 
-        <!-- HEADER (desktop) -->
+        <!-- Header desktop -->
         <header class="app-header">
             <div class="header-left">
-                <h1><strong>Galago </strong><span style="color:var(--accent);">IA</span></h1>
+                <h1><strong>Educsen </strong><span style="color:var(--accent);">IA</span></h1>
             </div>
             <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">
                 <i class="fas fa-moon"></i>
             </button>
         </header>
 
+        <!-- Zone chat -->
         <main class="chat-container" id="chatContainer">
             <div class="messages-wrapper" id="messagesWrapper"></div>
         </main>
 
+        <!-- Zone saisie -->
         <div class="input-area">
             <div class="input-container">
-                <textarea id="userInput" placeholder="Posez votre question…" rows="1"></textarea>
+                <textarea id="userInput" placeholder="Posez votre question à Educsen IA…" rows="1"></textarea>
                 <button class="send-btn" id="sendBtn" disabled>
                     <i class="fas fa-arrow-up"></i>
                 </button>
@@ -449,36 +428,33 @@
         </div>
     </div>
 
-    <!-- MODAL RAPPORT PDF -->
+    <!-- ===== MODAL PDF ===== -->
     <div id="reportModal" class="report-modal">
         <div class="report-modal-content">
             <span class="report-close" id="closeReportModal">&times;</span>
             <h2>📄 Télécharger le rapport</h2>
-            <p style="margin-top:10px;color:#64748b;font-size:14px;">Votre rapport est prêt. Voulez-vous le télécharger en PDF ?</p>
-            <button id="downloadReportBtn" class="report-download-btn">
-                ⬇ Télécharger le PDF
-            </button>
+            <p style="margin-top:10px;color:#64748b;font-size:14px;">Votre analyse est prête. Voulez-vous la télécharger en PDF ?</p>
+            <button id="downloadReportBtn" class="report-download-btn">⬇️ Télécharger le PDF</button>
         </div>
     </div>
 
-    <!-- html2pdf -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script type="module">
-
-        // ─────────────────────────────────────────────
-        // 1. IMPORTS
-        // ─────────────────────────────────────────────
-        import { initializeApp }             from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getFirestore }              from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { initializeApp }               from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore }                from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
         import assistantJs from './assistant.js';
+        import {
+            isRecommandationRequest, handleRecommandations,
+            isEvolutionRequest, parseEvolutionRequest, handleEvolution,
+            getLastRecoData
+        } from './fonctionnalite.js';
         import { checkSubscription } from './subscription.js';
         await checkSubscription();
 
-        // ─────────────────────────────────────────────
-        // 2. FIREBASE
-        // ─────────────────────────────────────────────
+        // ── Firebase ──
         const firebaseConfig = {
             apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
             authDomain:        "real-educsen.firebaseapp.com",
@@ -491,156 +467,164 @@
         const db   = getFirestore(app);
         const auth = getAuth(app);
 
-        // ─────────────────────────────────────────────
-        // 3. VARIABLES & DOM
-        // ─────────────────────────────────────────────
+        // ── Références DOM ──
         const messagesWrapper = document.getElementById('messagesWrapper');
         const userInput       = document.getElementById('userInput');
         const sendBtn         = document.getElementById('sendBtn');
         const chatContainer   = document.getElementById('chatContainer');
 
-        let isTyping = false;
-        let userId   = null; // sera défini par onAuthStateChanged
+        let isTyping         = false;
+        let userId           = null;
+        let lastReportBubble = null;
 
-        // ─────────────────────────────────────────────
-        // 4. AUTH — récupère l'uid Firebase réel
-        // ─────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────
+        // AUTH
+        // ─────────────────────────────────────────────────────────────────
         onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.replace('/index.html');
-                return;
-            }
-            // Stocker l'uid Firebase Auth (c'est le même que createdBy dans Firestore)
+            if (!user) { window.location.replace('/index.html'); return; }
             userId = user.uid;
-
-            // Afficher les infos dans la sidebar
-            const name = user.displayName || user.email || 'Utilisateur';
-            document.getElementById('userName').textContent   = name;
-            document.getElementById('userAvatar').textContent = name[0].toUpperCase();
+            const name = user.displayName || user.email || 'Administrateur';
+            document.getElementById('userNameDisplay').textContent = name;
+            document.getElementById('userAvatar').textContent      = name[0].toUpperCase();
+            document.getElementById('userRole').textContent        = 'admin';
         });
 
-        // ─────────────────────────────────────────────
-        // 5. FONCTIONS D'AFFICHAGE
-        // ─────────────────────────────────────────────
-        function addMessage(text, sender) {
+        // ─────────────────────────────────────────────────────────────────
+        // MESSAGES
+        // ─────────────────────────────────────────────────────────────────
+        function addMessage(text, sender, isHtml = false, isTemp = false) {
+            if (!isTemp) removeTemp();
+
             const row = document.createElement('div');
             row.classList.add('message-row', sender);
+            if (isTemp) row.setAttribute('data-temp', 'true');
 
             const content = document.createElement('div');
             content.classList.add('message-content');
 
             const bubble = document.createElement('div');
             bubble.classList.add('message-bubble');
-            bubble.innerHTML = text;
+
+            if (isHtml) {
+                bubble.classList.add('html-content');
+                bubble.innerHTML = text;
+            } else {
+                bubble.innerHTML = text;
+            }
 
             const time = document.createElement('span');
             time.classList.add('message-time');
             const now = new Date();
-            time.textContent = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            time.textContent =
+                now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0');
 
             content.appendChild(bubble);
-            content.appendChild(time);
+            if (!isTemp) content.appendChild(time);
             row.appendChild(content);
             messagesWrapper.appendChild(row);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            return bubble;
         }
 
+        function removeTemp() {
+            document.querySelectorAll('[data-temp="true"]').forEach(el => el.remove());
+        }
         function showTyping() {
-            const indicator = document.createElement('div');
-            indicator.classList.add('message-row', 'assistant');
-            indicator.id = 'typingIndicator';
-            indicator.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
-            messagesWrapper.appendChild(indicator);
+            const el = document.createElement('div');
+            el.classList.add('message-row', 'assistant');
+            el.id = 'typingIndicator';
+            el.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+            messagesWrapper.appendChild(el);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-
         function removeTyping() {
             const el = document.getElementById('typingIndicator');
             if (el) el.remove();
         }
 
-        // ─────────────────────────────────────────────
-        // 6. ENVOI DU MESSAGE
-        // ─────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────
+        // ENVOI
+        // ─────────────────────────────────────────────────────────────────
         async function handleSend() {
             const message = userInput.value.trim();
             if (!message || isTyping) return;
-
-            // Sécurité : vérifier que l'auth est prête
-            if (!auth.currentUser) {
-                window.location.replace('/index.html');
-                return;
-            }
-
-            // S'assurer que userId est bien défini (cas rare de lag auth)
-            if (!userId) {
-                userId = auth.currentUser.uid;
-            }
+            if (!auth.currentUser) { window.location.replace('/index.html'); return; }
+            if (!userId) userId = auth.currentUser.uid;
 
             addMessage(message, 'user');
             userInput.value = '';
             userInput.style.height = 'auto';
             sendBtn.disabled = true;
             isTyping = true;
-            showTyping();
 
             try {
-                // ── Appel de l'assistant avec userId et db ──
-                const response = await assistantJs(message, userId, db);
-                removeTyping();
-                addMessage(response, 'assistant');
+                if (isRecommandationRequest(message)) {
+                    showTyping();
+                    const statusFn = (txt, sndr) => {
+                        removeTyping(); removeTemp();
+                        addMessage(txt, sndr, false, true);
+                    };
+                    const recoHtml = await handleRecommandations(db, userId, statusFn);
+                    removeTyping(); removeTemp();
+                    const bubble = addMessage(recoHtml, 'assistant', true);
+                    showPdfModal(bubble);
 
-                // Si c'est un rapport → afficher la modal PDF
-                if (response.includes('Rapport pédagogique')) {
-                    setTimeout(() => {
-                        document.getElementById('reportModal').style.display = 'flex';
-                    }, 300);
+                } else if (isEvolutionRequest(message)) {
+                    showTyping();
+                    const parsed  = parseEvolutionRequest(message);
+                    const evoHtml = await handleEvolution(db, userId, parsed.type, parsed.name);
+                    removeTyping();
+                    const bubble = addMessage(evoHtml, 'assistant', true);
+                    showPdfModal(bubble);
+
+                } else {
+                    showTyping();
+                    const response = await assistantJs(message, userId, db);
+                    removeTyping();
+                    addMessage(response, 'assistant');
                 }
 
-            } catch (error) {
-                console.error('Erreur assistant:', error);
-                removeTyping();
-                addMessage('❌ Une erreur technique est survenue. Veuillez réessayer.', 'assistant');
+            } catch (err) {
+                console.error('Erreur handleSend:', err);
+                removeTyping(); removeTemp();
+                addMessage('Une erreur technique est survenue. Veuillez réessayer.', 'assistant');
             } finally {
                 isTyping = false;
                 sendBtn.disabled = userInput.value.trim() === '';
             }
         }
 
-        // ─────────────────────────────────────────────
-        // 7. ÉVÉNEMENTS INPUT / BOUTON
-        // ─────────────────────────────────────────────
-        userInput.addEventListener('input', function() {
+        userInput.addEventListener('input', function () {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
             sendBtn.disabled = this.value.trim() === '' || isTyping;
         });
-
         sendBtn.addEventListener('click', handleSend);
-
         userInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-            }
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
         });
 
-        // ─────────────────────────────────────────────
-        // 8. MESSAGE DE BIENVENUE
-        // ─────────────────────────────────────────────
-        addMessage("Bonjour ! Je suis Zeyna, votre assistante pédagogique. Tapez <strong>aide</strong> pour voir les commandes disponibles.", 'assistant');
+        // ─────────────────────────────────────────────────────────────────
+        // BIENVENUE
+        // ─────────────────────────────────────────────────────────────────
+        addMessage(
+            'Bonjour, je suis votre assistant pédagogique <strong>Educsen IA</strong>.<br><br>' +
+            'Tapez <strong>aide</strong> pour découvrir toutes les commandes disponibles.',
+            'assistant',
+            true
+        );
 
-        // ─────────────────────────────────────────────
-        // 9. THÈME CLAIR / SOMBRE
-        // ─────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────
+        // THÈME
+        // ─────────────────────────────────────────────────────────────────
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon   = themeToggle.querySelector('i');
-
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-theme');
             themeIcon.className = 'fas fa-sun';
         }
-
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('light-theme');
             const isLight = document.body.classList.contains('light-theme');
@@ -648,90 +632,424 @@
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
         });
 
-        // ─────────────────────────────────────────────
-        // 10. MODAL PDF
-        // ─────────────────────────────────────────────
-        document.getElementById('downloadReportBtn').addEventListener('click', () => {
-            const bubbles = document.querySelectorAll('.message-row.assistant .message-bubble');
-            if (!bubbles.length) return;
-            const reportElement = bubbles[bubbles.length - 1];
-            html2pdf().set({
-                margin: 0.5,
-                filename: 'rapport_scolaire.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            }).from(reportElement).save();
+        // ─────────────────────────────────────────────────────────────────
+        // MODAL PDF
+        // ─────────────────────────────────────────────────────────────────
+        function showPdfModal(bubble) {
+            lastReportBubble = bubble;
+            setTimeout(() => {
+                document.getElementById('reportModal').style.display = 'flex';
+            }, 400);
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        // EXPORT PDF — RAPPORT ADMINISTRATIF PROFESSIONNEL
+        // Page 1  : En-tête + stats + analyse générale (seule)
+        // Page 2  : Enseignants en difficulté
+        // Page 3  : Enseignants en développement
+        // Page 4  : Enseignants performants
+        // Page 5  : Recommandations prioritaires
+        // Page 6  : Suivi des élèves
+        // Données : getLastRecoData() — aucun parsing DOM
+        // ─────────────────────────────────────────────────────────────────
+        function exportRecommandationsPdf(filename) {
+            filename = filename || 'rapport_pedagogique_educsen.pdf';
+
+            var data = getLastRecoData();
+            if (!data) {
+                alert('Données non disponibles. Veuillez générer les recommandations d\'abord.');
+                return;
+            }
+
+            var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
+            var PW  = 210, PH = 297, MG = 18, TW = PW - MG * 2, CX = PW / 2;
+            var y   = MG;
+            var BOT = PH - 18;
+
+            // ── Helpers de base ──
+            function np() { doc.addPage(); y = MG; }
+            function chk(h) { if (y + h > BOT) np(); }
+
+            function wC(text, fs, bold, after, rgb) {
+                rgb = rgb || [0, 0, 0];
+                doc.setFontSize(fs);
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                var lh = fs * 0.40;
+                doc.splitTextToSize(text, TW).forEach(function(l) {
+                    chk(lh); doc.text(l, CX, y, { align: 'center' }); y += lh;
+                });
+                y += (after || 0);
+                doc.setTextColor(0, 0, 0);
+            }
+
+            function wL(text, fs, bold, after, indent, rgb) {
+                indent = indent || 0;
+                rgb    = rgb    || [0, 0, 0];
+                doc.setFontSize(fs);
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                var lh = fs * 0.40;
+                doc.splitTextToSize(text, TW - indent).forEach(function(l) {
+                    chk(lh); doc.text(l, MG + indent, y); y += lh;
+                });
+                y += (after || 0);
+                doc.setTextColor(0, 0, 0);
+            }
+
+            function wR(text, fs, bold, rgb) {
+                rgb = rgb || [0, 0, 0];
+                doc.setFontSize(fs);
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                doc.text(text, PW - MG, y, { align: 'right' });
+                doc.setTextColor(0, 0, 0);
+            }
+
+            // ── En-tête courant (pages 2+) ──
+            function runHdr() {
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(100, 100, 100);
+                doc.text('EDUCSEN IA', MG, 13);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Analyse pédagogique  ·  ' + data.anneeScol, PW - MG, 13, { align: 'right' });
+                doc.setTextColor(0, 0, 0);
+                y = 24;
+            }
+
+            // ── Boîte statistique (page 1) ──
+            function statBox(bx, by, bw, bh, val, label, sub, fillRgb) {
+                doc.setFillColor(fillRgb[0], fillRgb[1], fillRgb[2]);
+                doc.setDrawColor(210, 210, 210);
+                doc.setLineWidth(0.2);
+                doc.roundedRect(bx, by, bw, bh, 3, 3, 'FD');
+
+                doc.setFontSize(17);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(25, 25, 25);
+                doc.text(String(val), bx + bw / 2, by + 11, { align: 'center' });
+
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(70, 70, 70);
+                doc.text(label, bx + bw / 2, by + 17, { align: 'center' });
+
+                if (sub) {
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(110, 110, 110);
+                    doc.text(sub, bx + bw / 2, by + 21.5, { align: 'center' });
+                }
+                doc.setTextColor(0, 0, 0);
+            }
+
+            // ── Séparateur discret entre profs ──
+            function profSep() {
+                y += 6;
+                doc.setDrawColor(225, 225, 225);
+                doc.setLineWidth(0.15);
+                doc.line(MG + 10, y, PW - MG - 10, y);
+                y += 6;
+            }
+
+            // ── Bloc d'un professeur ──
+            function renderProf(item, statusRgb) {
+                var pd  = item.pd;
+                var par = item.paragraphs;
+
+                chk(35);
+
+                // Nom + note sur la même ligne
+                doc.setFontSize(13);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(15, 15, 15);
+                var nameMaxW = TW - 18;
+                var nameParts = doc.splitTextToSize(pd.nom, nameMaxW);
+                doc.text(nameParts[0], MG, y);
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(statusRgb[0], statusRgb[1], statusRgb[2]);
+                doc.text(pd.profMoy.toFixed(1) + ' / 20', PW - MG, y, { align: 'right' });
+                doc.setTextColor(0, 0, 0);
+                y += 5.5;
+
+                // Méta
+                var metaParts = [];
+                if (pd.matiere) metaParts.push(pd.matiere);
+                if (pd.classes && pd.classes.length) metaParts.push(pd.classes.join(', '));
+                wL(metaParts.join('   ·   '), 8, false, 5, 0, [110, 110, 110]);
+
+                // Paragraphe admin
+                wL(par.admin, 9.5, false, 0);
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 1 — EN-TÊTE + STATISTIQUES + ANALYSE GÉNÉRALE
+            // ════════════════════════════════════════════════════════════
+            var d       = data;
+            var dateStr = d.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            var years   = d.anneeScol.split('-');
+
+            y = 22;
+
+            // Bloc gauche : Educsen IA + contact
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(12, 12, 12);
+            doc.text('EDUCSEN IA', MG, y);
+
+            // Bloc droit : date
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(80, 80, 80);
+            doc.text(dateStr, PW - MG, y, { align: 'right' });
+
+            y += 6;
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(130, 130, 130);
+            doc.text('221 78 570 29 16', MG, y);
+            doc.text('Année scolaire', PW - MG, y, { align: 'right' });
+
+            y += 5.5;
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 30, 90);
+            doc.text(d.anneeScol, PW - MG, y, { align: 'right' });
+
+            // Années stylisées côté droit (petit, sous l'année)
+            y += 5;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(160, 160, 180);
+            doc.text((years[0] || '') + '  |  ' + (years[1] || ''), PW - MG, y, { align: 'right' });
+
+            doc.setTextColor(0, 0, 0);
+            y += 16;
+
+            // Titre du rapport
+            doc.setFontSize(19);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(10, 10, 10);
+            doc.text("SYNTHÈSE DES PERFORMANCES", CX, y, { align: 'center' });
+            y += 8;
+            doc.text('PÉDAGOGIQUES', CX, y, { align: 'center' });
+            y += 5;
+            doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(120, 120, 120);
+            doc.text('Analyse complète par enseignant  ·  ' + d.anneeScol, CX, y, { align: 'center' });
+            doc.setTextColor(0, 0, 0);
+            y += 13;
+
+            // ── Statistiques : 4 boîtes ──
+            var bW = 37, bH = 26, bGap = 5;
+            var bStart = CX - (4 * bW + 3 * bGap) / 2;
+            statBox(bStart,                  y, bW, bH, d.stats.total,                    'Enseignants',  'analysés',       [239, 246, 255]);
+            statBox(bStart + (bW + bGap),    y, bW, bH, d.stats.moyGlobale.toFixed(1)+'/20','Moyenne',   'générale',       [240, 255, 244]);
+            statBox(bStart + 2*(bW + bGap),  y, bW, bH, d.stats.nbAmeliorer,              'En difficulté','à accompagner', [255, 242, 242]);
+            statBox(bStart + 3*(bW + bGap),  y, bW, bH, d.stats.nbMaintenir,              'Performants',  'à valoriser',   [255, 251, 235]);
+            y += bH + 13;
+
+            // ── Analyse générale (paragraphes Groq) ──
+            var globalParas = d.globalAnalyse
+                .split('|||')
+                .map(function(p) { return p.trim(); })
+                .filter(Boolean);
+
+            globalParas.forEach(function(para, idx) {
+                wL(para, 9.5, false, idx < globalParas.length - 1 ? 5 : 0);
+            });
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 2 — ENSEIGNANTS EN SITUATION DE DIFFICULTÉ
+            // ════════════════════════════════════════════════════════════
+            if (d.profs.ameliorer.length > 0) {
+                np(); runHdr();
+                wC('ENSEIGNANTS EN SITUATION DE DIFFICULTÉ', 13, true, 2);
+                wC('Moyenne inférieure à 10  ·  Accompagnement prioritaire requis', 8, false, 10, [110, 110, 110]);
+
+                d.profs.ameliorer.forEach(function(item, idx) {
+                    if (idx > 0) profSep();
+                    renderProf(item, [185, 28, 28]);
+                });
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 3 — ENSEIGNANTS EN DÉVELOPPEMENT
+            // ════════════════════════════════════════════════════════════
+            if (d.profs.progresser.length > 0) {
+                np(); runHdr();
+                wC('ENSEIGNANTS EN DÉVELOPPEMENT', 13, true, 2);
+                wC('Moyenne entre 10 et 14  ·  Progression à consolider', 8, false, 10, [110, 110, 110]);
+
+                d.profs.progresser.forEach(function(item, idx) {
+                    if (idx > 0) profSep();
+                    renderProf(item, [146, 64, 14]);
+                });
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 4 — ENSEIGNANTS PERFORMANTS
+            // ════════════════════════════════════════════════════════════
+            if (d.profs.maintenir.length > 0) {
+                np(); runHdr();
+                wC('ENSEIGNANTS PERFORMANTS', 13, true, 2);
+                wC('Moyenne supérieure à 14  ·  Résultats à valoriser et maintenir', 8, false, 10, [110, 110, 110]);
+
+                d.profs.maintenir.forEach(function(item, idx) {
+                    if (idx > 0) profSep();
+                    renderProf(item, [21, 128, 61]);
+                });
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 5 — RECOMMANDATIONS PRIORITAIRES
+            // ════════════════════════════════════════════════════════════
+            np(); runHdr();
+            wC('RECOMMANDATIONS PRIORITAIRES', 13, true, 2);
+            wC('Axes d\'intervention recommandés à l\'administration', 8, false, 10, [110, 110, 110]);
+
+            var recos = Array.isArray(d.priorityRecos) ? d.priorityRecos : [String(d.priorityRecos)];
+            recos.forEach(function(reco, idx) {
+                chk(22);
+                // Numéro
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(59, 130, 246);
+                doc.text(String(idx + 1) + '.', MG, y);
+                doc.setTextColor(0, 0, 0);
+                y += 0.5;
+                // Texte indenté
+                wL(reco.replace(/^\d+[\.\)]\s*/, '').trim(), 9.5, false, 9, 7);
+            });
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 6 — SUIVI DES ÉLÈVES
+            // ════════════════════════════════════════════════════════════
+            np(); runHdr();
+            wC('SUIVI DES ÉLÈVES', 13, true, 2);
+            wC('Synthèse consolidée sur l\'ensemble des évaluations', 8, false, 10, [110, 110, 110]);
+
+            // Élèves à accompagner
+            if (d.elevesAAider.length > 0) {
+                y += 4;
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(146, 64, 14);
+                doc.text('Élèves nécessitant un accompagnement', MG, y);
+                doc.setTextColor(0, 0, 0);
+                y += 7;
+
+                d.elevesAAider.forEach(function(e) {
+                    chk(7);
+                    doc.setFontSize(9.5);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(20, 20, 20);
+                    doc.text(e.nom, MG + 2, y);
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(110, 110, 110);
+                    var info = (e.classe || '') + (e.matiere ? '  ·  ' + e.matiere : '') + '  ·  ' + e.moyenneEleve.toFixed(1) + '/20';
+                    doc.text(info, PW - MG, y, { align: 'right' });
+                    doc.setTextColor(0, 0, 0);
+                    y += 6.5;
+                });
+            }
+
+            // Élèves à valoriser
+            if (d.elevesAFeliciter.length > 0) {
+                y += 10;
+                chk(15);
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(21, 128, 61);
+                doc.text('Élèves à valoriser', MG, y);
+                doc.setTextColor(0, 0, 0);
+                y += 7;
+
+                d.elevesAFeliciter.forEach(function(e) {
+                    chk(7);
+                    doc.setFontSize(9.5);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(20, 20, 20);
+                    doc.text(e.nom, MG + 2, y);
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(110, 110, 110);
+                    var info = (e.classe || '') + (e.matiere ? '  ·  ' + e.matiere : '') + '  ·  ' + e.moyenneEleve.toFixed(1) + '/20';
+                    doc.text(info, PW - MG, y, { align: 'right' });
+                    doc.setTextColor(0, 0, 0);
+                    y += 6.5;
+                });
+            }
+
+            // ── Pied de page sur toutes les pages ──
+            var total = doc.internal.getNumberOfPages();
+            for (var i = 1; i <= total; i++) {
+                doc.setPage(i);
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(185, 185, 185);
+                doc.text(
+                    'Educsen IA  ·  Rapport pédagogique  ·  Page ' + i + ' / ' + total,
+                    CX, PH - 8, { align: 'center' }
+                );
+            }
+
+            doc.save(filename);
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        // BOUTONS MODAL PDF
+        // ─────────────────────────────────────────────────────────────────
+        document.getElementById('downloadReportBtn').addEventListener('click', function () {
+            exportRecommandationsPdf('rapport_pedagogique_educsen.pdf');
             document.getElementById('reportModal').style.display = 'none';
         });
 
-        document.getElementById('closeReportModal').addEventListener('click', () => {
+        document.getElementById('closeReportModal').addEventListener('click', function () {
             document.getElementById('reportModal').style.display = 'none';
         });
 
-        // ─────────────────────────────────────────────
-        // 11. GESTION SIDEBAR (mobile/desktop)
-        // ─────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────
+        // SIDEBAR
+        // ─────────────────────────────────────────────────────────────────
         const sidebar        = document.getElementById('sidebar');
         const toggleBtn      = document.getElementById('toggleSidebar');
         const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
         const toggleIcon     = document.getElementById('toggleIcon');
-        const overlay        = document.getElementById('sidebarOverlay');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-        function openMobile() {
-            sidebar.classList.add('mobile-open');
-            if (overlay) overlay.classList.add('active');
-        }
-        function closeMobile() {
-            sidebar.classList.remove('mobile-open');
-            if (overlay) overlay.classList.remove('active');
-        }
+        const openMobile  = () => { sidebar.classList.add('mobile-open');    sidebarOverlay.classList.add('active'); };
+        const closeMobile = () => { sidebar.classList.remove('mobile-open'); sidebarOverlay.classList.remove('active'); };
 
-        // Bouton chevron dans la sidebar
         toggleBtn.addEventListener('click', () => {
             if (window.innerWidth <= 768) {
-                // sur mobile : ouvre/ferme le slide
                 sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
             } else {
-                // sur desktop : collapse/expand
                 sidebar.classList.toggle('collapsed');
                 toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
             }
         });
-
-        // Bouton hamburger de la topbar mobile
-        mobileMenuBtn.addEventListener('click', () => {
-            sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
-        });
-
-        // Clic sur l'overlay → ferme la sidebar
-        overlay.addEventListener('click', closeMobile);
-
-        // Fermer en cliquant à l'extérieur (mobile)
+        mobileMenuBtn.addEventListener('click', () =>
+            sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile()
+        );
+        sidebarOverlay.addEventListener('click', closeMobile);
         document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                closeMobile();
-            }
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(e.target) &&
+                !mobileMenuBtn.contains(e.target)) closeMobile();
         });
-
-        // Réinitialiser au redimensionnement
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                closeMobile();
-                // restaurer l'état collapsed si besoin (optionnel)
-            } else {
-                // sur mobile, on s'assure que le bouton chevron affiche chevron_left
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
                 toggleIcon.textContent = 'chevron_left';
+                closeMobile();
+            } else {
+                closeMobile();
             }
         });
-
-        // Initialisation : sur desktop, le chevron doit correspondre à l'état collapsed
-        if (window.innerWidth > 768) {
-            toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
-        } else {
-            toggleIcon.textContent = 'chevron_left';
-        }
-
     </script>
 </body>
 </html>
