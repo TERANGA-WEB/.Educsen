@@ -2,68 +2,36 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/images/icon-192x192.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduMetrics | Paramètres</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        /* ========== STYLE CONSERVÉ ========== */
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: rgba(59, 130, 246, 0.2);
-            --secondary: #10b981;
-            --secondary-dark: #059669;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-            --gray-50: #0f172a;
-            --gray-100: #1e293b;
-            --gray-200: #334155;
-            --gray-300: #475569;
-            --gray-400: #64748b;
-            --gray-500: #94a3b8;
-            --gray-600: #cbd5e1;
-            --gray-700: #e2e8f0;
-            --gray-800: #f1f5f9;
-            --gray-900: #f8fafc;
-            --sidebar-width: 280px;
-            --header-height: 70px;
-            --border-radius: 10px;
-            --border-radius-sm: 6px;
-            --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            --box-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.4);
-            --transition: all 0.2s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
-            background-color: var(--gray-50);
-            color: var(--gray-700);
-            line-height: 1.5;
+            font-family: 'Inter', sans-serif;
+            background: #f3f4f6;
+            color: #1e293b;
             display: flex;
             min-height: 100vh;
         }
 
-        /* ========== SIDEBAR ========== */
+        /* ===== SIDEBAR (harmonisée avec classes.html) ===== */
         .sidebar {
             width: 280px;
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             color: white;
             display: flex;
             flex-direction: column;
-            transition: width 0.3s ease;
+            transition: width 0.3s ease, transform 0.3s ease;
             box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-            height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
+            height: 100vh;
+            z-index: 1000;
             overflow-y: auto;
         }
 
@@ -110,7 +78,6 @@
             white-space: nowrap;
             overflow: hidden;
             transition: opacity 0.2s;
-            color: white;
         }
 
         .sidebar.collapsed .logo-text {
@@ -123,7 +90,7 @@
         }
 
         .toggle-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             border: 1px solid #4b5563;
             border-radius: 50%;
             width: 32px;
@@ -138,7 +105,7 @@
         }
 
         .toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             border-color: #3b82f6;
             color: white;
         }
@@ -170,15 +137,6 @@
             text-align: center;
         }
 
-        .nav-item span:last-child {
-            transition: opacity 0.2s;
-        }
-
-        .sidebar.collapsed .nav-item span:last-child {
-            opacity: 0;
-            width: 0;
-            display: none;
-        }
         .sidebar.collapsed .nav-item {
             padding: 14px 0;
             margin: 0 8px;
@@ -191,24 +149,11 @@
             text-align: center;
         }
 
-        .sidebar.collapsed .sidebar-footer {
-            padding: 16px 8px;
-        }
-
-        .sidebar.collapsed .user-info {
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .logout-btn {
-            padding: 10px 0;
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .logout-btn span:last-child,
-        .sidebar.collapsed .logout-btn .logout-text {
+        .sidebar.collapsed .nav-item span:last-child {
+            opacity: 0;
+            width: 0;
             display: none;
         }
-
 
         .nav-item.active {
             background: #3b82f6;
@@ -270,7 +215,7 @@
         .logout-btn {
             width: 100%;
             padding: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255,255,255,0.1);
             color: #94a3b8;
             border: none;
             border-radius: 6px;
@@ -282,29 +227,112 @@
             font-size: 14px;
             transition: all 0.2s;
             white-space: nowrap;
+            text-decoration: none;
         }
 
         .logout-btn:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255,255,255,0.2);
             color: white;
         }
 
-        /* ========== MAIN CONTENT ========== */
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
+        /* ---------- OVERLAY MOBILE ---------- */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
 
-        .sidebar.collapsed ~ .main-content {
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ---------- TOPBAR MOBILE (sticky) ---------- */
+        .mobile-topbar {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 998;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+        }
+
+        .topbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar-logo .logo-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 1.05rem;
+        }
+
+        .topbar-logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .topbar-logo-text em {
+            color: #3b82f6;
+            font-style: normal;
+        }
+
+        .topbar-menu-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #334155;
+            border-radius: 8px;
+            transition: background .2s;
+        }
+
+        .topbar-menu-btn:hover {
+            background: #f1f5f9;
+        }
+
+        /* ---------- PAGE WRAPPER ---------- */
+        .page-wrapper {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+            min-width: 0;
+        }
+
+        .sidebar.collapsed ~ .page-wrapper {
             margin-left: 80px;
         }
 
+        .main-content {
+            flex: 1;
+            background: #f8fafc;
+            padding: 0;
+        }
+
+        /* ========== MAIN HEADER (desktop) ========== */
         .main-header {
-            height: var(--header-height);
-            background: var(--gray-100);
-            border-bottom: 1px solid var(--gray-200);
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
             padding: 0 2rem;
             display: flex;
             align-items: center;
@@ -322,12 +350,12 @@
 
         .page-title h1 {
             font-size: 1.5rem;
-            color: var(--gray-700);
+            color: #1e293b;
             font-weight: 600;
         }
 
         .page-title i {
-            color: var(--primary);
+            color: #3b82f6;
             font-size: 1.25rem;
         }
 
@@ -342,15 +370,15 @@
             align-items: center;
             gap: 0.75rem;
             padding: 0.5rem 0.75rem;
-            border-radius: var(--border-radius-sm);
-            background: var(--gray-200);
+            border-radius: 6px;
+            background: #f1f5f9;
         }
 
         .admin-avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -361,13 +389,13 @@
 
         .admin-name {
             font-weight: 600;
-            color: var(--gray-700);
+            color: #1e293b;
             font-size: 0.9rem;
         }
 
         .admin-role {
             font-size: 0.75rem;
-            color: var(--gray-400);
+            color: #64748b;
         }
 
         .content-wrapper {
@@ -380,13 +408,14 @@
 
         .page-header h2 {
             font-size: 1.25rem;
-            color: var(--gray-600);
+            color: #334155;
             font-weight: 500;
         }
 
+        /* ===== onglets ===== */
         .tabs-container {
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .tabs {
@@ -400,10 +429,10 @@
             background: transparent;
             border: none;
             border-bottom: 2px solid transparent;
-            color: var(--gray-500);
+            color: #64748b;
             font-weight: 500;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s;
             white-space: nowrap;
             display: flex;
             align-items: center;
@@ -412,12 +441,12 @@
         }
 
         .tab:hover {
-            color: var(--gray-700);
+            color: #1e293b;
         }
 
         .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
             background: transparent;
         }
 
@@ -435,13 +464,14 @@
             to { opacity: 1; }
         }
 
+        /* ===== cartes ===== */
         .card {
-            background: var(--gray-100);
-            border-radius: var(--border-radius);
+            background: white;
+            border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 1rem;
-            box-shadow: var(--box-shadow);
-            border: 1px solid var(--gray-200);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .card-header {
@@ -450,22 +480,22 @@
             gap: 0.75rem;
             margin-bottom: 1rem;
             padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .card-header i {
             font-size: 1.25rem;
-            color: var(--primary);
+            color: #3b82f6;
         }
 
         .card-header h3 {
             font-size: 1.1rem;
-            color: var(--gray-700);
+            color: #1e293b;
             font-weight: 600;
         }
 
         .card-description {
-            color: var(--gray-500);
+            color: #64748b;
             margin-bottom: 1.5rem;
             font-size: 0.95rem;
         }
@@ -478,10 +508,10 @@
         }
 
         .setting-group {
-            background: var(--gray-200);
-            border-radius: var(--border-radius-sm);
+            background: #f8fafc;
+            border-radius: 6px;
             padding: 1.25rem;
-            border: 1px solid var(--gray-300);
+            border: 1px solid #e2e8f0;
         }
 
         .setting-item {
@@ -496,7 +526,7 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: var(--gray-600);
+            color: #334155;
             font-size: 0.95rem;
             display: flex;
             align-items: center;
@@ -504,30 +534,30 @@
         }
 
         .setting-label i {
-            color: var(--gray-500);
+            color: #94a3b8;
             font-size: 0.875rem;
         }
 
         .setting-input {
             width: 100%;
             padding: 0.625rem 0.75rem;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--border-radius-sm);
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
             font-size: 0.95rem;
-            transition: var(--transition);
-            background: var(--gray-100);
-            color: var(--gray-700);
+            transition: all 0.2s;
+            background: white;
+            color: #1e293b;
         }
 
         .setting-input:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
         .setting-hint {
             font-size: 0.85rem;
-            color: var(--gray-400);
+            color: #94a3b8;
             margin-top: 0.375rem;
             line-height: 1.4;
         }
@@ -541,7 +571,7 @@
             left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray-500);
+            color: #64748b;
             font-size: 0.9rem;
         }
 
@@ -550,7 +580,7 @@
             right: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray-500);
+            color: #64748b;
             font-size: 0.9rem;
         }
 
@@ -567,15 +597,15 @@
         }
 
         .security-indicator.weak {
-            color: var(--danger);
+            color: #ef4444;
         }
 
         .security-indicator.medium {
-            color: var(--warning);
+            color: #f59e0b;
         }
 
         .security-indicator.strong {
-            color: var(--success);
+            color: #10b981;
         }
 
         .code-inputs {
@@ -585,12 +615,12 @@
         }
 
         .critical-section {
-            border: 1px solid var(--danger);
-            background: linear-gradient(to bottom, rgba(239, 68, 68, 0.1) 0%, var(--gray-100) 50px);
+            border: 1px solid #ef4444;
+            background: linear-gradient(to bottom, rgba(239,68,68,0.05) 0%, white 50px);
         }
 
         .critical-section .card-header i {
-            color: var(--danger);
+            color: #ef4444;
         }
 
         .buttons {
@@ -598,7 +628,7 @@
             gap: 0.75rem;
             margin-top: 1.5rem;
             padding-top: 1.5rem;
-            border-top: 1px solid var(--gray-200);
+            border-top: 1px solid #e2e8f0;
         }
 
         .btn {
@@ -608,48 +638,48 @@
             padding: 0.75rem 1.25rem;
             font-weight: 500;
             border: none;
-            border-radius: var(--border-radius-sm);
+            border-radius: 6px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s;
             font-size: 0.95rem;
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: #3b82f6;
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            background: #2563eb;
             transform: translateY(-1px);
-            box-shadow: var(--box-shadow-lg);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .btn-secondary {
-            background: var(--gray-200);
-            color: var(--gray-700);
-            border: 1px solid var(--gray-300);
+            background: #f1f5f9;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
         }
 
         .btn-secondary:hover {
-            background: var(--gray-300);
-            border-color: var(--gray-400);
+            background: #e2e8f0;
+            border-color: #cbd5e1;
         }
 
         .btn-danger {
-            background: var(--danger);
+            background: #ef4444;
             color: white;
         }
 
         .btn-danger:hover {
             background: #dc2626;
             transform: translateY(-1px);
-            box-shadow: var(--box-shadow-lg);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .status-message {
             padding: 0.75rem 1rem;
-            border-radius: var(--border-radius-sm);
+            border-radius: 6px;
             margin-bottom: 1rem;
             display: none;
             align-items: center;
@@ -658,127 +688,15 @@
         }
 
         .status-message.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(16,185,129,0.1);
+            color: #059669;
+            border: 1px solid rgba(16,185,129,0.3);
         }
 
         .status-message.error {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        /* ========== TOPBAR MOBILE ========== */
-        .mobile-topbar {
-            display: none;
-            position: sticky;
-            top: 0;
-            z-index: 998;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0 16px;
-            height: 60px;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,.07);
-        }
-        .topbar-logo { display: flex; align-items: center; gap: 10px; }
-        .topbar-logo .logo-icon { width: 34px; height: 34px; font-size: 1.05rem; border-radius: 8px; }
-        .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
-        .topbar-logo-text em { color: #3b82f6; font-style: normal; }
-        .topbar-menu-btn {
-            background: none; border: none;
-            width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #334155; border-radius: 8px;
-            transition: background .2s;
-        }
-        .topbar-menu-btn:hover { background: #f1f5f9; }
-
-        /* ========== PAGE WRAPPER ========== */
-        .page-wrapper {
-            flex: 1;
-            margin-left: 280px;
-            display: flex;
-            flex-direction: column;
-            transition: margin-left .3s ease;
-            min-width: 0;
-        }
-        .sidebar.collapsed ~ .page-wrapper { margin-left: 80px; }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px !important;
-                transition: transform 0.3s ease;
-                position: fixed;
-                z-index: 1000;
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .sidebar-overlay {
-                display: block;
-                pointer-events: none;
-            }
-
-            .sidebar-overlay.active {
-                pointer-events: auto;
-            }
-
-            .sidebar.collapsed {
-                width: 80px !important;
-            }
-            .sidebar.collapsed.mobile-open {
-                transform: translateX(0);
-            }
-            /* Topbar mobile visible */
-            .mobile-topbar { display: flex; }
-            /* Header PC caché sur mobile */
-            .main-header { display: none; }
-            /* Wrapper sans décalage */
-            .page-wrapper { margin-left: 0 !important; width: 100%; }
-            .main-content { margin-left: 0 !important; width: 100%; }
-            .content-wrapper {
-                padding: 16px;
-            }
-            .settings-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .settings-card {
-                padding: 20px 16px;
-            }
-            .buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-            .page-header, .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .page-header h1, .header h1 {
-                font-size: 1.4rem;
-            }
-            input, select, textarea {
-                font-size: 16px; /* prevent iOS zoom */
-            }
-            .form-group {
-                margin-bottom: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .content-wrapper {
-                padding: 12px;
-            }
+            background: rgba(239,68,68,0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239,68,68,0.3);
         }
 
         /* Loader */
@@ -796,7 +714,7 @@
         }
         .loader-spinner {
             border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary);
+            border-top: 5px solid #3b82f6;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -809,24 +727,62 @@
         .hidden {
             display: none !important;
         }
-    
-        /* ========== OVERLAY MOBILE ========== */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+
+        /* ===== responsive ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px !important;
+                transition: transform 0.3s ease;
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay {
+                display: block;
+            }
+            .page-wrapper {
+                margin-left: 0 !important;
+            }
+            .mobile-topbar {
+                display: flex;
+            }
+            .main-header {
+                display: none;
+            }
+            .content-wrapper {
+                padding: 1rem;
+            }
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .page-header h2 {
+                font-size: 1.1rem;
+            }
+            input, select, textarea {
+                font-size: 16px;
+            }
+            .code-inputs {
+                flex-direction: column;
+                gap: 1rem;
+            }
         }
 
-        .sidebar-overlay.active {
-            opacity: 1;
+        @media (max-width: 480px) {
+            .content-wrapper {
+                padding: 0.75rem;
+            }
         }
-        </style>
+    </style>
 </head>
 <body>
     <!-- LOADER GLOBAL -->
@@ -834,7 +790,7 @@
         <div class="loader-spinner"></div>
     </div>
 
-        <!-- OVERLAY MOBILE -->
+    <!-- OVERLAY MOBILE -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- SIDEBAR -->
@@ -857,7 +813,7 @@
                 <span>Dashboard</span>
             </a>
             <a href="/user-admin/assistant.html" class="nav-item">
-                <span class="nav-icon material-icons">assessment</span>
+                <span class="nav-icon material-icons">smart_toy</span>
                 <span>Assistant</span>
             </a>
             <a href="/user-admin/rapport.html" class="nav-item">
@@ -872,15 +828,14 @@
                 <span class="nav-icon material-icons">person</span>
                 <span>Professeurs</span>
             </a>
-       
             <a href="/user-admin/notes.html" class="nav-item">
                 <span class="nav-icon material-icons">assignment</span>
                 <span>Notes</span>
             </a>
-             <a href="/user-admin/bulletin.html" class="nav-item active">
-      <span class="nav-icon material-icons">receipt_long</span>
-      <span class="nav-lbl">Bulletins</span>
-    </a>
+            <a href="/user-admin/bulletin.html" class="nav-item">
+                <span class="nav-icon material-icons">receipt_long</span>
+                <span>Bulletins</span>
+            </a>
             <a href="/user-admin/parametres.html" class="nav-item active">
                 <span class="nav-icon material-icons">settings</span>
                 <span>Paramètres</span>
@@ -896,7 +851,7 @@
                 </div>
             </div>
             <button class="logout-btn" id="logoutBtn">
-                <span class="nav-icon material-icons">logout</span>
+                <span class="material-icons">logout</span>
                 <span>Déconnexion</span>
             </button>
         </div>
@@ -905,175 +860,176 @@
     <!-- PAGE WRAPPER -->
     <div class="page-wrapper" id="pageWrapper">
 
-    <!-- TOPBAR MOBILE — visible uniquement sur mobile, sticky -->
-    <header class="mobile-topbar" id="mobileTopbar">
-        <div class="topbar-logo">
-            <div class="logo-icon">E</div>
-            <span class="topbar-logo-text">Educ<em>sen</em></span>
-        </div>
-        <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
-            <span class="material-icons">menu</span>
-        </button>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content" id="mainContent">
-        <header class="main-header">
-            <div class="page-title">
-                <i class="fas fa-cogs"></i>
-                <h1>Paramètres</h1>
+        <!-- TOPBAR MOBILE -->
+        <header class="mobile-topbar" id="mobileTopbar">
+            <div class="topbar-logo">
+                <div class="logo-icon">E</div>
+                <span class="topbar-logo-text">Educ<em>sen</em></span>
             </div>
-            <div class="header-actions">
-                <div class="admin-info" id="headerAdminInfo">
-                    <div class="admin-avatar" id="headerAvatar">--</div>
-                    <div>
-                        <div class="admin-name" id="headerName">Chargement...</div>
-                        <div class="admin-role" id="headerRole">-</div>
-                    </div>
-                </div>
-            </div>
+            <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <span class="material-icons">menu</span>
+            </button>
         </header>
 
-        <div class="content-wrapper">
-            <div class="page-header">
-                <h2>Configurez les paramètres de votre établissement</h2>
-            </div>
-
-            <!-- Tabs (seulement 3 onglets) -->
-            <div class="tabs-container">
-                <div class="tabs">
-                    <button class="tab active" data-tab="seuils"><i class="fas fa-chart-line"></i> Seuils</button>
-                    <button class="tab" data-tab="securite"><i class="fas fa-shield-alt"></i> Sécurité</button>
-                    <button class="tab" data-tab="code-secret"><i class="fas fa-key"></i> Code secret</button>
+        <!-- MAIN CONTENT -->
+        <main class="main-content" id="mainContent">
+            <header class="main-header">
+                <div class="page-title">
+                    <i class="fas fa-cogs"></i>
+                    <h1>Paramètres</h1>
                 </div>
-            </div>
-
-            <!-- Tab 1: Seuils -->
-            <div id="seuils" class="tab-content active">
-                <div id="seuils-success" class="status-message success"><i class="fas fa-check-circle"></i> <span></span></div>
-                <div class="card">
-                    <div class="card-header"><i class="fas fa-chart-line"></i><h3>Seuils de performance</h3></div>
-                    <p class="card-description">Définissez les seuils utilisés pour analyser les performances.</p>
-                    <div class="settings-grid">
-                        <div class="setting-group">
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-chalkboard-teacher"></i> Seuil "en difficulté" (profs)</label>
-                                <div class="input-with-icon">
-                                    <input type="number" class="setting-input" id="seuil-profs-difficulte" min="0" max="100" step="0.1">
-                                    <span class="suffix">%</span>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-trophy"></i> Seuil "performant" (profs)</label>
-                                <div class="input-with-icon">
-                                    <input type="number" class="setting-input" id="seuil-profs-performant" min="0" max="100" step="0.1">
-                                    <span class="suffix">%</span>
-                                </div>
-                            </div>
+                <div class="header-actions">
+                    <div class="admin-info" id="headerAdminInfo">
+                        <div class="admin-avatar" id="headerAvatar">--</div>
+                        <div>
+                            <div class="admin-name" id="headerName">Chargement...</div>
+                            <div class="admin-role" id="headerRole">-</div>
                         </div>
-                        <div class="setting-group">
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-user-graduate"></i> Seuil "en difficulté" (élèves)</label>
-                                <div class="input-with-icon">
-                                    <input type="number" class="setting-input" id="seuil-eleves-difficulte" min="0" max="20" step="0.1">
-                                    <span class="suffix">/20</span>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-chart-line"></i> Seuil "en progression"</label>
-                                <div class="input-with-icon">
-                                    <input type="number" class="setting-input" id="seuil-eleves-progression" min="0" max="10" step="0.1">
-                                    <span class="suffix">points</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="buttons">
-                        <button id="save-seuils" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
-                        <button id="reset-seuils" class="btn btn-secondary"><i class="fas fa-undo"></i> Valeurs par défaut</button>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <!-- Tab 2: Sécurité -->
-            <div id="securite" class="tab-content">
-                <div id="securite-success" class="status-message success"><i class="fas fa-check-circle"></i> <span></span></div>
-                <div class="card">
-                    <div class="card-header"><i class="fas fa-shield-alt"></i><h3>Sécurité</h3></div>
-                    <p class="card-description">Paramètres de sécurité.</p>
-                    <div class="settings-grid">
-                        <div class="setting-group">
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-ban"></i> Tentatives maximales</label>
-                                <input type="number" class="setting-input" id="max-tentatives" min="1" max="10">
-                            </div>
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-clock"></i> Déconnexion automatique</label>
-                                <select class="setting-input" id="deconnexion-auto">
-                                    <option value="15">15 minutes</option>
-                                    <option value="30">30 minutes</option>
-                                    <option value="60">60 minutes</option>
-                                    <option value="120">2 heures</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="setting-group">
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-shield-alt"></i> Validation à deux facteurs</label>
-                                <select class="setting-input" id="2fa">
-                                    <option value="false">Désactivée</option>
-                                    <option value="true">Activée</option>
-                                </select>
-                            </div>
-                            <div class="setting-item">
-                                <label class="setting-label"><i class="fas fa-history"></i> Historique des connexions</label>
-                                <select class="setting-input" id="historique-connexions">
-                                    <option value="7">7 jours</option>
-                                    <option value="30">30 jours</option>
-                                    <option value="90">90 jours</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="buttons">
-                        <button id="save-securite" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h2>Configurez les paramètres de votre établissement</h2>
+                </div>
+
+                <!-- Tabs (seulement 3 onglets) -->
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="seuils"><i class="fas fa-chart-line"></i> Seuils</button>
+                        <button class="tab" data-tab="securite"><i class="fas fa-shield-alt"></i> Sécurité</button>
+                        <button class="tab" data-tab="code-secret"><i class="fas fa-key"></i> Code secret</button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Tab 3: Code secret -->
-            <div id="code-secret" class="tab-content">
-                <div id="code-success" class="status-message success"><i class="fas fa-check-circle"></i> <span></span></div>
-                <div id="code-error" class="status-message error"><i class="fas fa-exclamation-circle"></i> <span id="code-error-text"></span></div>
-                <div class="card critical-section">
-                    <div class="card-header"><i class="fas fa-key"></i><h3>Code secret administrateur</h3></div>
-                    <p class="card-description">Modifiez le code secret utilisé pour la connexion rapide.</p>
-                    <form id="code-form">
-                        <div class="setting-item">
-                            <label class="setting-label"><i class="fas fa-lock"></i> Code secret actuel</label>
-                            <div class="input-with-icon">
-                                <input type="password" class="setting-input" id="current-code" maxlength="6" placeholder="●●●●●●" required>
+                <!-- Tab 1: Seuils -->
+                <div id="seuils" class="tab-content active">
+                    <div id="seuils-success" class="status-message success"><i class="fas fa-check-circle"></i> <span></span></div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-chart-line"></i><h3>Seuils de performance</h3></div>
+                        <p class="card-description">Définissez les seuils utilisés pour analyser les performances.</p>
+                        <div class="settings-grid">
+                            <div class="setting-group">
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-chalkboard-teacher"></i> Seuil "en difficulté" (profs)</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" class="setting-input" id="seuil-profs-difficulte" min="0" max="100" step="0.1">
+                                        <span class="suffix">%</span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-trophy"></i> Seuil "performant" (profs)</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" class="setting-input" id="seuil-profs-performant" min="0" max="100" step="0.1">
+                                        <span class="suffix">%</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="code-inputs">
-                            <div class="setting-item" style="flex:1;">
-                                <label class="setting-label"><i class="fas fa-key"></i> Nouveau code secret</label>
-                                <input type="password" class="setting-input" id="new-code" maxlength="6" placeholder="6 chiffres" required>
-                                <div class="security-indicator" id="security-level"><i class="fas fa-shield-alt"></i> <span>Saisissez 6 chiffres</span></div>
-                            </div>
-                            <div class="setting-item" style="flex:1;">
-                                <label class="setting-label"><i class="fas fa-redo"></i> Confirmer le code</label>
-                                <input type="password" class="setting-input" id="confirm-code" maxlength="6" placeholder="6 chiffres" required>
+                            <div class="setting-group">
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-user-graduate"></i> Seuil "en difficulté" (élèves)</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" class="setting-input" id="seuil-eleves-difficulte" min="0" max="20" step="0.1">
+                                        <span class="suffix">/20</span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-chart-line"></i> Seuil "en progression"</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" class="setting-input" id="seuil-eleves-progression" min="0" max="10" step="0.1">
+                                        <span class="suffix">points</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="buttons">
-                            <button type="submit" class="btn btn-primary" id="change-code-btn"><i class="fas fa-sync-alt"></i> Modifier le code</button>
+                            <button id="save-seuils" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+                            <button id="reset-seuils" class="btn btn-secondary"><i class="fas fa-undo"></i> Valeurs par défaut</button>
                         </div>
-                    </form>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Sécurité -->
+                <div id="securite" class="tab-content">
+                    <div id="securite-success" class="status-message success"><i class="fas fa-check-circle"></i> <span></span></div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-shield-alt"></i><h3>Sécurité</h3></div>
+                        <p class="card-description">Paramètres de sécurité.</p>
+                        <div class="settings-grid">
+                            <div class="setting-group">
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-ban"></i> Tentatives maximales</label>
+                                    <input type="number" class="setting-input" id="max-tentatives" min="1" max="10">
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-clock"></i> Déconnexion automatique</label>
+                                    <select class="setting-input" id="deconnexion-auto">
+                                        <option value="15">15 minutes</option>
+                                        <option value="30">30 minutes</option>
+                                        <option value="60">60 minutes</option>
+                                        <option value="120">2 heures</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-shield-alt"></i> Validation à deux facteurs</label>
+                                    <select class="setting-input" id="2fa">
+                                        <option value="false">Désactivée</option>
+                                        <option value="true">Activée</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label"><i class="fas fa-history"></i> Historique des connexions</label>
+                                    <select class="setting-input" id="historique-connexions">
+                                        <option value="7">7 jours</option>
+                                        <option value="30">30 jours</option>
+                                        <option value="90">90 jours</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons">
+                            <button id="save-securite" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Code secret -->
+                <div id="code-secret" class="tab-content">
+                    <div id="code-success" class="status-message success"><i class="fas fa-check-circle"></i> <span></span></div>
+                    <div id="code-error" class="status-message error"><i class="fas fa-exclamation-circle"></i> <span id="code-error-text"></span></div>
+                    <div class="card critical-section">
+                        <div class="card-header"><i class="fas fa-key"></i><h3>Code secret administrateur</h3></div>
+                        <p class="card-description">Modifiez le code secret utilisé pour la connexion rapide.</p>
+                        <form id="code-form">
+                            <div class="setting-item">
+                                <label class="setting-label"><i class="fas fa-lock"></i> Code secret actuel</label>
+                                <div class="input-with-icon">
+                                    <input type="password" class="setting-input" id="current-code" maxlength="6" placeholder="●●●●●●" required>
+                                </div>
+                            </div>
+                            <div class="code-inputs">
+                                <div class="setting-item" style="flex:1;">
+                                    <label class="setting-label"><i class="fas fa-key"></i> Nouveau code secret</label>
+                                    <input type="password" class="setting-input" id="new-code" maxlength="6" placeholder="6 chiffres" required>
+                                    <div class="security-indicator" id="security-level"><i class="fas fa-shield-alt"></i> <span>Saisissez 6 chiffres</span></div>
+                                </div>
+                                <div class="setting-item" style="flex:1;">
+                                    <label class="setting-label"><i class="fas fa-redo"></i> Confirmer le code</label>
+                                    <input type="password" class="setting-input" id="confirm-code" maxlength="6" placeholder="6 chiffres" required>
+                                </div>
+                            </div>
+                            <div class="buttons">
+                                <button type="submit" class="btn btn-primary" id="change-code-btn"><i class="fas fa-sync-alt"></i> Modifier le code</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <!-- FIREBASE MODULES -->
     <script type="module">
@@ -1323,76 +1279,71 @@
             loadUserData(user);
         });
 
-        // Gestion sidebar (identique)
-        (function() {
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.getElementById('toggleSidebar');
-            const toggleIcon = document.getElementById('toggleIcon');
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        // ===== GESTION SIDEBAR (harmonisée avec les autres pages) =====
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', () => {
-                    sidebar.classList.toggle('collapsed');
-                    toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
-                });
-            }
+        function openMobileSidebar() {
+            sidebar.classList.add('mobile-open');
+            if (sidebarOverlay) sidebarOverlay.classList.add('active');
+        }
 
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function closeMobileSidebar() {
+            sidebar.classList.remove('mobile-open');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        }
 
-            function openMobileSidebar() {
-                sidebar.classList.add('mobile-open');
-                if (sidebarOverlay) sidebarOverlay.classList.add('active');
-            }
-
-            function closeMobileSidebar() {
-                sidebar.classList.remove('mobile-open');
-                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
-            }
-
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', () => {
-                    sidebar.classList.toggle('collapsed');
-                    toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
-                });
-            }
-
-            if (mobileMenuBtn && sidebar) {
-                mobileMenuBtn.addEventListener('click', () => {
-                    if (sidebar.classList.contains('mobile-open')) {
-                        closeMobileSidebar();
-                    } else {
-                        openMobileSidebar();
-                        if (sidebar.classList.contains('collapsed')) {
-                            sidebar.classList.remove('collapsed');
-                            toggleIcon.textContent = 'chevron_left';
-                        }
-                    }
-                });
-            }
-
-            if (sidebarOverlay) {
-                sidebarOverlay.addEventListener('click', () => closeMobileSidebar());
-            }
-
-            document.addEventListener('click', (e) => {
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
-                    if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                        closeMobileSidebar();
+                    sidebar.classList.contains('mobile-open') ? closeMobileSidebar() : openMobileSidebar();
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+                }
+            });
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                if (sidebar.classList.contains('mobile-open')) {
+                    closeMobileSidebar();
+                } else {
+                    openMobileSidebar();
+                    if (sidebar.classList.contains('collapsed')) {
+                        sidebar.classList.remove('collapsed');
+                        toggleIcon.textContent = 'chevron_left';
                     }
                 }
             });
+        }
 
-            function handleResize() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('collapsed');
-                    toggleIcon.textContent = 'chevron_left';
-                } else {
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeMobileSidebar);
+        }
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
                     closeMobileSidebar();
                 }
             }
-            window.addEventListener('resize', handleResize);
-            handleResize();
-        })();
+        });
+
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                toggleIcon.textContent = 'chevron_left';
+                closeMobileSidebar();
+            } else {
+                closeMobileSidebar();
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
 
         // Gestion des onglets (seulement 3)
         document.querySelectorAll('.tab').forEach(tab => {
@@ -1405,6 +1356,5 @@
             });
         });
     </script>
-    </div><!-- /page-wrapper -->
 </body>
 </html>
