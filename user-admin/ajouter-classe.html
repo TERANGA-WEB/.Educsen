@@ -2,1402 +2,2207 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
-    <title>Edusen · Création de classe</title>
+    <link rel="icon" href="/images/icon-192x192.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edusen · Ajouter une classe</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ===== STYLE EXISTANT (CONSERVÉ) ===== */
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #10b981;
-            --secondary-dark: #059669;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --gray-light: #e2e8f0;
-            --gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            --transition: all 0.3s ease;
+            --blue:        #2563eb;
+            --blue-light:  #3b82f6;
+            --blue-soft:   #eff6ff;
+            --blue-mid:    #dbeafe;
+            --purple:      #7c3aed;
+            --green:       #059669;
+            --green-soft:  #f0fdf4;
+            --green-mid:   #bbf7d0;
+            --amber:       #d97706;
+            --amber-soft:  #fffbeb;
+            --amber-mid:   #fde68a;
+            --red:         #dc2626;
+            --red-soft:    #fef2f2;
+            --surface:     #f1f5f9;
+            --white:       #ffffff;
+            --ink:         #0f172a;
+            --ink-2:       #334155;
+            --ink-3:       #64748b;
+            --border:      #e2e8f0;
+            --border-2:    #cbd5e1;
+            --grad:        linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            --grad-soft:   linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+            --shadow-sm:   0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:   0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+            --shadow-lg:   0 12px 40px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.05);
+            --radius:      14px;
+            --radius-lg:   20px;
+            --radius-xl:   28px;
+            --t:           all 0.2s ease;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--surface);
+            color: var(--ink);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            flex: 1;
+        /* ─── TOPBAR ───────────────────────────────────────── */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 64px;
             display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        header {
-            display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            width: 100%;
-            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
+        .topbar-left { display: flex; align-items: center; gap: 1.2rem; }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             text-decoration: none;
-            color: var(--dark);
+            color: var(--ink);
         }
 
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: var(--gradient);
+        .logo-mark {
+            width: 36px; height: 36px;
+            background: var(--grad);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.5rem;
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .logo-text span {
-            color: var(--primary);
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            flex: 1;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            margin-right: 40px;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--gray);
-            font-weight: 500;
             font-size: 1rem;
-            transition: var(--transition);
-            padding: 8px 0;
-            position: relative;
-            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .nav-links a:hover {
-            color: var(--primary);
-        }
+        .logo-name { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+        .logo-name em { color: var(--blue-light); font-style: normal; }
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: var(--transition);
-        }
+        .topbar-divider { width: 1px; height: 24px; background: var(--border); }
 
-        .nav-links a:hover::after {
-            width: 100%;
-        }
+        .page-title { font-size: 0.9rem; font-weight: 600; color: var(--ink-3); }
 
-        .language-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray);
-            font-size: 0.9rem;
+        .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--ink-2);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: var(--transition);
-            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--t);
+            font-family: inherit;
         }
 
-        .language-selector:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+        .btn-ghost:hover { background: var(--surface); border-color: var(--border-2); }
 
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 0 40px;
-        }
-
-        .back-btn {
-            margin-bottom: 1.5rem;
-            align-self: flex-start;
+        /* ─── STEPPER ──────────────────────────────────────── */
+        .stepper-wrap {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
         }
 
         .stepper {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: stretch;
+            height: 56px;
+        }
+
+        .step {
+            flex: 1;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            background: white;
-            padding: 0.6rem 0.8rem;
-            border-radius: 60px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--gray-light);
-            margin: 0 auto 40px;
-            width: fit-content;
-        }
-
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.55rem 1.8rem;
-            border-radius: 40px;
-            font-weight: 600;
-            transition: var(--transition);
-            background: transparent;
-            color: var(--gray);
-            cursor: default;
-        }
-
-        .step-item i {
-            font-size: 1.15rem;
-            color: var(--gray);
-        }
-
-        .step-item.active {
-            background: var(--gradient);
-            color: white;
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
-        }
-
-        .step-item.active i {
-            color: white;
-        }
-
-        .section-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 2.5rem;
-            transition: opacity 0.25s, transform 0.3s ease;
-            border: 1px solid var(--gray-light);
-            margin-bottom: 1.5rem;
-        }
-
-        .section-hidden {
-            display: none;
-        }
-
-        .section-title {
-            font-size: 1.6rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.9rem;
-            color: var(--dark);
-            border-bottom: 2px solid var(--gray-light);
-            padding-bottom: 1rem;
-        }
-
-        .section-title i {
-            background: var(--gradient);
-            padding: 0.5rem;
-            border-radius: 12px;
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            color: var(--gray);
-            margin-left: 0.3rem;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select {
-            padding: 1rem 1.4rem;
-            border: 1.5px solid var(--gray-light);
-            border-radius: 44px;
-            font-size: 0.98rem;
-            background: white;
-            transition: 0.18s ease;
-            font-weight: 450;
-            color: var(--dark);
-            width: 100%;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
-            background: white;
-        }
-
-        .text-small {
-            font-size: 0.85rem;
-            color: var(--gray);
-            margin-left: 0.4rem;
-        }
-
-        .subjects-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .subject-card {
-            background: #f9fafc;
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: 1px solid var(--gray-light);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+            gap: 0.7rem;
+            padding: 0 1rem;
             position: relative;
+            cursor: default;
+            transition: var(--t);
         }
 
-        .subject-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 24px;
+            background: var(--border);
         }
 
-        .subject-title {
-            font-weight: 600;
-            color: var(--primary-dark);
-            font-size: 1.1rem;
-        }
-
-        .btn-remove-card {
-            background: transparent;
-            border: none;
-            color: var(--gray);
-            font-size: 1.3rem;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
+        .step-num {
+            width: 28px; height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.18s;
+            font-size: 0.78rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            background: var(--border);
+            color: var(--ink-3);
+            transition: var(--t);
         }
 
-        .btn-remove-card:hover {
-            background: #fee2e2;
-            color: #ef4444;
-        }
+        .step-label { font-size: 0.88rem; font-weight: 600; color: var(--ink-3); transition: var(--t); }
 
-        .subject-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
+        .step.active .step-num { background: var(--grad); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .step.active .step-label { color: var(--blue); }
 
-        .subject-row .subject-name-input {
-            flex: 2;
-            min-width: 200px;
-        }
+        .step.done .step-num { background: var(--green); color: white; }
+        .step.done .step-label { color: var(--green); }
 
-        .subject-row .prof-select {
-            flex: 3;
-            min-width: 250px;
-        }
-
-        .btn-create-prof {
-            background: white;
-            border: 1.8px dashed var(--primary);
-            color: var(--primary);
-            padding: 0.8rem 1.5rem;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 0.5rem;
-        }
-
-        .btn-create-prof:hover {
-            background: #f0f9ff;
-            border-color: var(--primary-dark);
-        }
-
-        .btn-add {
-            background: white;
-            border: 1.8px dashed var(--primary);
-            color: var(--primary);
-            padding: 0.9rem 2rem;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.7rem;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 0.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-add:hover {
-            background: #f0f9ff;
-            border-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* ─── LAYOUT ───────────────────────────────────────── */
+        .page-body {
+            flex: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* ─── SECTION CARD ─────────────────────────────────── */
+        .section-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-hidden { display: none; }
+
+        .card-head {
+            padding: 1.6rem 2rem 1.4rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .card-head-icon {
+            width: 42px; height: 42px;
+            background: var(--grad-soft);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--blue);
+            flex-shrink: 0;
+        }
+
+        .card-head-text h2 { font-size: 1.1rem; font-weight: 700; color: var(--ink); }
+        .card-head-text p { font-size: 0.82rem; color: var(--ink-3); margin-top: 0.1rem; }
+
+        .card-body { padding: 2rem; }
+
+        /* ─── ÉTAPE 0 : CHOIX COLLÈGE / LYCÉE ─────────────── */
+        .type-ecole-intro {
+            text-align: center;
+            padding: 1rem 0 2rem;
+        }
+
+        .type-ecole-intro h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        .type-ecole-intro p {
+            font-size: 0.9rem;
+            color: var(--ink-3);
+        }
+
+        .type-ecole-choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.4rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 560px) {
+            .type-ecole-choices { grid-template-columns: 1fr; }
+        }
+
+        .type-ecole-card {
+            position: relative;
+            border: 2.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem 1.5rem 1.8rem;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            background: var(--white);
+            text-align: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .type-ecole-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.22s ease;
+            border-radius: calc(var(--radius-lg) - 2px);
+        }
+
+        .type-ecole-card.college::before {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+        }
+
+        .type-ecole-card.lycee::before {
+            background: linear-gradient(135deg, #fdf4ff 0%, #fff7ed 100%);
+        }
+
+        .type-ecole-card:hover {
+            border-color: var(--blue-light);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(37,99,235,0.12);
+        }
+
+        .type-ecole-card:hover::before { opacity: 1; }
+
+        .type-ecole-card.selected.college {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.12), 0 8px 28px rgba(37,99,235,0.15);
+            transform: translateY(-2px);
+        }
+
+        .type-ecole-card.selected.college::before { opacity: 1; }
+
+        .type-ecole-card.selected.lycee {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.12), 0 8px 28px rgba(124,58,237,0.15);
+            transform: translateY(-2px);
+        }
+
+        .type-ecole-card.selected.lycee::before {
+            background: linear-gradient(135deg, #fdf4ff 0%, #ede9fe 100%);
+            opacity: 1;
+        }
+
+        .type-ecole-card-inner { position: relative; z-index: 1; }
+
+        .type-ecole-icon {
+            width: 68px; height: 68px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.1rem;
+            transition: var(--t);
+        }
+
+        .type-ecole-card.college .type-ecole-icon {
+            background: linear-gradient(135deg, #dbeafe, #bbf7d0);
+            color: var(--blue);
+        }
+
+        .type-ecole-card.lycee .type-ecole-icon {
+            background: linear-gradient(135deg, #ede9fe, #fde68a);
+            color: var(--purple);
+        }
+
+        .type-ecole-card.selected .type-ecole-icon {
+            transform: scale(1.08);
+        }
+
+        .type-ecole-name {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .type-ecole-card.selected.college .type-ecole-name { color: var(--blue); }
+        .type-ecole-card.selected.lycee  .type-ecole-name  { color: var(--purple); }
+
+        .type-ecole-desc {
+            font-size: 0.8rem;
+            color: var(--ink-3);
+            line-height: 1.5;
+        }
+
+        .type-ecole-levels {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-top: 0.9rem;
+        }
+
+        .type-ecole-level-tag {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.2rem 0.65rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--ink-3);
+            transition: var(--t);
+        }
+
+        .type-ecole-card.selected.college .type-ecole-level-tag {
+            background: var(--blue-mid);
+            border-color: var(--blue-light);
+            color: var(--blue);
+        }
+
+        .type-ecole-card.selected.lycee .type-ecole-level-tag {
+            background: #ede9fe;
+            border-color: #c4b5fd;
+            color: var(--purple);
+        }
+
+        .type-ecole-check {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            width: 26px; height: 26px;
+            border-radius: 50%;
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 800;
         }
 
-        .modal-card {
-            background: white;
-            border-radius: 24px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
+        .type-ecole-card.selected.college .type-ecole-check {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+            background: var(--blue);
         }
 
-        .modal-header h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray);
-        }
-
-        .modal-close:hover {
-            color: var(--danger, #ef4444);
-        }
-
-        .modal-form .form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .modal-actions {
+        .type-ecole-card.selected.lycee .type-ecole-check {
             display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 2rem;
+            background: var(--purple);
         }
 
-        .btn-secondary {
-            background: white;
-            color: var(--gray);
-            border: 1px solid var(--gray-light);
-            padding: 0.8rem 1.8rem;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-secondary:hover {
-            background: #f1f5f9;
-        }
-
-        .student-badge {
-            background: #dbeafe;
-            border-radius: 60px;
-            padding: 0.7rem 1.8rem;
+        /* Badge affiché dans le stepper / récap après choix */
+        .type-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.8rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            margin-bottom: 2.2rem;
-            font-size: 0.95rem;
-        }
-
-        .students-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.1rem;
-            max-height: 440px;
-            overflow-y: auto;
-            padding: 0.2rem 0.3rem 0.2rem 0.1rem;
-        }
-
-        .student-entry {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            background: white;
-            padding: 0.9rem 1.3rem;
-            border-radius: 100px;
-            border: 1px solid var(--gray-light);
-            transition: var(--transition);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.01);
-        }
-
-        .student-entry:hover {
-            background: #f8fafc;
-            border-color: var(--primary);
-            box-shadow: 0 8px 18px -10px rgba(59,130,246,0.2);
-        }
-
-        .student-index {
+            gap: 0.5rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
             font-weight: 700;
-            background: #dbeafe;
-            color: var(--primary-dark);
-            width: 38px;
-            height: 38px;
+            margin-left: 0.8rem;
+        }
+
+        .type-badge.college {
+            background: var(--blue-mid);
+            color: var(--blue);
+            border: 1px solid var(--blue-light);
+        }
+
+        .type-badge.lycee {
+            background: #ede9fe;
+            color: var(--purple);
+            border: 1px solid #c4b5fd;
+        }
+
+        /* ─── FORM ELEMENTS ────────────────────────────────── */
+        .field { margin-bottom: 1.6rem; }
+
+        .field-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--ink-3);
+            margin-bottom: 0.5rem;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 0.85rem 1.2rem;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--ink);
+            background: var(--white);
+            transition: var(--t);
+            outline: none;
+        }
+
+        .field-input:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+        .field-hint { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.4rem; }
+
+        /* ─── SUBJECTS ─────────────────────────────────────── */
+        .subjects-stack { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; }
+
+        .subject-item {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem 1.3rem;
+            transition: var(--t);
+        }
+
+        .subject-item:hover { border-color: var(--blue-light); }
+
+        .subject-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.9rem;
+        }
+
+        .subject-item-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--blue);
+        }
+
+        .subject-badges { display: flex; align-items: center; gap: 0.5rem; }
+
+        .badge-shared {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid var(--amber-mid);
+            border-radius: 20px;
+            padding: 0.15rem 0.65rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-remove {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--ink-3);
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 18px;
-            border: 1px solid white;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            transition: var(--t);
         }
 
-        .student-entry input {
-            flex: 1 1 180px;
-            padding: 0.7rem 1.2rem;
-            border-radius: 40px;
-            border: 1px solid var(--gray-light);
+        .btn-remove:hover { background: var(--red-soft); color: var(--red); }
+
+        .subject-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.9rem; }
+
+        @media (max-width: 560px) { .subject-fields { grid-template-columns: 1fr; } }
+
+        .subject-name-input,
+        .prof-select { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: inherit; font-weight: 500; color: var(--ink); background: var(--white); transition: var(--t); outline: none; }
+        .subject-name-input:focus, .prof-select:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+        .btn-new-prof {
             background: white;
-            transition: 0.15s;
-        }
-
-        .student-entry input:focus {
-            background: white;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
-        }
-
-        .students-grid::-webkit-scrollbar {
-            width: 8px;
-        }
-        .students-grid::-webkit-scrollbar-track {
-            background: #eef2f6;
-            border-radius: 20px;
-        }
-        .students-grid::-webkit-scrollbar-thumb {
-            background: #b9c7d9;
-            border-radius: 20px;
-        }
-
-        .navigation-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 2.8rem;
-            gap: 1.2rem;
-        }
-
-        .btn {
-            border: none;
-            padding: 0.9rem 2.2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
+            border: 1.5px dashed var(--blue-light);
+            color: var(--blue);
+            padding: 0.6rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.45rem;
+            transition: var(--t);
+        }
+
+        .btn-new-prof:hover { background: var(--blue-soft); }
+
+        .btn-add-subject {
+            width: 100%;
+            padding: 0.9rem;
+            background: transparent;
+            border: 1.5px dashed var(--border-2);
+            border-radius: var(--radius);
+            color: var(--ink-3);
+            font-size: 0.88rem;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            transition: var(--t);
         }
 
-        .btn-primary {
-            background: var(--gradient);
-            color: white;
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
-        }
+        .btn-add-subject:hover { border-color: var(--blue-light); color: var(--blue); background: var(--blue-soft); }
 
-        .btn-primary:hover:not(:disabled) {
-            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-outline {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-outline:hover {
-            background: #f0f9ff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .message-area {
+        /* ─── DELEGATION PANEL ──────────── */
+        .delegation-panel {
             margin-top: 2rem;
-            padding: 1.3rem 2rem;
-            border-radius: 12px;
+            background: var(--grad-soft);
+            border: 1.5px solid var(--blue-mid);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .delegation-panel-head {
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            border-bottom: 1px solid var(--blue-mid);
+            background: rgba(255,255,255,0.6);
+        }
+
+        .delegation-panel-icon {
+            width: 38px; height: 38px;
+            background: var(--grad);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .delegation-panel-title { font-size: 0.95rem; font-weight: 800; color: var(--ink); }
+        .delegation-panel-sub { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.1rem; }
+
+        .delegation-panel-body { padding: 1.2rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+        .delegation-empty {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--ink-3);
+            font-size: 0.85rem;
+        }
+
+        /* ─── TOKEN ROW ─────────────────────────────────────── */
+        .token-row {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--t);
+        }
+
+        .token-row:hover { border-color: var(--blue-light); box-shadow: 0 4px 16px rgba(37,99,235,0.08); }
+
+        .token-row-top {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 1rem 1.2rem 0.9rem;
+        }
+
+        .token-matiere-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--grad);
+            flex-shrink: 0;
+        }
+
+        .token-matiere-info { flex: 1; min-width: 0; }
+        .token-matiere-name { font-weight: 700; font-size: 0.95rem; color: var(--ink); }
+        .token-prof-name { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.2rem; display: flex; align-items: center; gap: 0.35rem; }
+
+        .token-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .token-status.pending { background: #fef9c3; color: #78350f; border: 1px solid var(--amber-mid); }
+        .token-status.ready   { background: #dcfce7; color: #14532d; border: 1px solid var(--green-mid); }
+
+        .token-row-action { padding: 0 1.2rem 1.1rem; }
+
+        .btn-generate {
+            width: 100%;
+            background: var(--grad);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 11px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            transition: var(--t);
+            box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+            letter-spacing: 0.01em;
+        }
+
+        .btn-generate:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(37,99,235,0.45); }
+        .btn-generate:active:not(:disabled) { transform: translateY(0); }
+        .btn-generate:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-generate.regen {
+            background: white;
+            color: var(--blue);
+            border: 2px solid var(--blue-light);
+            box-shadow: none;
+            padding: 0.65rem 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-generate.regen:hover:not(:disabled) { background: var(--blue-soft); box-shadow: 0 3px 10px rgba(37,99,235,0.15); }
+
+        /* ─── LINK BOX ──────────── */
+        .link-reveal {
+            display: none;
+            border-top: 1px solid var(--border);
+            background: #f0fdf4;
+            padding: 0.9rem 1.2rem;
+        }
+
+        .link-reveal.show { display: block; }
+
+        .link-reveal-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .link-row { display: flex; align-items: center; gap: 0.6rem; }
+
+        .link-input {
+            flex: 1;
+            min-width: 0;
+            padding: 0.55rem 0.9rem;
+            border: 1.5px solid var(--green-mid);
+            border-radius: 9px;
+            font-size: 0.82rem;
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--ink-2);
+            background: white;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: default;
+        }
+
+        .btn-copy {
+            background: white;
+            border: 1.5px solid var(--green-mid);
+            color: var(--green);
+            padding: 0.5rem 0.9rem;
+            border-radius: 9px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: var(--t);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-copy:hover { background: var(--green-soft); }
+        .btn-copy.copied { background: var(--green); color: white; border-color: var(--green); }
+
+        .link-warning-text {
+            font-size: 0.72rem;
+            color: #9a3412;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* ─── COEFFICIENTS ─────────────────────────────────── */
+        .coeff-stack { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .coeff-group-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+            border-bottom: 1.5px solid var(--border);
+            margin-top: 0.5rem;
+        }
+
+        .coeff-group-label { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); }
+        .coeff-group-badge { background: var(--grad); color: white; border-radius: 6px; padding: 0.12rem 0.5rem; font-size: 0.68rem; font-weight: 800; }
+
+        .coeff-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.9rem 1.2rem;
+            transition: var(--t);
+        }
+
+        .coeff-item:hover { border-color: var(--blue-light); }
+        .coeff-item.grouped { margin-left: 1.5rem; border-left: 3px solid var(--blue-mid); }
+
+        .coeff-item-info { flex: 1; }
+        .coeff-item-name { font-weight: 700; font-size: 0.92rem; color: var(--ink); }
+        .coeff-item-prof { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.35rem; }
+
+        .coeff-controls { display: flex; align-items: center; gap: 0.7rem; flex-shrink: 0; }
+        .coeff-ctrl-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); white-space: nowrap; }
+
+        .coeff-number {
+            width: 80px;
+            text-align: center;
+            padding: 0.6rem 0.5rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 800;
+            font-family: inherit;
+            color: var(--ink);
+            background: white;
+            outline: none;
+            transition: var(--t);
+        }
+
+        .coeff-number:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+        .coeff-pill {
+            background: var(--grad);
+            color: white;
+            border-radius: 8px;
+            padding: 0.3rem 0.65rem;
+            font-size: 0.72rem;
+            font-weight: 800;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .coeff-total-row {
+            background: var(--blue-soft);
+            border: 1.5px solid var(--blue-mid);
+            border-radius: var(--radius);
+            padding: 0.9rem 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+
+        .coeff-total-lbl { font-size: 0.85rem; font-weight: 700; color: var(--ink-2); }
+        .coeff-total-val { font-size: 1.4rem; font-weight: 800; color: var(--blue); }
+
+        /* ─── ÉLÈVES ────────────────────────────────────────── */
+        .eleves-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--blue-soft);
+            color: var(--blue);
+            border: 1px solid var(--blue-mid);
+            border-radius: 30px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .eleves-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            max-height: 460px;
+            overflow-y: auto;
+            padding-right: 0.3rem;
+        }
+
+        .eleve-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 50px;
+            padding: 0.7rem 1rem;
+            transition: var(--t);
+        }
+
+        .eleve-row:hover { border-color: var(--blue-light); background: white; }
+
+        .eleve-num {
+            width: 34px; height: 34px;
+            background: var(--blue-mid);
+            color: var(--blue);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+
+        .eleve-input {
+            flex: 1 1 160px;
+            padding: 0.6rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-family: inherit;
             font-weight: 500;
             background: white;
-            border: 1px solid var(--gray-light);
-            color: var(--dark);
+            color: var(--ink);
+            outline: none;
+            transition: var(--t);
+        }
+
+        .eleve-input:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(59,130,246,0.08); }
+
+        .eleves-stack::-webkit-scrollbar { width: 6px; }
+        .eleves-stack::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
+        .eleves-stack::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 10px; }
+
+        /* ─── FOOTER CARD ───────────────────────────────────── */
+        .card-footer {
+            padding: 1.2rem 2rem;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-prev {
+            background: white;
+            color: var(--blue);
+            border: 1.5px solid var(--blue-light);
+            padding: 0.75rem 1.6rem;
+            border-radius: 11px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            transition: var(--t);
+        }
+
+        .btn-prev:hover { background: var(--blue-soft); }
+
+        .btn-next {
+            background: var(--grad);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 11px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            transition: var(--t);
+            box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+        }
+
+        .btn-next:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(37,99,235,0.38); }
+        .btn-next:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--green) 0%, #10b981 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 11px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            transition: var(--t);
+            box-shadow: 0 4px 14px rgba(5,150,105,0.3);
+        }
+
+        .btn-save:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(5,150,105,0.38); }
+        .btn-save:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ─── MESSAGE BAR ───────────────────────────────────── */
+        .msg-bar {
+            margin-top: 1.2rem;
+            padding: 1rem 1.4rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.88rem;
             display: flex;
             align-items: center;
             gap: 0.7rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            background: white;
         }
 
-        .message-area.success {
-            background: #ecfdf5;
-            border-left: 6px solid var(--secondary);
-            color: #065f46;
+        .msg-bar.success { background: var(--green-soft); border-color: var(--green-mid); color: #14532d; }
+        .msg-bar.error   { background: var(--red-soft); border-color: #fecaca; color: #991b1b; }
+        .msg-bar.info    { background: var(--blue-soft); border-color: var(--blue-mid); color: #1e3a8a; }
+
+        /* ─── MODAL ─────────────────────────────────────────── */
+        .modal-bg {
+            position: fixed; inset: 0;
+            background: rgba(15,23,42,0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            backdrop-filter: blur(5px);
+            padding: 1rem;
         }
 
-        .message-area.error {
-            background: #fef2f2;
-            border-left: 6px solid #ef4444;
-            color: #991b1b;
+        .modal-bg.open { display: flex; }
+
+        .modal-box {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .message-area.info {
-            background: #eff6ff;
-            border-left: 6px solid var(--primary);
-            color: #1e3a8a;
+        .modal-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
         }
 
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            color: var(--gray);
+        .modal-title { font-size: 1.1rem; font-weight: 800; color: var(--ink); }
+
+        .btn-modal-close {
+            width: 32px; height: 32px;
+            border: none;
+            background: var(--surface);
+            border-radius: 8px;
+            color: var(--ink-3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 0.9rem;
-            border-top: 1px solid var(--gray-light);
-            margin-top: 40px;
+            transition: var(--t);
         }
 
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            .logo-container {
-                width: 100%;
-                justify-content: center;
-            }
-            .nav-container {
-                width: 100%;
-                justify-content: center;
-            }
-            .nav-links {
-                margin-right: 0;
-                gap: 30px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .stepper {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .step-item {
-                padding: 0.5rem 1.2rem;
-            }
-            .btn {
-                padding: 0.8rem 1.5rem;
-            }
+        .btn-modal-close:hover { background: var(--red-soft); color: var(--red); }
+
+        .existing-block {
+            background: var(--amber-soft);
+            border: 1.5px solid var(--amber-mid);
+            border-radius: var(--radius);
+            padding: 1rem 1.1rem;
+            margin-bottom: 1.3rem;
+            display: none;
         }
 
-        @media (max-width: 480px) {
-            .stepper {
-                flex-direction: column;
-                background: transparent;
-                box-shadow: none;
-                gap: 0.5rem;
-            }
-            .step-item {
-                width: 100%;
-                justify-content: center;
-                background: white;
-                border: 1px solid var(--gray-light);
-            }
-            .nav-links {
-                flex-direction: column;
-                gap: 10px;
-            }
+        .existing-block.show { display: block; }
+
+        .existing-block-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #92400e;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
-        .section-card:not(.section-hidden) {
-            animation: fadeSlide 0.35s ease-out;
+        .existing-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 160px; overflow-y: auto; }
+
+        .existing-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border: 1px solid var(--amber-mid);
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            gap: 0.8rem;
         }
-        @keyframes fadeSlide {
-            0% { opacity: 0.8; transform: translateY(6px); }
-            100% { opacity: 1; transform: translateY(0); }
+
+        .existing-item-name { font-weight: 700; font-size: 0.88rem; color: var(--ink); }
+        .existing-item-sub { font-size: 0.75rem; color: var(--ink-3); }
+
+        .btn-reuse {
+            background: var(--amber);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: var(--t);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-reuse:hover { background: #b45309; }
+
+        .modal-sep {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--ink-3);
+        }
+
+        .modal-sep::before, .modal-sep::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        .modal-field { margin-bottom: 1rem; }
+        .modal-field-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-3); display: block; margin-bottom: 0.4rem; }
+        .modal-input { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: inherit; font-weight: 500; color: var(--ink); outline: none; transition: var(--t); }
+        .modal-input:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem; }
+
+        .btn-cancel {
+            background: var(--surface);
+            color: var(--ink-2);
+            border: 1px solid var(--border);
+            padding: 0.65rem 1.3rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--t);
+        }
+
+        .btn-cancel:hover { background: var(--border); }
+
+        .btn-save-prof {
+            background: var(--grad);
+            color: white;
+            border: none;
+            padding: 0.65rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: var(--t);
+        }
+
+        .btn-save-prof:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* ─── RESPONSIVE ────────────────────────────────────── */
+        @media (max-width: 640px) {
+            .topbar { padding: 0 1rem; }
+            .page-title { display: none; }
+            .stepper-wrap { padding: 0 0.5rem; }
+            .step-label { font-size: 0.72rem; }
+            .page-body { padding: 1.2rem 0.8rem 3rem; }
+            .card-body { padding: 1.3rem; }
+            .card-head { padding: 1.2rem 1.3rem; }
+            .card-footer { padding: 1rem 1.3rem; }
+            .coeff-item { flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+            .link-row { flex-direction: column; align-items: stretch; }
+            .token-row-top { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo-container">
-                <a href="#" class="logo" onclick="return false;">
-                    <div class="logo-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="logo-text">Edu<span>sen</span></div>
-                </a>
-            </div>
-            <div class="nav-container">
-                <nav class="nav-links">
-                    <a href="/contact.html">Contact</a>
-                    <a href="Aide.html">Aide</a>
-                </nav>
-            </div>
-        </header>
 
-        <main>
-            <button id="backBtn" class="btn btn-outline back-btn">
-                <i class="fas fa-arrow-left"></i> Retour
-            </button>
-
-            <div class="stepper">
-                <div class="step-item active" id="step1Indicator">
-                    <i class="fas fa-chalkboard"></i>
-                    <span>Classe</span>
-                </div>
-                <div class="step-item" id="step2Indicator">
-                    <i class="fas fa-user-graduate"></i>
-                    <span>Élèves</span>
-                </div>
-            </div>
-
-            <!-- SECTION 1 : INFOS CLASSE -->
-            <div id="section1" class="section-card">
-                <div class="section-title">
-                    <i class="fas fa-school"></i> Informations de la classe
-                </div>
-
-                <div class="form-group">
-                    <label for="className">Nom de la classe</label>
-                    <input type="text" id="className" placeholder="Ex : 3ème A, CP, Terminale S..." autocomplete="off">
-                </div>
-
-                <div class="form-group">
-                    <label>Matières et professeurs</label>
-                    <div id="subjectsContainer" class="subjects-list"></div>
-                    <button type="button" id="addSubjectBtn" class="btn-add">
-                        <i class="fas fa-plus-circle"></i> Ajouter une matière
-                    </button>
-                </div>
-
-                <div class="form-group">
-                    <label for="numStudents">Nombre d'élèves</label>
-                    <input type="number" id="numStudents" min="1" max="60" step="1" value="12">
-                    <span class="text-small">
-                        <i class="fas fa-arrows-alt-h"></i> Ajustez pour générer les fiches élèves
-                    </span>
-                </div>
-
-                <div class="navigation-buttons">
-                    <span></span>
-                    <button id="nextBtn" class="btn btn-primary">
-                        Suivant <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- SECTION 2 : LISTE ÉLÈVES -->
-            <div id="section2" class="section-card section-hidden">
-                <div class="section-title">
-                    <i class="fas fa-users"></i> Liste des élèves
-                </div>
-
-                <div class="student-badge">
-                    <i class="fas fa-user-friends"></i> Total élèves : <span id="studentCountValue">12</span>
-                </div>
-
-                <div id="studentsListContainer" class="students-grid"></div>
-                
-                <div class="text-small" style="margin: 1.2rem 0 0.8rem;">
-                    <i class="fas fa-info-circle"></i> Tous les noms et prénoms sont requis.
-                </div>
-
-                <div class="navigation-buttons">
-                    <button id="prevBtn" class="btn btn-outline">
-                        <i class="fas fa-arrow-left"></i> Précédent
-                    </button>
-                    <button id="saveClassBtn" class="btn btn-primary" disabled>
-                        <i class="fas fa-save"></i> Enregistrer
-                    </button>
-                </div>
-            </div>
-
-            <!-- Zone de message -->
-            <div id="messageBox" class="message-area">
-                <i class="fas fa-plug"></i> 🔐 Connectez-vous pour commencer.
-            </div>
-        </main>
-
-        <footer>
-            <p>Edusen © 2023 - Tous droits réservés</p>
-            <p>Plateforme de gestion académique pour les établissements scolaires</p>
-        </footer>
+<!-- ══ TOPBAR ══════════════════════════════════════════════════════ -->
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="#" class="logo" onclick="return false;">
+            <div class="logo-mark"><i class="fas fa-chart-line"></i></div>
+            <div class="logo-name">Edu<em>sen</em></div>
+        </a>
+        <div class="topbar-divider"></div>
+        <span class="page-title">Ajouter une classe</span>
     </div>
+    <div class="topbar-right">
+        <button class="btn-ghost" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i> Retour
+        </button>
+    </div>
+</div>
 
-    <!-- MODALE DE CRÉATION DE PROFESSEUR -->
-    <div id="professorModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Créer un professeur</h3>
-                <button class="modal-close" id="modalCloseBtn"><i class="fas fa-times"></i></button>
+<!-- ══ STEPPER ═════════════════════════════════════════════════════ -->
+<div class="stepper-wrap">
+    <div class="stepper">
+        <div class="step active" id="step0">
+            <div class="step-num" id="sn0">0</div>
+            <span class="step-label">Type d'école</span>
+        </div>
+        <div class="step" id="step1">
+            <div class="step-num" id="sn1">1</div>
+            <span class="step-label">Classe & matières</span>
+        </div>
+        <div class="step" id="step2">
+            <div class="step-num" id="sn2">2</div>
+            <span class="step-label">Coefficients</span>
+        </div>
+        <div class="step" id="step3">
+            <div class="step-num" id="sn3">3</div>
+            <span class="step-label">Élèves</span>
+        </div>
+    </div>
+</div>
+
+<!-- ══ PAGE BODY ═══════════════════════════════════════════════════ -->
+<div class="page-body">
+
+    <!-- ══ SECTION 0 : TYPE D'ÉCOLE ═════════════════════════════ -->
+    <div id="sec0" class="section-card">
+        <div class="card-head">
+            <div class="card-head-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="card-head-text">
+                <h2>Type d'établissement</h2>
+                <p>Choisissez le type d'école pour adapter la configuration de la classe</p>
             </div>
-            <div class="modal-form">
-                <div class="form-group">
-                    <label for="modalPrenom">Prénom</label>
-                    <input type="text" id="modalPrenom" placeholder="Ex : Jean">
-                </div>
-                <div class="form-group">
-                    <label for="modalNom">Nom</label>
-                    <input type="text" id="modalNom" placeholder="Ex : Dupont">
-                </div>
-                <div class="form-group">
-                    <label for="modalMatiere">Matière enseignée</label>
-                    <input type="text" id="modalMatiere" placeholder="Ex : Mathématiques">
-                </div>
+        </div>
+        <div class="card-body">
+            <div class="type-ecole-intro">
+                <h3>Quel type d'établissement ?</h3>
+                <p>Ce choix sera enregistré avec la classe et permettra de mieux organiser vos données.</p>
             </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" id="modalCancelBtn">Annuler</button>
-                <button class="btn-primary" id="modalSaveBtn">Enregistrer</button>
+
+            <div class="type-ecole-choices">
+
+                <!-- COLLÈGE -->
+                <div class="type-ecole-card college" id="cardCollege" onclick="selectTypeEcole('college')">
+                    <div class="type-ecole-check"><i class="fas fa-check"></i></div>
+                    <div class="type-ecole-card-inner">
+                        <div class="type-ecole-icon">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <div class="type-ecole-name">Collège</div>
+                        <div class="type-ecole-desc">Enseignement secondaire du premier cycle</div>
+                        <div class="type-ecole-levels">
+                            <span class="type-ecole-level-tag">6ème</span>
+                            <span class="type-ecole-level-tag">5ème</span>
+                            <span class="type-ecole-level-tag">4ème</span>
+                            <span class="type-ecole-level-tag">3ème</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LYCÉE -->
+                <div class="type-ecole-card lycee" id="cardLycee" onclick="selectTypeEcole('lycee')">
+                    <div class="type-ecole-check"><i class="fas fa-check"></i></div>
+                    <div class="type-ecole-card-inner">
+                        <div class="type-ecole-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="type-ecole-name">Lycée</div>
+                        <div class="type-ecole-desc">Enseignement secondaire du second cycle</div>
+                        <div class="type-ecole-levels">
+                            <span class="type-ecole-level-tag">Seconde</span>
+                            <span class="type-ecole-level-tag">Première</span>
+                            <span class="type-ecole-level-tag">Terminale</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+        </div>
+        <div class="card-footer">
+            <span></span>
+            <button id="nextBtn0" class="btn-next" disabled>
+                Suivant <i class="fas fa-arrow-right"></i>
+            </button>
         </div>
     </div>
 
-    <!-- Firebase imports -->
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"
-            }
-        }
-    </script>
+    <!-- ══ SECTION 1 ════════════════════════════════════════════ -->
+    <div id="sec1" class="section-card section-hidden">
+        <div class="card-head">
+            <div class="card-head-icon"><i class="fas fa-school"></i></div>
+            <div class="card-head-text">
+                <h2>Informations de la classe <span id="typeEcoleBadge"></span></h2>
+                <p>Renseignez le nom, les matières et configurez les liens de délégation</p>
+            </div>
+        </div>
+        <div class="card-body">
 
-    <script type="module">
-        // -------------------------------------------------------------
-        // 1. IMPORTS FIREBASE (addDoc ajouté)
-        // -------------------------------------------------------------
-        import { initializeApp } from 'firebase/app';
-        import { getAuth, onAuthStateChanged } from 'firebase/auth';
-        import {
-            getFirestore,
-            collection,
-            doc,
-            writeBatch,
-            serverTimestamp,
-            getDocs,
-            query,
-            where,
-            arrayUnion,
-            addDoc
-        } from 'firebase/firestore';
+            <!-- Nom de la classe -->
+            <div class="field">
+                <label class="field-label" for="className">Nom de la classe</label>
+                <input class="field-input" type="text" id="className" placeholder="Ex : 3ème A, Terminale S, CP..." autocomplete="off">
+            </div>
 
-        // -------------------------------------------------------------
-        // 2. CONFIGURATION FIREBASE
-        // -------------------------------------------------------------
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
-            authDomain: "real-educsen.firebaseapp.com",
-            projectId: "real-educsen",
-            storageBucket: "real-educsen.firebasestorage.app",
-            messagingSenderId: "80660233362",
-            appId: "1:80660233362:web:5edf5060254170056eba4b"
-        };
+            <!-- Matières -->
+            <div class="field">
+                <label class="field-label">Matières et professeurs</label>
+                <div id="subjectsStack" class="subjects-stack"></div>
+                <button type="button" id="addSubjectBtn" class="btn-add-subject">
+                    <i class="fas fa-plus"></i> Ajouter une matière
+                </button>
+            </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            <!-- Nombre d'élèves -->
+            <div class="field">
+                <label class="field-label" for="numStudents">Nombre d'élèves</label>
+                <input class="field-input" type="number" id="numStudents" min="1" max="60" value="12">
+                <div class="field-hint"><i class="fas fa-info-circle"></i> Ajustez ce nombre pour générer les fiches à l'étape 3</div>
+            </div>
 
-        // -------------------------------------------------------------
-        // 3. ÉTAT GLOBAL
-        // -------------------------------------------------------------
-        let currentUser = null;
-        let saveInProgress = false;
-        let professorsList = []; // Chaque élément : { id, nom, matiere }
-        let subjects = [];
-        let numStudents = 12;
-        let currentSubjectIndex = null;
-        let initialSubjectsAndProfessorsLoaded = false;
+            <!-- DÉLÉGATION -->
+            <div class="delegation-panel">
+                <div class="delegation-panel-head">
+                    <div class="delegation-panel-icon"><i class="fas fa-paper-plane"></i></div>
+                    <div>
+                        <div class="delegation-panel-title">Déléguer la saisie des notes</div>
+                        <div class="delegation-panel-sub">
+                            Générez un lien sécurisé par matière · Usage unique · Valide jusqu'à utilisation
+                        </div>
+                    </div>
+                </div>
+                <div class="delegation-panel-body" id="delegationBody">
+                    <div class="delegation-empty">
+                        <i class="fas fa-book-open" style="font-size:1.4rem;display:block;margin-bottom:0.5rem;color:var(--border-2);"></i>
+                        Ajoutez des matières ci-dessus pour générer des liens de saisie.
+                    </div>
+                </div>
+            </div>
 
-        // -------------------------------------------------------------
-        // 4. RÉFÉRENCES DOM
-        // -------------------------------------------------------------
-        const section1 = document.getElementById('section1');
-        const section2 = document.getElementById('section2');
-        const step1Indicator = document.getElementById('step1Indicator');
-        const step2Indicator = document.getElementById('step2Indicator');
-        const classNameInput = document.getElementById('className');
-        const numStudentsInput = document.getElementById('numStudents');
-        const subjectsContainer = document.getElementById('subjectsContainer');
-        const addSubjectBtn = document.getElementById('addSubjectBtn');
-        const studentsListContainer = document.getElementById('studentsListContainer');
-        const studentCountSpan = document.getElementById('studentCountValue');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtn = document.getElementById('prevBtn');
-        const saveBtn = document.getElementById('saveClassBtn');
-        const messageBox = document.getElementById('messageBox');
-        const backBtn = document.getElementById('backBtn');
+        </div>
+        <div class="card-footer">
+            <button id="prevBtn1" class="btn-prev"><i class="fas fa-arrow-left"></i> Précédent</button>
+            <button id="nextBtn1" class="btn-next">Suivant <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
 
-        const modalOverlay = document.getElementById('professorModal');
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-        const modalCancelBtn = document.getElementById('modalCancelBtn');
-        const modalSaveBtn = document.getElementById('modalSaveBtn');
-        const modalPrenom = document.getElementById('modalPrenom');
-        const modalNom = document.getElementById('modalNom');
-        const modalMatiere = document.getElementById('modalMatiere');
+    <!-- ══ SECTION 2 : COEFFICIENTS ═════════════════════════════ -->
+    <div id="sec2" class="section-card section-hidden">
+        <div class="card-head">
+            <div class="card-head-icon"><i class="fas fa-balance-scale"></i></div>
+            <div class="card-head-text">
+                <h2>Coefficients des matières</h2>
+                <p>Les matières du même professeur sont regroupées automatiquement</p>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="coeffStack" class="coeff-stack"></div>
+            <div class="coeff-total-row">
+                <span class="coeff-total-lbl"><i class="fas fa-sigma" style="margin-right:0.4rem;"></i>Total des coefficients</span>
+                <span class="coeff-total-val" id="coeffTotal">0</span>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button id="prevBtn2" class="btn-prev"><i class="fas fa-arrow-left"></i> Précédent</button>
+            <button id="nextBtn2" class="btn-next">Suivant <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
 
-        // -------------------------------------------------------------
-        // 5. CHARGEMENT DES PROFESSEURS (avec matière)
-        // -------------------------------------------------------------
-        async function loadProfessors() {
-            if (!currentUser) return;
-            try {
-                const q = query(collection(db, 'classes'), where('createdBy', '==', currentUser.uid));
-                const snapshot = await getDocs(q);
-                
-                // Map pour dédoublonner : key = professeurId, value = { nom, matiere (première rencontrée) }
-                const professorsMap = new Map();
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.matieres && Array.isArray(data.matieres)) {
-                        data.matieres.forEach(matiere => {
-                            if (matiere.professeurId && matiere.professeurNom) {
-                                if (!professorsMap.has(matiere.professeurId)) {
-                                    professorsMap.set(matiere.professeurId, {
-                                        id: matiere.professeurId,
-                                        nom: matiere.professeurNom,
-                                        matiere: matiere.nom || '' // on stocke la matière associée
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
-                
-                professorsList = Array.from(professorsMap.values());
-                
-            } catch (error) {
-                console.error('Erreur chargement professeurs:', error);
-                showMessage('Erreur lors du chargement des professeurs.', 'error');
-            }
-        }
+    <!-- ══ SECTION 3 : ÉLÈVES ════════════════════════════════════ -->
+    <div id="sec3" class="section-card section-hidden">
+        <div class="card-head">
+            <div class="card-head-icon"><i class="fas fa-users"></i></div>
+            <div class="card-head-text">
+                <h2>Liste des élèves</h2>
+                <p>Renseignez le nom et le prénom de chaque élève</p>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="eleves-count-badge">
+                <i class="fas fa-user-friends"></i>
+                <span id="elevesCount">12</span> élèves à renseigner
+            </div>
+            <div id="elevesStack" class="eleves-stack"></div>
+            <div class="field-hint" style="margin-top:1rem;">
+                <i class="fas fa-info-circle"></i> Tous les champs nom et prénom sont obligatoires.
+            </div>
+        </div>
+        <div class="card-footer">
+            <button id="prevBtn3" class="btn-prev"><i class="fas fa-arrow-left"></i> Précédent</button>
+            <button id="saveBtn" class="btn-save" disabled><i class="fas fa-check-circle"></i> Enregistrer la classe</button>
+        </div>
+    </div>
 
-        // -------------------------------------------------------------
-        // 6. RENDU DES MATIÈRES (avec préremplissage automatique)
-        // -------------------------------------------------------------
-        function renderSubjects() {
-            subjectsContainer.innerHTML = '';
-            subjects.forEach((subject, index) => {
-                const card = document.createElement('div');
-                card.className = 'subject-card';
+    <!-- Message -->
+    <div id="msgBar" class="msg-bar info">
+        <i class="fas fa-plug"></i> 🔐 Connectez-vous pour commencer.
+    </div>
 
-                const header = document.createElement('div');
-                header.className = 'subject-header';
-                header.innerHTML = `<span class="subject-title">Matière ${index + 1}</span>`;
-                if (subjects.length > 1) {
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'btn-remove-card';
-                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-                    removeBtn.addEventListener('click', () => {
-                        subjects.splice(index, 1);
-                        renderSubjects();
-                    });
-                    header.appendChild(removeBtn);
-                }
-                card.appendChild(header);
+</div><!-- /page-body -->
 
-                const nameInput = document.createElement('input');
-                nameInput.type = 'text';
-                nameInput.className = 'subject-name-input';
-                nameInput.placeholder = 'Nom de la matière';
-                nameInput.value = subject.name || '';
-                nameInput.addEventListener('input', (e) => {
-                    subject.name = e.target.value;
-                });
+<!-- ══ MODAL PROFESSEUR ════════════════════════════════════════════ -->
+<div id="modalBg" class="modal-bg">
+    <div class="modal-box">
+        <div class="modal-top">
+            <div class="modal-title"><i class="fas fa-user-tie" style="color:var(--blue);margin-right:0.5rem;"></i>Assigner un professeur</div>
+            <button class="btn-modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+        </div>
 
-                const select = document.createElement('select');
-                select.className = 'prof-select';
-                // Remplir les options
-                function updateSelectOptions() {
-                    select.innerHTML = '<option value="">-- Aucun professeur assigné --</option>';
-                    professorsList.forEach(p => {
-                        const option = document.createElement('option');
-                        option.value = p.id;
-                        option.textContent = p.nom || 'Nom inconnu';
-                        if (p.id === subject.professorId) option.selected = true;
-                        select.appendChild(option);
-                    });
-                }
-                updateSelectOptions();
+        <div id="existingBlock" class="existing-block">
+            <div class="existing-block-title">
+                <i class="fas fa-exclamation-circle"></i>
+                Prof(s) existant(s) avec ce nom — réutiliser le même ID ?
+            </div>
+            <div id="existingList" class="existing-list"></div>
+            <div class="modal-sep">ou créer un nouveau</div>
+        </div>
 
-                // Écouteur pour préremplir la matière lors du changement
-                select.addEventListener('change', (e) => {
-                    const selectedId = e.target.value;
-                    if (selectedId) {
-                        const prof = professorsList.find(p => p.id === selectedId);
-                        subject.professorId = prof.id;
-                        subject.professorName = prof.nom;
-                        // Préremplir le nom de la matière avec celle du professeur (si disponible)
-                        if (prof.matiere) {
-                            subject.name = prof.matiere;
-                            nameInput.value = prof.matiere;
-                        }
-                    } else {
-                        subject.professorId = null;
-                        subject.professorName = null;
-                    }
-                });
+        <div class="modal-field">
+            <label class="modal-field-label" for="mPrenom">Prénom</label>
+            <input class="modal-input" type="text" id="mPrenom" placeholder="Jean" autocomplete="off">
+        </div>
+        <div class="modal-field">
+            <label class="modal-field-label" for="mNom">Nom</label>
+            <input class="modal-input" type="text" id="mNom" placeholder="Dupont" autocomplete="off">
+        </div>
+        <div class="modal-field">
+            <label class="modal-field-label" for="mMatiere">Matière enseignée</label>
+            <input class="modal-input" type="text" id="mMatiere" placeholder="Ex : Dictée, Maths, Rédaction...">
+        </div>
 
-                const createBtn = document.createElement('button');
-                createBtn.className = 'btn-create-prof';
-                createBtn.innerHTML = '<i class="fas fa-user-plus"></i> Créer un professeur';
-                createBtn.addEventListener('click', () => {
-                    currentSubjectIndex = index;
-                    modalMatiere.value = subject.name || '';
-                    modalOverlay.style.display = 'flex';
-                });
+        <div class="modal-actions">
+            <button class="btn-cancel" id="modalCancel">Annuler</button>
+            <button class="btn-save-prof" id="modalSave">
+                <i class="fas fa-save"></i> Créer et assigner
+            </button>
+        </div>
+    </div>
+</div>
 
-                const row = document.createElement('div');
-                row.className = 'subject-row';
-                row.appendChild(nameInput);
-                row.appendChild(select);
-                card.appendChild(row);
-                card.appendChild(createBtn);
-                subjectsContainer.appendChild(card);
-            });
-        }
+<!-- ══ FIREBASE ════════════════════════════════════════════════════ -->
+<script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js","firebase/auth":"https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js","firebase/firestore":"https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"}}</script>
 
-        // -------------------------------------------------------------
-        // 7. GESTION DE LA MODALE (AVEC VÉRIFICATION DOUBLONS)
-        // -------------------------------------------------------------
-        function closeModal() {
-            modalOverlay.style.display = 'none';
-            modalPrenom.value = '';
-            modalNom.value = '';
-            modalMatiere.value = '';
-            currentSubjectIndex = null;
-        }
+<script type="module">
+import { initializeApp }        from 'firebase/app';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import {
+    getFirestore, collection, doc, writeBatch,
+    serverTimestamp, getDocs, query, where,
+    arrayUnion, addDoc, setDoc
+} from 'firebase/firestore';
 
-        async function saveNewProfessor() {
-            const prenom = modalPrenom.value.trim();
-            const nom = modalNom.value.trim();
-            const matiere = modalMatiere.value.trim();
+const cfg = {
+    apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+    authDomain: "real-educsen.firebaseapp.com",
+    projectId: "real-educsen",
+    storageBucket: "real-educsen.firebasestorage.app",
+    messagingSenderId: "80660233362",
+    appId: "1:80660233362:web:5edf5060254170056eba4b"
+};
 
-            if (!prenom || !nom || !matiere) {
-                alert('Veuillez remplir tous les champs.');
-                return;
-            }
-            if (!currentUser) {
-                alert('Utilisateur non connecté.');
-                return;
-            }
+const app  = initializeApp(cfg);
+const auth = getAuth(app);
+const db   = getFirestore(app);
 
-            modalSaveBtn.disabled = true;
-            const originalText = modalSaveBtn.textContent;
-            modalSaveBtn.textContent = 'Vérification...';
+/* ── STATE ────────────────────────────────────────────────────── */
+let user       = null;
+let saving     = false;
+let profsList  = [];
+let subjects   = [];
+let nbEleves   = 12;
+let curSubjIdx = null;
+let loaded     = false;
+const tokens   = new Map();
 
-            try {
-                // Vérifier l'existence d'un professeur avec les mêmes nom, prénom, matière
-                const q = query(
-                    collection(db, 'professeurs'),
-                    where('createdBy', '==', currentUser.uid),
-                    where('nom', '==', nom),
-                    where('prenom', '==', prenom),
-                    where('matiere', '==', matiere)
-                );
-                const querySnapshot = await getDocs(q);
+// ★ NOUVEAU : type d'école sélectionné
+let typeEcole = null; // 'college' | 'lycee'
 
-                let professorId, professorName;
+/* ── DOM ──────────────────────────────────────────────────────── */
+const $  = id => document.getElementById(id);
+const sec0 = $('sec0'), sec1 = $('sec1'), sec2 = $('sec2'), sec3 = $('sec3');
+const s0 = $('step0'), s1 = $('step1'), s2 = $('step2'), s3 = $('step3');
+const sn0 = $('sn0'), sn1 = $('sn1'), sn2 = $('sn2'), sn3 = $('sn3');
+const classNameEl   = $('className');
+const numEl         = $('numStudents');
+const subjStack     = $('subjectsStack');
+const addSubjBtn    = $('addSubjectBtn');
+const delegBody     = $('delegationBody');
+const coeffStack    = $('coeffStack');
+const coeffTotalEl  = $('coeffTotal');
+const elevesStack   = $('elevesStack');
+const elevesCount   = $('elevesCount');
+const msgBar        = $('msgBar');
+const saveBtn       = $('saveBtn');
+const modalBg       = $('modalBg');
+const mPrenom       = $('mPrenom');
+const mNom          = $('mNom');
+const mMatiere      = $('mMatiere');
+const existingBlock = $('existingBlock');
+const existingList  = $('existingList');
 
-                if (!querySnapshot.empty) {
-                    // Professeur existant
-                    const existingDoc = querySnapshot.docs[0];
-                    professorId = existingDoc.id;
-                    const data = existingDoc.data();
-                    professorName = `${data.prenom || ''} ${data.nom || ''}`.trim();
-                    console.log('Professeur existant trouvé, utilisation de:', professorId);
-                    showMessage('Professeur déjà existant, utilisation de celui-ci.', 'info');
-                } else {
-                    // Création
-                    const profData = {
-                        prenom,
-                        nom,
-                        matiere,
-                        createdBy: currentUser.uid,
-                        classes: [],
-                        createdAt: serverTimestamp()
-                    };
-                    const docRef = await addDoc(collection(db, 'professeurs'), profData);
-                    professorId = docRef.id;
-                    professorName = `${prenom} ${nom}`;
-                    console.log('Nouveau professeur créé avec ID:', docRef.id);
-                    // Ajouter à professorsList avec la matière
-                    professorsList.push({ id: docRef.id, nom: professorName, matiere });
-                }
+/* ── HELPERS ──────────────────────────────────────────────────── */
+function msg(html, type = 'info') {
+    msgBar.innerHTML = html;
+    msgBar.className = `msg-bar ${type}`;
+}
 
-                // Associer à la matière courante
-                if (currentSubjectIndex !== null && subjects[currentSubjectIndex]) {
-                    subjects[currentSubjectIndex].professorId = professorId;
-                    subjects[currentSubjectIndex].professorName = professorName;
-                    // Préremplir le nom de la matière
-                    subjects[currentSubjectIndex].name = matiere;
-                }
+function genToken() {
+    const b = new Uint8Array(32);
+    crypto.getRandomValues(b);
+    return Array.from(b).map(x => x.toString(16).padStart(2,'0')).join('');
+}
 
-                renderSubjects();
-                closeModal();
-            } catch (error) {
-                console.error('Erreur lors de la création/recherche du professeur:', error);
-                alert('Erreur lors de l\'opération.');
-            } finally {
-                modalSaveBtn.disabled = false;
-                modalSaveBtn.textContent = originalText;
-            }
-        }
+/* ── SÉLECTION TYPE D'ÉCOLE ───────────────────────────────────── */
+window.selectTypeEcole = function(type) {
+    typeEcole = type;
 
-        // -------------------------------------------------------------
-        // 8. FONCTIONS ÉLÈVES (inchangées)
-        // -------------------------------------------------------------
-        function createStudentEntry(index) {
-            const entry = document.createElement('div');
-            entry.className = 'student-entry';
-            entry.innerHTML = `
-                <span class="student-index">${index + 1}</span>
-                <input type="text" class="student-nom" placeholder="Nom">
-                <input type="text" class="student-prenom" placeholder="Prénom">
-            `;
-            return entry;
-        }
+    // Mise à jour visuelle des cartes
+    $('cardCollege').classList.toggle('selected', type === 'college');
+    $('cardLycee').classList.toggle('selected', type === 'lycee');
 
-        function renderStudents(count) {
-            studentsListContainer.innerHTML = '';
-            for (let i = 0; i < count; i++) {
-                studentsListContainer.appendChild(createStudentEntry(i));
-            }
-            updateStudentBadge();
-        }
+    // Activer le bouton Suivant
+    $('nextBtn0').disabled = false;
 
-        function updateStudentBadge() {
-            studentCountSpan.textContent = studentsListContainer.children.length;
-        }
+    // Préparer le badge affiché dans l'étape 1
+    const badge = $('typeEcoleBadge');
+    if (type === 'college') {
+        badge.innerHTML = `<span class="type-badge college"><i class="fas fa-school"></i> Collège</span>`;
+    } else {
+        badge.innerHTML = `<span class="type-badge lycee"><i class="fas fa-university"></i> Lycée</span>`;
+    }
+};
 
-        function handleNumStudentsChange(e) {
-            const newVal = parseInt(e.target.value, 10);
-            if (!isNaN(newVal) && newVal >= 1 && newVal <= 60) {
-                numStudents = newVal;
-                if (!section2.classList.contains('section-hidden')) {
-                    renderStudents(numStudents);
-                }
-            } else {
-                e.target.value = numStudents;
-            }
-        }
+/* ── LOAD PROFS ───────────────────────────────────────────────── */
+async function loadProfs() {
+    if (!user) return;
+    try {
+        const snap = await getDocs(query(collection(db,'professeurs'), where('createdBy','==',user.uid)));
+        profsList = [];
+        snap.forEach(d => { const v = d.data(); profsList.push({id:d.id, prenom:v.prenom||'', nom:v.nom||'', matiere:v.matiere||''}); });
+    } catch(e) { console.error(e); msg('Erreur chargement professeurs.','error'); }
+}
 
-        // -------------------------------------------------------------
-        // 9. NAVIGATION
-        // -------------------------------------------------------------
-        function showSection1() {
-            section1.classList.remove('section-hidden');
-            section2.classList.add('section-hidden');
-            step1Indicator.classList.add('active');
-            step2Indicator.classList.remove('active');
-        }
+/* ── CREATE TOKEN ─────────────────────────────────────────────── */
+async function createToken(idx) {
+    if (!user) { msg('Connectez-vous d\'abord.','error'); return null; }
+    const s = subjects[idx];
+    if (!s || !s.name.trim()) { msg('Cette matière n\'a pas de nom.','error'); return null; }
 
-        function showSection2() {
-            renderStudents(numStudents);
-            section1.classList.add('section-hidden');
-            section2.classList.remove('section-hidden');
-            step1Indicator.classList.remove('active');
-            step2Indicator.classList.add('active');
-        }
+    const token = genToken();
 
-        // -------------------------------------------------------------
-        // 10. VALIDATION
-        // -------------------------------------------------------------
-        function validateForm() {
-            const errors = [];
+    const eleves = [];
+    const rows = elevesStack.children;
+    for (let i = 0; i < rows.length; i++) {
+        const n = rows[i].querySelector('.eleve-nom')?.value.trim() || '';
+        const p = rows[i].querySelector('.eleve-prenom')?.value.trim() || '';
+        if (n && p) eleves.push({nom:n, prenom:p, index:i});
+    }
 
-            const className = classNameInput.value.trim();
-            if (!className) errors.push('Le nom de la classe est obligatoire.');
+    try {
+        await setDoc(doc(db,'saisie_tokens',token), {
+            token,
+            classeId:     '__pending__',
+            nomClasse:    classNameEl.value.trim() || '(non enregistrée)',
+            // ★ typeEcole inclus dans le token aussi
+            typeEcole:    typeEcole,
+            matiereNom:   s.name.trim(),
+            coefficient:  s.coefficient || 1,
+            professeurId: s.professorId || null,
+            professeurNom:s.professorName || null,
+            nombreEleves: parseInt(numEl.value) || 12,
+            eleves,
+            used:         false,
+            createdBy:    user.uid,
+            createdAt:    serverTimestamp()
+        });
+        return token;
+    } catch(e) {
+        console.error(e);
+        msg('Erreur génération du lien.','error');
+        return null;
+    }
+}
 
-            if (subjects.length === 0) {
-                errors.push('Ajoutez au moins une matière.');
-            } else {
-                const names = subjects.map(s => s.name.trim().toLowerCase()).filter(n => n !== '');
-                if (names.length === 0) errors.push('Chaque matière doit avoir un nom.');
-                if (new Set(names).size !== names.length) errors.push('Les noms de matières ne doivent pas être en double.');
-            }
+/* ── RENDER DELEGATION ────────────────────────────────────────── */
+function renderDelegation() {
+    const valid = subjects.filter(s => s.name && s.name.trim());
 
-            const studentEntries = studentsListContainer.children;
-            if (studentEntries.length === 0) {
-                errors.push('Aucun élève généré.');
-            } else {
-                const seen = new Set();
-                for (let i = 0; i < studentEntries.length; i++) {
-                    const nom = studentEntries[i].querySelector('.student-nom')?.value.trim() || '';
-                    const prenom = studentEntries[i].querySelector('.student-prenom')?.value.trim() || '';
-                    if (!nom || !prenom) {
-                        errors.push(`Élève ${i + 1} : le nom et le prénom sont obligatoires.`);
-                    } else {
-                        const key = `${nom.toLowerCase()}|${prenom.toLowerCase()}`;
-                        if (seen.has(key)) {
-                            errors.push(`Doublon : ${nom} ${prenom}.`);
-                        } else {
-                            seen.add(key);
-                        }
-                    }
-                }
-            }
+    if (!valid.length) {
+        delegBody.innerHTML = `
+            <div class="delegation-empty">
+                <i class="fas fa-book-open" style="font-size:1.4rem;display:block;margin-bottom:0.5rem;color:var(--border-2);"></i>
+                Ajoutez des matières ci-dessus pour générer des liens de saisie.
+            </div>`;
+        return;
+    }
 
-            if (!currentUser) errors.push('Vous devez être connecté.');
+    delegBody.innerHTML = '';
 
-            return { isValid: errors.length === 0, errors };
+    valid.forEach(subj => {
+        const idx = subjects.indexOf(subj);
+        const already = tokens.has(idx);
+
+        const row = document.createElement('div');
+        row.className = 'token-row';
+        row.id = `tr-${idx}`;
+
+        const top = document.createElement('div');
+        top.className = 'token-row-top';
+        top.innerHTML = `
+            <div class="token-matiere-dot"></div>
+            <div class="token-matiere-info">
+                <div class="token-matiere-name">${subj.name.trim()}</div>
+                <div class="token-prof-name">
+                    <i class="fas fa-user-tie"></i>
+                    ${subj.professorName || '<em>Aucun prof assigné</em>'}
+                </div>
+            </div>
+            <div class="token-status ${already ? 'ready' : 'pending'}" id="ts-${idx}">
+                ${already ? '<i class="fas fa-check-circle"></i> Lien prêt' : '<i class="fas fa-clock"></i> En attente'}
+            </div>
+        `;
+
+        const actionZone = document.createElement('div');
+        actionZone.className = 'token-row-action';
+        actionZone.innerHTML = `
+            <button class="btn-generate${already ? ' regen' : ''}" id="tg-${idx}">
+                <i class="fas fa-${already ? 'redo' : 'link'}"></i>
+                ${already ? 'Régénérer un nouveau lien' : '✦ Générer le lien de saisie'}
+            </button>
+        `;
+
+        const reveal = document.createElement('div');
+        reveal.className = `link-reveal${already ? ' show' : ''}`;
+        reveal.id = `tlr-${idx}`;
+
+        if (already) {
+            const {url} = tokens.get(idx);
+            reveal.innerHTML = buildRevealHTML(url, idx);
         }
 
-        // -------------------------------------------------------------
-        // 11. SAUVEGARDE (BATCH)
-        // -------------------------------------------------------------
-        async function saveClass() {
-            if (saveInProgress) return;
-            const validation = validateForm();
-            if (!validation.isValid) {
-                showMessage(validation.errors.join(' • '), 'error');
+        row.appendChild(top);
+        row.appendChild(actionZone);
+        row.appendChild(reveal);
+        delegBody.appendChild(row);
+
+        $(`tg-${idx}`).addEventListener('click', async () => {
+            const btn = $(`tg-${idx}`);
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération en cours…';
+
+            const token = await createToken(idx);
+            if (!token) {
+                btn.disabled = false;
+                btn.className = 'btn-generate';
+                btn.innerHTML = '<i class="fas fa-link"></i> ✦ Générer le lien de saisie';
                 return;
             }
 
-            saveInProgress = true;
-            saveBtn.disabled = true;
-            showMessage('Sauvegarde en cours...', 'info');
+            const url = `${location.origin}/saisie-notes.html?token=${token}`;
+            tokens.set(idx, {token, url});
 
-            try {
-                const cleanClassName = classNameInput.value.trim();
-                const studentsData = [];
-                for (let i = 0; i < studentsListContainer.children.length; i++) {
-                    const entry = studentsListContainer.children[i];
-                    studentsData.push({
-                        nom: entry.querySelector('.student-nom').value.trim(),
-                        prenom: entry.querySelector('.student-prenom').value.trim()
-                    });
-                }
+            const statusEl = $(`ts-${idx}`);
+            statusEl.className = 'token-status ready';
+            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Lien prêt';
 
-                const matieresArray = subjects
-                    .map(s => ({
-                        nom: s.name.trim(),
-                        professeurId: s.professorId || null,
-                        professeurNom: s.professorName || null
-                    }))
-                    .filter(m => m.nom !== '');
+            btn.disabled = false;
+            btn.className = 'btn-generate regen';
+            btn.innerHTML = '<i class="fas fa-redo"></i> Régénérer un nouveau lien';
 
-                const batch = writeBatch(db);
+            const revealEl = $(`tlr-${idx}`);
+            revealEl.innerHTML = buildRevealHTML(url, idx);
+            revealEl.classList.add('show');
 
-                const classRef = doc(collection(db, 'classes'));
-                batch.set(classRef, {
-                    id: classRef.id,
-                    nomClasse: cleanClassName,
-                    matieres: matieresArray,
-                    nombreEleves: studentsData.length,
-                    createdBy: currentUser.uid,
-                    createdAt: serverTimestamp()
-                });
+            msg(`✅ Lien généré pour "${subj.name.trim()}" — copiez-le et envoyez-le au professeur.`, 'success');
+        });
+    });
+}
 
-                const elevesColRef = collection(db, 'classes', classRef.id, 'eleves');
-                for (const student of studentsData) {
-                    const eleveRef = doc(elevesColRef);
-                    batch.set(eleveRef, {
-                        id: eleveRef.id,
-                        nom: student.nom,
-                        prenom: student.prenom,
-                        classeId: classRef.id,
-                        createdAt: serverTimestamp()
-                    });
-                }
+function buildRevealHTML(url, idx) {
+    const safeUrl = url.replace(/'/g, "\\'");
+    return `
+        <div class="link-reveal-label"><i class="fas fa-check-circle"></i> Lien prêt à envoyer au professeur</div>
+        <div class="link-row">
+            <input class="link-input" type="text" value="${url}" readonly title="${url}">
+            <button class="btn-copy" id="bc-${idx}" onclick="doCopy('${safeUrl}', ${idx})">
+                <i class="fas fa-copy"></i> Copier
+            </button>
+        </div>
+        <div class="link-warning-text">
+            <i class="fas fa-shield-alt"></i>
+            Usage unique — le lien sera automatiquement désactivé après validation par le professeur.
+        </div>
+    `;
+}
 
-                const updatedProfessors = new Set();
-                matieresArray.forEach(m => {
-                    if (m.professeurId) updatedProfessors.add(m.professeurId);
-                });
+window.doCopy = async (url, idx) => {
+    try {
+        await navigator.clipboard.writeText(url);
+    } catch {
+        const t = document.createElement('textarea');
+        t.value = url;
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+    }
+    const btn = $(`bc-${idx}`);
+    if (btn) {
+        btn.className = 'btn-copy copied';
+        btn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+        setTimeout(() => {
+            btn.className = 'btn-copy';
+            btn.innerHTML = '<i class="fas fa-copy"></i> Copier';
+        }, 2200);
+    }
+};
 
-                for (const profId of updatedProfessors) {
-                    const profRef = doc(db, 'professeurs', profId);
-                 batch.set(profRef, {
-    classes: arrayUnion(classRef.id)
-}, { merge: true });
-                }
+/* ── RENDER SUBJECTS ──────────────────────────────────────────── */
+function renderSubjects() {
+    subjStack.innerHTML = '';
 
-                await batch.commit();
+    subjects.forEach((subj, idx) => {
+        const item = document.createElement('div');
+        item.className = 'subject-item';
 
-                showMessage(
-                    '✅ Classe enregistrée avec succès ! <button id="goDashboard" class="btn btn-primary" style="margin-left: 1rem; font-size:0.9rem;">Aller au Dashboard</button>',
-                    'success'
-                );
+        const top = document.createElement('div');
+        top.className = 'subject-item-top';
 
-                setTimeout(() => {
-                    document.getElementById('goDashboard')?.addEventListener('click', () => {
-                        window.location.href = '/userdashboard.html';
-                    });
-                }, 50);
+        const labelWrap = document.createElement('div');
+        labelWrap.className = 'subject-badges';
 
-                console.log('Classe créée :', classRef.id);
-            } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-                showMessage('Erreur lors de la sauvegarde.', 'error');
-            } finally {
-                saveInProgress = false;
-                saveBtn.disabled = false;
-                if (!currentUser) saveBtn.disabled = true;
+        const lbl = document.createElement('span');
+        lbl.className = 'subject-item-label';
+        lbl.textContent = `Matière ${idx + 1}`;
+        labelWrap.appendChild(lbl);
+
+        if (subj.professorId) {
+            const shared = subjects.filter((s,i) => i !== idx && s.professorId === subj.professorId).length;
+            if (shared > 0) {
+                const b = document.createElement('span');
+                b.className = 'badge-shared';
+                b.innerHTML = `<i class="fas fa-link"></i> Même prof (${shared + 1})`;
+                labelWrap.appendChild(b);
             }
         }
 
-        // -------------------------------------------------------------
-        // 12. AUTHENTIFICATION
-        // -------------------------------------------------------------
-        const mainContent = document.querySelector('main');
+        top.appendChild(labelWrap);
 
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            if (user) {
-                mainContent.style.display = 'block';
-                showMessage(`<i class="fas fa-check-circle"></i> Connecté : ${user.email}`, 'success');
-                saveBtn.disabled = false;
+        if (subjects.length > 1) {
+            const del = document.createElement('button');
+            del.className = 'btn-remove';
+            del.innerHTML = '<i class="fas fa-times"></i>';
+            del.title = 'Supprimer';
+            del.addEventListener('click', () => { subjects.splice(idx,1); tokens.delete(idx); renderSubjects(); });
+            top.appendChild(del);
+        }
 
-                await loadProfessors();
+        item.appendChild(top);
 
-                if (!initialSubjectsAndProfessorsLoaded) {
-                    subjects = [{ name: '', professorId: null, professorName: null }];
-                    initialSubjectsAndProfessorsLoaded = true;
-                }
-                renderSubjects();
+        const fields = document.createElement('div');
+        fields.className = 'subject-fields';
 
-            } else {
-                mainContent.style.display = 'none';
-                showMessage('<i class="fas fa-plug"></i> 🔐 Veuillez vous connecter pour enregistrer.', 'error');
-                saveBtn.disabled = true;
-                subjects = [];
-                professorsList = [];
-                initialSubjectsAndProfessorsLoaded = false;
-                renderSubjects();
-                setTimeout(() => {
-                    window.location.href = 'connexion.html';
-                }, 500);
-            }
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.className = 'subject-name-input';
+        nameInput.placeholder = 'Nom de la matière…';
+        nameInput.value = subj.name || '';
+        nameInput.addEventListener('input', e => { subj.name = e.target.value; renderDelegation(); });
+
+        const sel = document.createElement('select');
+        sel.className = 'prof-select';
+        buildSelectOpts(sel, subj);
+        sel.addEventListener('change', e => {
+            const v = e.target.value;
+            if (v) {
+                const p = profsList.find(x => x.id === v);
+                if (p) { subj.professorId = p.id; subj.professorName = `${p.prenom} ${p.nom}`.trim(); }
+            } else { subj.professorId = null; subj.professorName = null; }
+            renderSubjects();
         });
 
-        // -------------------------------------------------------------
-        // 13. AFFICHAGE DES MESSAGES
-        // -------------------------------------------------------------
-        function showMessage(msg, type = 'info') {
-            messageBox.innerHTML = msg;
-            messageBox.className = 'message-area';
-            if (type === 'success') messageBox.classList.add('success');
-            if (type === 'error') messageBox.classList.add('error');
-            if (type === 'info') messageBox.classList.add('info');
+        fields.appendChild(nameInput);
+        fields.appendChild(sel);
+        item.appendChild(fields);
+
+        const newProfBtn = document.createElement('button');
+        newProfBtn.className = 'btn-new-prof';
+        newProfBtn.innerHTML = '<i class="fas fa-user-plus"></i> Nouveau prof';
+        newProfBtn.addEventListener('click', () => openModal(idx));
+        item.appendChild(newProfBtn);
+
+        subjStack.appendChild(item);
+    });
+
+    renderDelegation();
+}
+
+function buildSelectOpts(sel, subj) {
+    sel.innerHTML = '<option value="">— Aucun professeur —</option>';
+    const seen = new Set();
+    profsList.filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true; }).forEach(p => {
+        const o = document.createElement('option');
+        o.value = p.id;
+        o.textContent = p.matiere ? `${p.prenom} ${p.nom} (${p.matiere})` : `${p.prenom} ${p.nom}`;
+        if (p.id === subj.professorId) o.selected = true;
+        sel.appendChild(o);
+    });
+}
+
+/* ── MODAL PROF ───────────────────────────────────────────────── */
+function openModal(idx) {
+    curSubjIdx = idx;
+    mPrenom.value = ''; mNom.value = '';
+    mMatiere.value = subjects[idx]?.name || '';
+    existingBlock.classList.remove('show');
+    existingList.innerHTML = '';
+
+    const check = () => detectExisting();
+    mPrenom.addEventListener('input', check);
+    mNom.addEventListener('input', check);
+    modalBg._clean = () => { mPrenom.removeEventListener('input', check); mNom.removeEventListener('input', check); };
+    modalBg.classList.add('open');
+    mPrenom.focus();
+}
+
+function detectExisting() {
+    const p = mPrenom.value.trim().toLowerCase();
+    const n = mNom.value.trim().toLowerCase();
+    if (!p || !n) { existingBlock.classList.remove('show'); existingList.innerHTML = ''; return; }
+
+    const matches = profsList.filter(x => x.prenom.toLowerCase() === p && x.nom.toLowerCase() === n);
+    if (!matches.length) { existingBlock.classList.remove('show'); existingList.innerHTML = ''; return; }
+
+    existingBlock.classList.add('show');
+    existingList.innerHTML = '';
+
+    const seen = new Set();
+    matches.forEach(prof => {
+        if (seen.has(prof.id)) return;
+        seen.add(prof.id);
+        const el = document.createElement('div');
+        el.className = 'existing-item';
+        el.innerHTML = `
+            <div>
+                <div class="existing-item-name">${prof.prenom} ${prof.nom}</div>
+                <div class="existing-item-sub"><i class="fas fa-book" style="margin-right:0.3rem;"></i>${prof.matiere || 'N/A'}</div>
+            </div>
+            <button class="btn-reuse"><i class="fas fa-link"></i> Réutiliser</button>
+        `;
+        el.querySelector('.btn-reuse').addEventListener('click', () => assignExisting(prof.id, prof.prenom, prof.nom));
+        existingList.appendChild(el);
+    });
+}
+
+async function assignExisting(profId, prenom, nom) {
+    if (curSubjIdx === null) return;
+    const subj = subjects[curSubjIdx];
+    const mat = mMatiere.value.trim();
+    subj.professorId   = profId;
+    subj.professorName = `${prenom} ${nom}`.trim();
+    if (mat) subj.name = mat;
+
+    if (mat && user) {
+        const ex = profsList.find(p => p.id === profId && p.matiere.toLowerCase() === mat.toLowerCase());
+        if (!ex) {
+            try {
+                const ref = await addDoc(collection(db,'professeurs'), {prenom, nom, matiere:mat, groupId:profId, createdBy:user.uid, classes:[], createdAt:serverTimestamp()});
+                profsList.push({id:ref.id, prenom, nom, matiere:mat});
+            } catch(e) { console.error(e); }
+        }
+    }
+    renderSubjects();
+    closeModal();
+    msg(`Prof "${prenom} ${nom}" assigné à "${mat || subj.name}".`,'info');
+}
+
+function closeModal() {
+    if (modalBg._clean) { modalBg._clean(); delete modalBg._clean; }
+    modalBg.classList.remove('open');
+    mPrenom.value = ''; mNom.value = ''; mMatiere.value = '';
+    existingBlock.classList.remove('show'); existingList.innerHTML = '';
+    curSubjIdx = null;
+}
+
+async function saveProf() {
+    const prenom = mPrenom.value.trim();
+    const nom    = mNom.value.trim();
+    const mat    = mMatiere.value.trim();
+    if (!prenom || !nom || !mat) { alert('Remplissez les 3 champs.'); return; }
+    if (!user) { alert('Non connecté.'); return; }
+
+    const saveBtn2 = $('modalSave');
+    saveBtn2.disabled = true;
+    saveBtn2.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification...';
+
+    try {
+        const q = query(collection(db,'professeurs'), where('createdBy','==',user.uid), where('nom','==',nom), where('prenom','==',prenom), where('matiere','==',mat));
+        const snap = await getDocs(q);
+        let pid, pname;
+
+        if (!snap.empty) {
+            const d = snap.docs[0]; pid = d.id;
+            const v = d.data(); pname = `${v.prenom} ${v.nom}`.trim();
+            msg('Professeur existant réutilisé.','info');
+            if (!profsList.find(p => p.id === pid)) profsList.push({id:pid, prenom:v.prenom, nom:v.nom, matiere:v.matiere});
+        } else {
+            const ref = await addDoc(collection(db,'professeurs'), {prenom, nom, matiere:mat, createdBy:user.uid, classes:[], createdAt:serverTimestamp()});
+            pid = ref.id; pname = `${prenom} ${nom}`;
+            profsList.push({id:ref.id, prenom, nom, matiere:mat});
+            msg(`Professeur "${pname}" créé.`,'success');
         }
 
-        // -------------------------------------------------------------
-        // 14. INITIALISATION
-        // -------------------------------------------------------------
-        function initApp() {
-            numStudentsInput.value = 12;
-            numStudents = 12;
-            renderStudents(12);
+        if (curSubjIdx !== null && subjects[curSubjIdx]) {
+            subjects[curSubjIdx].professorId   = pid;
+            subjects[curSubjIdx].professorName = pname;
+            subjects[curSubjIdx].name          = mat;
+        }
+        renderSubjects();
+        closeModal();
+    } catch(e) {
+        console.error(e); alert('Erreur création professeur.');
+    } finally {
+        saveBtn2.disabled = false;
+        saveBtn2.innerHTML = '<i class="fas fa-save"></i> Créer et assigner';
+    }
+}
 
-            numStudentsInput.addEventListener('input', handleNumStudentsChange);
-            addSubjectBtn.addEventListener('click', () => {
-                subjects.push({ name: '', professorId: null, professorName: null });
-                renderSubjects();
+/* ── COEFFICIENTS ─────────────────────────────────────────────── */
+function renderCoeff() {
+    coeffStack.innerHTML = '';
+    subjects.forEach(s => { if (!s.coefficient) s.coefficient = 1; });
+    const valid = subjects.filter(s => s.name && s.name.trim());
+
+    if (!valid.length) {
+        coeffStack.innerHTML = `<div style="text-align:center;color:var(--ink-3);padding:2rem;"><i class="fas fa-exclamation-triangle" style="font-size:2rem;display:block;margin-bottom:0.8rem;"></i>Aucune matière nommée.</div>`;
+        updateCoeffTotal(); return;
+    }
+
+    const groups = new Map();
+    valid.forEach(s => { const k = s.professorId||'none'; if (!groups.has(k)) groups.set(k,[]); groups.get(k).push(s); });
+
+    groups.forEach(gs => {
+        const grouped = gs.length > 1;
+        const pName   = gs[0].professorName;
+
+        if (grouped && pName) {
+            const h = document.createElement('div');
+            h.className = 'coeff-group-header';
+            h.innerHTML = `<i class="fas fa-user-tie" style="color:var(--ink-3);font-size:0.8rem;"></i><span class="coeff-group-label">${pName}</span><span class="coeff-group-badge">${gs.length} matières</span>`;
+            coeffStack.appendChild(h);
+        }
+
+        gs.forEach(subj => {
+            const item = document.createElement('div');
+            item.className = grouped ? 'coeff-item grouped' : 'coeff-item';
+
+            let profLine = '';
+            if (!grouped && subj.professorName) profLine = `<div class="coeff-item-prof"><i class="fas fa-user-tie"></i>${subj.professorName}</div>`;
+            else if (!subj.professorName)        profLine = `<div class="coeff-item-prof"><i class="fas fa-user-slash"></i>Aucun professeur</div>`;
+
+            const info = document.createElement('div');
+            info.className = 'coeff-item-info';
+            info.innerHTML = `<div class="coeff-item-name">${subj.name.trim()}</div>${profLine}`;
+
+            const ctrls = document.createElement('div');
+            ctrls.className = 'coeff-controls';
+
+            const lbl = document.createElement('span');
+            lbl.className = 'coeff-ctrl-label'; lbl.textContent = 'Coeff.';
+
+            const inp = document.createElement('input');
+            inp.type = 'number'; inp.className = 'coeff-number';
+            inp.min = '0.5'; inp.max = '20'; inp.step = '0.5';
+            inp.value = subj.coefficient;
+
+            const pill = document.createElement('span');
+            pill.className = 'coeff-pill';
+            pill.textContent = `×${subj.coefficient}`;
+
+            inp.addEventListener('input', e => {
+                const v = parseFloat(e.target.value);
+                subj.coefficient = (!isNaN(v) && v >= 0.5) ? v : 1;
+                pill.textContent = `×${e.target.value || 1}`;
+                updateCoeffTotal();
             });
-            nextBtn.addEventListener('click', showSection2);
-            prevBtn.addEventListener('click', showSection1);
-            saveBtn.addEventListener('click', saveClass);
-            backBtn.addEventListener('click', () => window.history.back());
 
-            modalCloseBtn.addEventListener('click', closeModal);
-            modalCancelBtn.addEventListener('click', closeModal);
-            modalSaveBtn.addEventListener('click', saveNewProfessor);
-            window.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) closeModal();
+            ctrls.appendChild(lbl); ctrls.appendChild(inp); ctrls.appendChild(pill);
+            item.appendChild(info); item.appendChild(ctrls);
+            coeffStack.appendChild(item);
+        });
+    });
+
+    updateCoeffTotal();
+}
+
+function updateCoeffTotal() {
+    const valid = subjects.filter(s => s.name && s.name.trim());
+    const t = valid.reduce((a,s) => a + (parseFloat(s.coefficient)||0), 0);
+    coeffTotalEl.textContent = Number.isInteger(t) ? t : t.toFixed(1);
+}
+
+/* ── ÉLÈVES ───────────────────────────────────────────────────── */
+function renderEleves(n) {
+    elevesStack.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+        const r = document.createElement('div');
+        r.className = 'eleve-row';
+        r.innerHTML = `
+            <div class="eleve-num">${i+1}</div>
+            <input class="eleve-input eleve-nom"    type="text" placeholder="Nom">
+            <input class="eleve-input eleve-prenom" type="text" placeholder="Prénom">
+        `;
+        elevesStack.appendChild(r);
+    }
+    elevesCount.textContent = n;
+}
+
+/* ── NAVIGATION ───────────────────────────────────────────────── */
+function setStepper(active) {
+    // 4 étapes : 0,1,2,3 → indices 0 à 3
+    const steps = [[s0,sn0,'0'],[s1,sn1,'1'],[s2,sn2,'2'],[s3,sn3,'3']];
+    steps.forEach(([el,num,lbl], i) => {
+        el.classList.remove('active','done');
+        if (i < active)  { el.classList.add('done');   num.innerHTML = '<i class="fas fa-check" style="font-size:0.7rem;"></i>'; }
+        if (i === active) { el.classList.add('active'); num.textContent = lbl; }
+        if (i > active)   { num.textContent = lbl; }
+    });
+}
+
+function showSec(n) {
+    [sec0, sec1, sec2, sec3].forEach(s => s.classList.add('section-hidden'));
+    [sec0, sec1, sec2, sec3][n].classList.remove('section-hidden');
+    setStepper(n);
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toStep1() {
+    if (!typeEcole) { msg('Veuillez choisir un type d\'établissement.','error'); return; }
+    showSec(1);
+    msg(`<i class="fas fa-check-circle"></i> Type d'école sélectionné : <strong>${typeEcole === 'college' ? 'Collège' : 'Lycée'}</strong>`, 'success');
+}
+
+function toStep2() {
+    if (!classNameEl.value.trim()) { msg('Le nom de la classe est obligatoire.','error'); return; }
+    if (!subjects.filter(s => s.name && s.name.trim()).length) { msg('Ajoutez au moins une matière.','error'); return; }
+    renderCoeff();
+    showSec(2);
+}
+
+function toStep3() {
+    renderEleves(nbEleves);
+    showSec(3);
+}
+
+/* ── VALIDATION ───────────────────────────────────────────────── */
+function validate() {
+    const errs = [];
+    // ★ Vérifier typeEcole
+    if (!typeEcole) errs.push('Type d\'établissement requis.');
+    if (!classNameEl.value.trim()) errs.push('Nom de classe requis.');
+    const valid = subjects.filter(s => s.name && s.name.trim());
+    if (!valid.length) errs.push('Ajoutez au moins une matière.');
+    else {
+        if (new Set(valid.map(s => s.name.trim().toLowerCase())).size !== valid.length) errs.push('Doublons de matières.');
+        valid.forEach(s => { if (!s.coefficient || s.coefficient < 0.5) errs.push(`Coeff invalide : "${s.name}".`); });
+    }
+    const rows = elevesStack.children;
+    if (!rows.length) errs.push('Aucun élève.');
+    else {
+        const seen = new Set();
+        for (let i = 0; i < rows.length; i++) {
+            const n = rows[i].querySelector('.eleve-nom')?.value.trim()||'';
+            const p = rows[i].querySelector('.eleve-prenom')?.value.trim()||'';
+            if (!n||!p) errs.push(`Élève ${i+1} : nom et prénom requis.`);
+            else { const k=`${n}|${p}`; if (seen.has(k)) errs.push(`Doublon : ${n} ${p}.`); else seen.add(k); }
+        }
+    }
+    if (!user) errs.push('Connectez-vous.');
+    return errs;
+}
+
+/* ── SAVE CLASS ───────────────────────────────────────────────── */
+async function saveClass() {
+    if (saving) return;
+    const errs = validate();
+    if (errs.length) { msg(errs.join(' • '),'error'); return; }
+
+    saving = true;
+    saveBtn.disabled = true;
+    msg('Sauvegarde en cours...','info');
+
+    try {
+        const elevesData = [];
+        const rows = elevesStack.children;
+        for (let i = 0; i < rows.length; i++) {
+            elevesData.push({
+                nom:    rows[i].querySelector('.eleve-nom').value.trim(),
+                prenom: rows[i].querySelector('.eleve-prenom').value.trim()
             });
         }
 
-        initApp();
-    </script>
+        const matieres = subjects.filter(s => s.name && s.name.trim()).map(s => ({
+            nom:          s.name.trim(),
+            coefficient:  parseFloat(s.coefficient)||1,
+            professeurId: s.professorId||null,
+            professeurNom:s.professorName||null
+        }));
+
+        const batch   = writeBatch(db);
+        const classRef = doc(collection(db,'classes'));
+
+        // ★ typeEcole est inclus dans le document Firestore
+        batch.set(classRef, {
+            id:           classRef.id,
+            nomClasse:    classNameEl.value.trim(),
+            typeEcole:    typeEcole,              // ← 'college' ou 'lycee'
+            matieres,
+            nombreEleves: elevesData.length,
+            createdBy:    user.uid,
+            createdAt:    serverTimestamp()
+        });
+
+        const elevesRef = collection(db,'classes',classRef.id,'eleves');
+        elevesData.forEach(e => {
+            const r = doc(elevesRef);
+            batch.set(r, {id:r.id, nom:e.nom, prenom:e.prenom, classeId:classRef.id, createdAt:serverTimestamp()});
+        });
+
+        new Set(matieres.filter(m => m.professeurId).map(m => m.professeurId)).forEach(pid => {
+            batch.set(doc(db,'professeurs',pid), {classes:arrayUnion(classRef.id)}, {merge:true});
+        });
+
+        await batch.commit();
+
+        if (tokens.size > 0) {
+            const tb = writeBatch(db);
+            tokens.forEach(({token}, idx) => {
+                const s = subjects[idx];
+                if (!s) return;
+                tb.set(doc(db,'saisie_tokens',token), {
+                    classeId:  classRef.id,
+                    nomClasse: classNameEl.value.trim(),
+                    typeEcole: typeEcole,
+                    eleves:    elevesData.map((e,i) => ({...e, index:i}))
+                }, {merge:true});
+            });
+            await tb.commit();
+        }
+
+        msg('✅ Classe enregistrée avec succès ! <button onclick="location.href=\'/userdashboard.html\'" style="margin-left:1rem;padding:0.4rem 1rem;background:var(--green);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">Aller au Dashboard</button>','success');
+
+    } catch(e) {
+        console.error(e); msg('Erreur lors de la sauvegarde.','error');
+    } finally {
+        saving = false;
+        saveBtn.disabled = !user;
+    }
+}
+
+/* ── AUTH ─────────────────────────────────────────────────────── */
+onAuthStateChanged(auth, async u => {
+    user = u;
+    if (u) {
+        msg(`<i class="fas fa-check-circle"></i> Connecté : ${u.email}`, 'success');
+        saveBtn.disabled = false;
+        await loadProfs();
+        if (!loaded) {
+            subjects = [{name:'', professorId:null, professorName:null, coefficient:1}];
+            loaded = true;
+        }
+        renderSubjects();
+    } else {
+        msg('<i class="fas fa-plug"></i> 🔐 Connectez-vous pour continuer.','error');
+        saveBtn.disabled = true;
+        subjects = []; profsList = []; loaded = false;
+        renderSubjects();
+        setTimeout(() => { location.href = 'connexion.html'; }, 500);
+    }
+});
+
+/* ── INIT ─────────────────────────────────────────────────────── */
+(function init() {
+    numEl.value = 12;
+    numEl.addEventListener('input', e => {
+        const v = parseInt(e.target.value,10);
+        if (!isNaN(v) && v >= 1 && v <= 60) nbEleves = v;
+        else e.target.value = nbEleves;
+    });
+
+    addSubjBtn.addEventListener('click', () => {
+        subjects.push({name:'', professorId:null, professorName:null, coefficient:1});
+        renderSubjects();
+    });
+
+    // Navigation
+    $('nextBtn0').addEventListener('click', toStep1);
+    $('prevBtn1').addEventListener('click', () => showSec(0));
+    $('nextBtn1').addEventListener('click', toStep2);
+    $('prevBtn2').addEventListener('click', () => showSec(1));
+    $('nextBtn2').addEventListener('click', toStep3);
+    $('prevBtn3').addEventListener('click', () => showSec(2));
+    saveBtn.addEventListener('click', saveClass);
+
+    $('modalClose').addEventListener('click',  closeModal);
+    $('modalCancel').addEventListener('click', closeModal);
+    $('modalSave').addEventListener('click',   saveProf);
+    modalBg.addEventListener('click', e => { if (e.target === modalBg) closeModal(); });
+})();
+</script>
 </body>
 </html>
