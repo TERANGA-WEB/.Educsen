@@ -1,910 +1,1057 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <link rel="icon" href="/images/icon-192x192.png" type="image/png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bulletins de Notes | Educsen</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/images/icon-192x192.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educsen IA · Assistant pédagogique</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        :root {
+            --bg-body: #0f172a;
+            --bg-chat: #0f172a;
+            --bg-header: #0f172a;
+            --bg-input: #1e293b;
+            --bg-user-message: #1e293b;
+            --bg-assistant-message: #2d3748;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-subtle: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --transition: background-color 0.3s ease, border-color 0.2s, box-shadow 0.2s;
+        }
 
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body.light-theme {
+            --bg-body: #ffffff;
+            --bg-chat: #f9f9f9;
+            --bg-header: #ffffff;
+            --bg-input: #ffffff;
+            --bg-user-message: #e5efff;
+            --bg-assistant-message: #f0f0f0;
+            --text-primary: #1e293b;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border-subtle: #e2e8f0;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+        }
 
-    :root {
-      --primary:      #3b82f6;
-      --primary-dark: #2563eb;
-      --sidebar-w:    280px;
-      --sidebar-coll: 80px;
-      --topbar-h:     60px;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            transition: var(--transition);
+            overflow: hidden;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f8fafc;
-      min-height: 100vh;
-      display: flex;
-      color: #1e293b;
-    }
+        /* ===== OVERLAY MOBILE ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.52);
+            z-index: 999; opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-    /* ====== OVERLAY MOBILE ====== */
-    .sidebar-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.52);
-      z-index: 999; opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            display: flex; flex-direction: column;
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            height: 100vh;
+            position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000;
+        }
+        .sidebar.collapsed { width: 80px; }
 
-    /* ====== SIDEBAR — identique dashboard ====== */
-    .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-      color: white;
-      display: flex; flex-direction: column;
-      transition: width 0.3s ease;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-      height: 100vh;
-      position: fixed; left: 0; top: 0;
-      overflow-y: auto; z-index: 1000;
-    }
-    .sidebar.collapsed { width: 80px; }
+        .sidebar-header { padding: 20px 16px; border-bottom: 1px solid #334155; }
+        .logo-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; }
 
-    .sidebar-header { padding: 20px 16px; border-bottom: 1px solid #334155; }
-    .logo-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-    .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+        .sidebar .logo-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 600; color: white; flex-shrink: 0;
+        }
+        .sidebar .logo-text {
+            font-size: 1.3rem; font-weight: 600;
+            white-space: nowrap; overflow: hidden;
+            transition: opacity 0.2s; color: white;
+        }
+        .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
+        .sidebar .logo-text span { color: #3b82f6; }
 
-    .sidebar .logo-icon {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; font-weight: 600; color: white; flex-shrink: 0;
-    }
-    .sidebar .logo-text {
-      font-size: 1.3rem; font-weight: 600;
-      white-space: nowrap; overflow: hidden;
-      transition: opacity 0.2s; color: white;
-    }
-    .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
-    .sidebar .logo-text span { color: #3b82f6; }
+        .toggle-btn {
+            background: rgba(255,255,255,0.1); border: 1px solid #4b5563;
+            border-radius: 50%; width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; color: #e2e8f0; flex-shrink: 0;
+        }
+        .toggle-btn:hover { background: rgba(255,255,255,0.2); border-color: #3b82f6; color: white; }
 
-    .toggle-btn {
-      background: rgba(255,255,255,0.1); border: 1px solid #4b5563;
-      border-radius: 50%; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s; color: #e2e8f0; flex-shrink: 0;
-    }
-    .toggle-btn:hover { background: rgba(255,255,255,0.2); border-color: #3b82f6; color: white; }
+        .nav-menu { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 4px; }
 
-    .nav-menu { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 4px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 24px; margin: 0 12px; border-radius: 12px;
+            color: #cbd5e1; text-decoration: none;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .nav-item .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
+        .nav-item span:last-child { transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item span:last-child { opacity: 0; width: 0; display: none; }
+        .sidebar.collapsed .nav-item { padding: 14px 0; margin: 0 8px; justify-content: center; gap: 0; }
+        .sidebar.collapsed .nav-item .nav-icon { width: 24px; text-align: center; }
+        .nav-item.active { background: #3b82f6; color: white; box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3); }
+        .nav-item:hover:not(.active) { background: #334155; color: white; }
 
-    .nav-item {
-      display: flex; align-items: center; gap: 16px;
-      padding: 14px 24px; margin: 0 12px; border-radius: 12px;
-      color: #cbd5e1; text-decoration: none;
-      transition: all 0.2s; white-space: nowrap;
-    }
-    .nav-item .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
-    .nav-item span:last-child { transition: opacity 0.2s; }
-    .sidebar.collapsed .nav-item span:last-child { opacity: 0; width: 0; display: none; }
-    .sidebar.collapsed .nav-item { padding: 14px 0; margin: 0 8px; justify-content: center; gap: 0; }
-    .sidebar.collapsed .nav-item .nav-icon { width: 24px; text-align: center; }
-    .nav-item.active { background: #3b82f6; color: white; box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3); }
-    .nav-item:hover:not(.active) { background: #334155; color: white; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid #334155; }
+        .user-info { display: flex; align-items: center; gap: 12px; white-space: nowrap; margin-bottom: 12px; }
+        .user-avatar {
+            width: 42px; height: 42px; background: #3b82f6; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .user-details { overflow: hidden; }
+        .user-name { font-weight: 500; font-size: 0.95rem; }
+        .user-role { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
+        .sidebar.collapsed .user-details { opacity: 0; width: 0; }
 
-    .sidebar-footer { padding: 20px; border-top: 1px solid #334155; }
-    .user-info { display: flex; align-items: center; gap: 12px; white-space: nowrap; margin-bottom: 12px; }
-    .user-avatar {
-      width: 42px; height: 42px; background: #3b82f6; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: 1.2rem; flex-shrink: 0;
-    }
-    .user-details { overflow: hidden; }
-    .user-name { font-weight: 500; font-size: 0.95rem; }
-    .user-role  { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
-    .sidebar.collapsed .user-details { opacity: 0; width: 0; }
+        .logout-btn {
+            width: 100%; padding: 10px;
+            background-color: rgba(255,255,255,0.1); color: #94a3b8;
+            border: none; border-radius: 6px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; font-size: 14px; transition: all 0.2s;
+            white-space: nowrap; text-decoration: none;
+        }
+        .logout-btn:hover { background-color: rgba(255,255,255,0.2); color: white; }
 
-    .logout-btn {
-      width: 100%; padding: 10px;
-      background-color: rgba(255,255,255,0.1); color: #94a3b8;
-      border: none; border-radius: 6px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      gap: 8px; font-size: 14px; transition: all 0.2s;
-      white-space: nowrap; text-decoration: none;
-    }
-    .logout-btn:hover { background-color: rgba(255,255,255,0.2); color: white; }
+        /* ===== TOPBAR MOBILE ===== */
+        .mobile-topbar {
+            display: none;
+            position: sticky; top: 0; z-index: 998;
+            background: #1e293b; border-bottom: 1px solid #334155;
+            padding: 0 16px; height: 60px;
+            align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        .topbar-logo { display: flex; align-items: center; gap: 10px; }
+        .topbar-logo .logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.05rem; font-weight: 700; color: #fff;
+        }
+        .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+        .topbar-logo-text em { color: #3b82f6; font-style: normal; }
+        .topbar-menu-btn {
+            background: none; border: none; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #cbd5e1; border-radius: 8px; transition: background .2s;
+        }
+        .topbar-menu-btn:hover { background: #334155; }
 
-    /* ====== TOPBAR MOBILE ====== */
-    .mobile-topbar {
-      display: none;
-      position: sticky; top: 0; z-index: 998;
-      background: #fff; border-bottom: 1px solid #e2e8f0;
-      padding: 0 16px; height: 60px;
-      align-items: center; justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,.07);
-    }
-    .topbar-logo { display: flex; align-items: center; gap: 10px; }
-    .topbar-logo .logo-icon {
-      width: 34px; height: 34px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.05rem; font-weight: 700; color: #fff;
-    }
-    .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
-    .topbar-logo-text em { color: #3b82f6; font-style: normal; }
-    .topbar-menu-btn {
-      background: none; border: none; width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #334155; border-radius: 8px; transition: background .2s;
-    }
-    .topbar-menu-btn:hover { background: #f1f5f9; }
+        /* ===== PAGE WRAPPER ===== */
+        .page-wrapper {
+            flex: 1; margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            min-width: 0; display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+        }
+        .sidebar.collapsed ~ .page-wrapper { margin-left: 80px; }
 
-    /* ====== PAGE WRAPPER ====== */
-    .page-wrapper {
-      flex: 1; margin-left: 280px;
-      transition: margin-left 0.3s ease;
-      min-width: 0; display: flex; flex-direction: column;
-    }
-    .sidebar.collapsed ~ .page-wrapper { margin-left: 80px; }
+        /* ===== HEADER ===== */
+        .app-header {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex; align-items: center; justify-content: space-between;
+            background-color: var(--bg-header);
+            transition: var(--transition); flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .app-header h1 { font-weight: 500; font-size: 1.6rem; letter-spacing: -0.02em; }
 
-    .main-content { padding: 30px; width: 100%; }
+        .theme-toggle {
+            background: transparent; border: 1px solid var(--border-subtle);
+            color: var(--text-secondary); width: 40px; height: 40px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: var(--transition); font-size: 1.2rem;
+        }
+        .theme-toggle:hover { background-color: var(--bg-input); color: var(--accent); border-color: var(--accent); }
 
-    /* ====== STYLES PAGE (conservés) ====== */
-    .page-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 28px; background: white; padding: 25px 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
-      border: 1px solid #e2e8f0;
-    }
-    .page-title { font-size: 26px; font-weight: 700; color: #1e293b; letter-spacing: -0.5px; }
-    .page-subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
-    .page-icon {
-      width: 52px; height: 52px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 14px; display: flex; align-items: center;
-      justify-content: center; color: white; font-size: 1.7rem;
-    }
+        /* ===== CHAT ===== */
+        .chat-container {
+            flex: 1; overflow-y: auto; padding: 24px 0;
+            display: flex; flex-direction: column; align-items: center;
+            background-color: var(--bg-chat); transition: var(--transition);
+        }
+        .messages-wrapper {
+            width: 100%; max-width: 800px;
+            display: flex; flex-direction: column; gap: 20px; padding: 0 24px;
+        }
+        .message-row { display: flex; width: 100%; animation: fadeIn 0.3s ease; }
+        .message-row.user { justify-content: flex-end; }
+        .message-row.assistant { justify-content: flex-start; }
+        .message-content { max-width: 85%; display: flex; flex-direction: column; }
+        .message-bubble {
+            padding: 16px 20px; font-size: 1rem; line-height: 1.6;
+            border-radius: 18px; color: var(--text-primary);
+            white-space: pre-wrap; word-break: break-word;
+            box-shadow: var(--shadow-sm); transition: var(--transition);
+        }
+        .message-bubble.html-content { white-space: normal; }
+        .message-row.user .message-bubble { background-color: var(--bg-user-message); border-bottom-right-radius: 4px; }
+        .message-row.assistant .message-bubble { background-color: var(--bg-assistant-message); border-bottom-left-radius: 4px; }
+        .message-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; padding-left: 4px; }
+        .message-row.user .message-time { text-align: right; }
 
-    .card {
-      background: white; border-radius: 16px; padding: 30px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
-      border: 1px solid #e2e8f0; margin-bottom: 24px;
-    }
-    .card-title {
-      font-size: 16px; font-weight: 700; color: #1e293b;
-      border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 22px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .card-title .material-icons { color: #3b82f6; font-size: 20px; }
+        /* ===== TYPING ===== */
+        .typing-indicator { display: flex; gap: 6px; padding: 16px 0; }
+        .typing-indicator span {
+            width: 8px; height: 8px; background-color: var(--text-muted);
+            border-radius: 50%; display: inline-block;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
-    .fields-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-    .field-full { grid-column: 1 / -1; }
-    .fld { display: flex; flex-direction: column; gap: 7px; }
-    .fld label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #64748b; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.6; }
+            40%            { transform: scale(1);   opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-    .input-wrapper { position: relative; }
-    .input-wrapper input { width: 100%; padding-right: 44px; }
-    .input-status {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      width: 24px; height: 24px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; display: none;
-    }
-    .input-status.ok      { background: #d1fae5; color: #059669; display: flex; }
-    .input-status.err     { background: #fee2e2; color: #dc2626; display: flex; }
-    .input-status.loading { background: #dbeafe; color: #3b82f6; display: flex; }
+        /* ===== INPUT ===== */
+        .input-area {
+            padding: 24px 32px 32px;
+            border-top: 1px solid var(--border-subtle);
+            background-color: var(--bg-header);
+            transition: var(--transition); flex-shrink: 0;
+        }
+        .input-container {
+            max-width: 800px; margin: 0 auto;
+            display: flex; align-items: flex-end; gap: 12px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px; padding: 8px 8px 8px 20px;
+            box-shadow: var(--shadow-md); transition: var(--transition);
+        }
+        .input-container:focus-within { box-shadow: 0 4px 28px rgba(59,130,246,0.2); border-color: var(--accent); }
+        textarea {
+            flex: 1; background: transparent; border: none; resize: none;
+            padding: 12px 0; max-height: 150px;
+            font-family: 'Inter', sans-serif; font-size: 1rem;
+            color: var(--text-primary); outline: none; line-height: 1.5;
+        }
+        textarea::placeholder { color: var(--text-muted); font-weight: 400; }
+        .send-btn {
+            background: var(--accent); border: none; color: white;
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.4);
+        }
+        .send-btn:hover  { background-color: var(--accent-hover); }
+        .send-btn:active { transform: scale(0.96); }
+        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
-    .class-hint { font-size: 11px; margin-top: 4px; min-height: 16px; display: flex; align-items: center; gap: 5px; }
-    .class-hint.ok   { color: #059669; }
-    .class-hint.err  { color: #dc2626; }
-    .class-hint.info { color: #64748b; }
+        /* ===== MODAL PDF ===== */
+        .report-modal {
+            display: none; position: fixed; z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center; align-items: center;
+        }
+        .report-modal-content {
+            background: white; padding: 30px; width: 400px;
+            border-radius: 16px; text-align: center; position: relative;
+            animation: fadeIn 0.3s ease; color: #1e293b;
+        }
+        .report-close { position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer; color: #64748b; }
+        .report-close:hover { color: #ef4444; }
+        .report-download-btn {
+            margin-top: 20px; padding: 12px 24px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white; border: none; border-radius: 10px;
+            cursor: pointer; font-size: 14px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+        .report-download-btn:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
 
-    .fld input {
-      padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px;
-      font-size: 14px; color: #1e293b; background: #f8fafc;
-      font-family: 'Inter', sans-serif; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .fld input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-    .fld input::placeholder { color: #94a3b8; }
-    .fld input.valid   { border-color: #10b981; }
-    .fld input.invalid { border-color: #ef4444; }
-
-    .btn-primary {
-      padding: 12px 28px; background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
-      cursor: pointer; font-family: 'Inter', sans-serif;
-      display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 4px 12px rgba(59,130,246,0.3); transition: all 0.2s;
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.4); }
-    .btn-primary:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
-
-    .btn-success {
-      padding: 12px 28px; background: linear-gradient(135deg, #10b981, #059669);
-      color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
-      cursor: pointer; font-family: 'Inter', sans-serif;
-      display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.2s;
-    }
-    .btn-success:hover { transform: translateY(-1px); }
-    .btn-success:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
-
-    #log-zone {
-      margin-top: 18px; background: #0f172a; border-radius: 10px;
-      padding: 12px 16px; font-family: 'Courier New', monospace;
-      font-size: 12px; color: #a8ffb0; max-height: 200px;
-      overflow-y: auto; display: none; border: 1px solid #1e293b;
-    }
-    .log-line  { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-    .log-error { color: #f87171; } .log-warn { color: #fbbf24; } .log-info { color: #60a5fa; }
-
-    #btn-pdf-container { display: none; margin-bottom: 24px; }
-    .pdf-bar {
-      background: white; border-radius: 16px; padding: 20px 28px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-      border: 1px solid #e2e8f0;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .pdf-info { display: flex; align-items: center; gap: 14px; }
-    .pdf-info .material-icons { font-size: 30px; color: #10b981; }
-    .pdf-info-title { font-size: 14px; font-weight: 700; color: #1e293b; }
-    .pdf-info-sub   { font-size: 12px; color: #64748b; margin-top: 2px; }
-
-    #bulletins-container { display: flex; flex-direction: column; align-items: center; gap: 32px; padding-bottom: 60px; }
-
-    .spinner {
-      display: inline-block; width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
-      border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle;
-    }
-    .spinner-dark {
-      display: inline-block; width: 12px; height: 12px;
-      border: 2px solid rgba(59,130,246,0.3); border-top-color: #3b82f6;
-      border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Styles bulletin (inchangés) */
-    .bulletin { width: 794px; height: 1122px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1; box-shadow: 0 8px 40px rgba(0,0,0,0.12); padding: 24px 40px 50px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; position: relative; }
-    .watermark { position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%) rotate(-35deg); font-size: 90px; font-weight: 900; color: rgba(0,0,0,0.025); white-space: nowrap; pointer-events: none; z-index: 0; }
-    .bul-content { position: relative; z-index: 1; }
-    .bul-topbar { display: table; width: 100%; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 28px; }
-    .bt-left, .bt-right { display: table-cell; vertical-align: top; }
-    .bt-right { text-align: right; }
-    .school-name { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #000; line-height: 1.35; }
-    .school-sub  { font-size: 9.5px; color: #555; margin-top: 2px; }
-    .annee-label { font-size: 9px; text-transform: uppercase; letter-spacing: .8px; color: #666; }
-    .annee-value { font-size: 14px; font-weight: 900; color: #000; margin-top: 2px; }
-    .bul-title { text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 28px; }
-    .bul-title-main { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; }
-    .bul-header { display: table; width: 100%; border-bottom: 1.5px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
-    .bh-left,.bh-center,.bh-right { display: table-cell; width: 33%; vertical-align: middle; }
-    .bh-center { text-align: center; } .bh-right { text-align: right; }
-    .rep-name { font-size: 12px; font-weight: 900; color: #000; line-height: 1.4; }
-    .rep-min  { font-size: 9.5px; color: #444; margin-top: 2px; font-style: italic; }
-    .semestre-val { font-size: 12px; font-weight: 700; color: #333; font-style: italic; }
-    .header-meta { font-size: 11px; line-height: 1.85; color: #222; }
-    .header-meta strong { font-weight: 700; color: #000; }
-    .eleve-band { display: table; width: 100%; background: #f2f2f2; border: 2px solid #000; padding: 9px 14px; margin-bottom: 10px; }
-    .eleve-cell { display: table-cell; width: 25%; vertical-align: top; padding-right: 8px; }
-    .ef-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: .6px; color: #666; margin-bottom: 2px; }
-    .ef-value { font-size: 13px; font-weight: 900; color: #000; line-height: 1.2; }
-    .notes-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; }
-    .notes-table thead tr { background: #000; color: #fff; }
-    .notes-table thead th { padding: 6px 7px; text-align: center; font-size: 9.5px; font-weight: 700; text-transform: uppercase; border: 1px solid #222; }
-    .notes-table thead th:first-child { text-align: left; padding-left: 8px; }
-    .notes-table tbody tr:nth-child(even) { background: #f7f7f7; }
-    .notes-table tbody td { padding: 5px 7px; border: 1px solid #ccc; text-align: center; }
-    .notes-table tbody td:first-child { text-align: left; font-weight: 700; padding-left: 8px; }
-    .appr-tb { font-size: 10px; font-style: italic; font-weight: 700; }
-    .moy-cell { font-weight: 900; }
-    .recap-row { display: table; width: 100%; margin-bottom: 8px; }
-    .recap-cell { display: table-cell; width: 25%; border: 1.5px solid #bbb; padding: 7px 6px; text-align: center; vertical-align: middle; }
-    .rc-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: .6px; color: #555; display: block; }
-    .rc-value { font-size: 18px; font-weight: 900; color: #000; display: block; margin-top: 2px; line-height: 1; }
-    .recap-cell.hi { background: #000; border-color: #000; }
-    .recap-cell.hi .rc-label { color: #ccc; } .recap-cell.hi .rc-value { color: #fff; }
-    .rang-ligne { display: table; width: 100%; border: 1px solid #ccc; background: #fafafa; padding: 6px 10px; margin-bottom: 10px; font-size: 11.5px; }
-    .rang-left  { display: table-cell; vertical-align: middle; }
-    .rang-right { display: table-cell; vertical-align: middle; text-align: right; }
-    .rang-val { font-size: 14px; font-weight: 900; }
-    .appr-gen { font-style: italic; font-weight: 900; font-size: 12px; }
-    .bottom-section { display: table; width: 100%; border-spacing: 8px; border-collapse: separate; }
-    .bottom-left  { display: table-cell; width: 58%; vertical-align: top; }
-    .bottom-right { display: table-cell; width: 42%; vertical-align: top; }
-    .obs-block { border: 1px solid #ccc; padding: 8px 10px; margin-bottom: 8px; }
-    .obs-title { font-size: 8.5px; text-transform: uppercase; letter-spacing: .8px; font-weight: 700; color: #333; margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
-    .obs-content { font-size: 11px; color: #333; font-style: italic; line-height: 1.5; min-height: 36px; }
-    .distinctions-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
-    .distinctions-table td { border: 1px solid #ccc; padding: 4px 8px; }
-    .distinctions-table td:first-child { font-weight: 700; background: #f5f5f5; width: 75%; }
-    .distinctions-table td:last-child  { text-align: center; font-weight: 900; font-size: 13px; }
-    .sign-block { border: 1px solid #ccc; padding: 10px 10px 8px; text-align: center; margin-bottom: 8px; }
-    .sign-title { font-size: 8.5px; text-transform: uppercase; letter-spacing: .8px; font-weight: 700; color: #333; margin-bottom: 36px; }
-    .sign-line  { border-top: 1.5px solid #000; width: 80%; margin: 0 auto; }
-    .sign-name  { font-size: 9px; color: #555; margin-top: 3px; }
-    .parents-block { border: 1px solid #ccc; padding: 8px 10px; }
-    .bul-footer { margin-top: 250px; border-top: 2px solid #000; padding-top: 6px; font-size: 9px; color: #333; text-align: center; font-style: italic; line-height: 1.4; }
-
-    @media (max-width: 860px) { .bulletin { transform: scale(.88); transform-origin: top center; margin-bottom: -80px; } }
-    @media (max-width: 660px) { .bulletin { transform: scale(.64); transform-origin: top center; margin-bottom: -230px; } }
-
-    @media (max-width: 768px) {
-      .sidebar { transform: translateX(-100%); width: 280px !important; transition: transform 0.3s ease; }
-      .sidebar.mobile-open { transform: translateX(0); }
-      .sidebar.collapsed { width: 280px !important; transform: translateX(-100%); }
-      .sidebar.collapsed.mobile-open { transform: translateX(0); }
-      .sidebar-overlay { display: block; }
-      .mobile-topbar { display: flex; }
-      .page-wrapper { margin-left: 0 !important; width: 100%; }
-      .main-content { padding: 20px; }
-      .fields-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px !important; transition: transform 0.3s ease; }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .sidebar.collapsed { width: 280px !important; transform: translateX(-100%); }
+            .sidebar.collapsed.mobile-open { transform: translateX(0); }
+            .sidebar-overlay { display: block; }
+            .mobile-topbar { display: flex; }
+            .page-wrapper { margin-left: 0 !important; width: 100%; }
+            .app-header { padding: 16px 20px; }
+            .input-area { padding: 16px 20px; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- ====== SIDEBAR ====== -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="logo-header">
-      <div class="logo-area">
-        <div class="logo-icon">E</div>
-        <span class="logo-text">Educ<span>sen</span></span>
-      </div>
-      <button class="toggle-btn" id="toggleSidebar">
-        <span class="material-icons" id="toggleIcon">chevron_left</span>
-      </button>
-    </div>
-  </div>
-
-  <nav class="nav-menu">
-    <a href="/userdashboard.html" class="nav-item">
-      <span class="nav-icon material-icons">dashboard</span>
-      <span>Dashboard</span>
-    </a>
-    <a href="/user-admin/assistant.html" class="nav-item">
-      <span class="nav-icon material-icons">smart_toy</span>
-      <span>Assistant</span>
-    </a>
-    <a href="/user-admin/rapport.html" class="nav-item">
-      <span class="nav-icon material-icons">assessment</span>
-      <span>Rapport</span>
-    </a>
-    <a href="/user-admin/classes.html" class="nav-item">
-      <span class="nav-icon material-icons">school</span>
-      <span>Classes</span>
-    </a>
-    <a href="/user-admin/professeurs.html" class="nav-item">
-      <span class="nav-icon material-icons">person</span>
-      <span>Professeurs</span>
-    </a>
-    <a href="/user-admin/notes.html" class="nav-item">
-      <span class="nav-icon material-icons">assignment</span>
-      <span>Notes</span>
-    </a>
-    <a href="/user-admin/bulletin.html" class="nav-item active">
-      <span class="nav-icon material-icons">receipt_long</span>
-      <span>Bulletins</span>
-    </a>
-    <a href="/user-admin/parametres.html" class="nav-item">
-      <span class="nav-icon material-icons">settings</span>
-      <span>Paramètres</span>
-    </a>
-  </nav>
-
-  <div class="sidebar-footer">
-    <div class="user-info" id="userInfo">
-      <div class="user-avatar" id="userAvatar">AD</div>
-      <div class="user-details">
-        <div class="user-name" id="userNameDisplay">Administrateur</div>
-        <div class="user-role" id="userRole">admin</div>
-      </div>
-    </div>
-    <a href="/index.html" class="logout-btn">
-      <span class="material-icons">logout</span>
-      <span>Déconnexion</span>
-    </a>
-  </div>
-</aside>
-
-<!-- ====== PAGE WRAPPER ====== -->
-<div class="page-wrapper" id="pageWrapper">
-
-  <!-- TOPBAR MOBILE -->
-  <header class="mobile-topbar" id="mobileTopbar">
-    <div class="topbar-logo">
-      <div class="logo-icon">E</div>
-      <span class="topbar-logo-text">Educ<em>sen</em></span>
-    </div>
-    <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
-      <span class="material-icons">menu</span>
-    </button>
-  </header>
-
-  <!-- MAIN CONTENT (inchangé) -->
-  <main class="main-content" id="mainContent">
-
-    <div class="page-header">
-      <div>
-        <div class="page-title">Bulletins de Notes</div>
-        <div class="page-subtitle">Générez et exportez les bulletins en PDF par classe</div>
-      </div>
-      <div class="page-icon"><span class="material-icons">receipt_long</span></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <span class="material-icons">tune</span>
-        Paramètres de génération
-      </div>
-      <div class="fields-grid">
-        <div class="fld">
-          <label for="nomEcole">Nom de l'École</label>
-          <input type="text" id="nomEcole" placeholder="ex: Lycée Blaise Diagne"/>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-header">
+                <div class="logo-area">
+                    <div class="logo-icon">E</div>
+                    <span class="logo-text">Educ<span>sen</span></span>
+                </div>
+                <button class="toggle-btn" id="toggleSidebar">
+                    <span class="material-icons" id="toggleIcon">chevron_left</span>
+                </button>
+            </div>
         </div>
-        <div class="fld">
-          <label for="adresseEcole">Adresse de l'École</label>
-          <input type="text" id="adresseEcole" placeholder="ex: Rue 10 x 17, Médina"/>
+
+        <nav class="nav-menu">
+            <a href="/userdashboard.html" class="nav-item">
+                <span class="nav-icon material-icons">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/user-admin/assistant.html" class="nav-item active">
+                <span class="nav-icon material-icons">smart_toy</span>
+                <span>Assistant</span>
+            </a>
+            <a href="/user-admin/rapport.html" class="nav-item">
+                <span class="nav-icon material-icons">assessment</span>
+                <span>Rapport</span>
+            </a>
+            <a href="/user-admin/classes.html" class="nav-item">
+                <span class="nav-icon material-icons">school</span>
+                <span>Classes</span>
+            </a>
+            <a href="/user-admin/professeurs.html" class="nav-item">
+                <span class="nav-icon material-icons">person</span>
+                <span>Professeurs</span>
+            </a>
+            <a href="/user-admin/notes.html" class="nav-item">
+                <span class="nav-icon material-icons">assignment</span>
+                <span>Notes</span>
+            </a>
+            <a href="/user-admin/bulletin.html" class="nav-item">
+                <span class="nav-icon material-icons">receipt_long</span>
+                <span>Bulletins</span>
+            </a>
+            <a href="/user-admin/parametres.html" class="nav-item">
+                <span class="nav-icon material-icons">settings</span>
+                <span>Paramètres</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar">AD</div>
+                <div class="user-details">
+                    <div class="user-name" id="userNameDisplay">Administrateur</div>
+                    <div class="user-role" id="userRole">admin</div>
+                </div>
+            </div>
+            <a href="/index.html" class="logout-btn" id="logoutBtn">
+                <span class="material-icons">logout</span>
+                <span>Déconnexion</span>
+            </a>
         </div>
-        <div class="fld">
-          <label for="telEcole">Contact de l'École</label>
-          <input type="text" id="telEcole" placeholder="ex: +221 33 820 00 00"/>
+    </aside>
+
+    <!-- ===== PAGE WRAPPER ===== -->
+    <div class="page-wrapper" id="pageWrapper">
+
+        <!-- Topbar mobile -->
+        <header class="mobile-topbar" id="mobileTopbar">
+            <div class="topbar-logo">
+                <div class="logo-icon">E</div>
+                <span class="topbar-logo-text">Educ<em>sen</em></span>
+            </div>
+            <button class="topbar-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <span class="material-icons">menu</span>
+            </button>
+        </header>
+
+        <!-- Header desktop -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1><strong>Educsen </strong><span style="color:var(--accent);">IA</span></h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <!-- Zone chat -->
+        <main class="chat-container" id="chatContainer">
+            <div class="messages-wrapper" id="messagesWrapper"></div>
+        </main>
+
+        <!-- Zone saisie -->
+        <div class="input-area">
+            <div class="input-container">
+                <textarea id="userInput" placeholder="Posez votre question à Educsen IA…" rows="1"></textarea>
+                <button class="send-btn" id="sendBtn" disabled>
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+            </div>
         </div>
-        <div class="fld field-full">
-          <label for="nomClasse">Nom de la Classe</label>
-          <div class="input-wrapper">
-            <input type="text" id="nomClasse"
-                   placeholder="ex: 6ème A, Terminale S2, 3ème B…"
-                   oninput="onClasseInput()"
-                   autocomplete="off"/>
-            <div class="input-status" id="classeStatus"></div>
-          </div>
-          <div class="class-hint info" id="classeHint">
-            <span class="material-icons" style="font-size:13px">info</span>
-            Tapez le nom exact de la classe — l'ID Firestore sera trouvé automatiquement
-          </div>
-        </div>
-      </div>
-      <button class="btn-primary" id="btn-generer" onclick="lancerGeneration()">
-        <span class="material-icons" style="font-size:18px">play_arrow</span>
-        Générer les Bulletins
-      </button>
-      <div id="log-zone"></div>
     </div>
 
-    <div id="btn-pdf-container">
-      <div class="pdf-bar">
-        <div class="pdf-info">
-          <span class="material-icons">picture_as_pdf</span>
-          <div>
-            <div class="pdf-info-title">Bulletins prêts à l'export</div>
-            <div class="pdf-info-sub">1 bulletin = 1 page A4 — prêt pour l'impression</div>
-          </div>
+    <!-- ===== MODAL PDF ===== -->
+    <div id="reportModal" class="report-modal">
+        <div class="report-modal-content">
+            <span class="report-close" id="closeReportModal">&times;</span>
+            <h2>📄 Télécharger le rapport</h2>
+            <p style="margin-top:10px;color:#64748b;font-size:14px;">Votre analyse est prête. Voulez-vous la télécharger en PDF ?</p>
+            <button id="downloadReportBtn" class="report-download-btn">⬇️ Télécharger le PDF</button>
         </div>
-        <button class="btn-success" id="btn-pdf" onclick="exporterPDF()">
-          <span class="material-icons" style="font-size:18px">download</span>
-          Télécharger le PDF
-        </button>
-      </div>
     </div>
 
-    <div id="bulletins-container"></div>
-  </main>
-</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<script>
-// ====== SIDEBAR JS — identique dashboard ======
-(function() {
-  const sidebar        = document.getElementById('sidebar');
-  const toggleBtn      = document.getElementById('toggleSidebar');
-  const toggleIcon     = document.getElementById('toggleIcon');
-  const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
+    <script type="module">
+        import { initializeApp }               from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore }                from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  const openMobile  = () => { sidebar.classList.add('mobile-open');    sidebarOverlay.classList.add('active'); };
-  const closeMobile = () => { sidebar.classList.remove('mobile-open'); sidebarOverlay.classList.remove('active'); };
+        import assistantJs from './assistant.js';
+        import {
+            isRecommandationRequest, handleRecommandations,
+            isEvolutionRequest, parseEvolutionRequest, handleEvolution,
+            getLastRecoData
+        } from './fonctionnalite.js';
+        import { checkSubscription } from './subscription.js';
+        await checkSubscription();
 
-  toggleBtn.addEventListener('click', () => {
-    if (window.innerWidth <= 768) {
-      sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
-    } else {
-      sidebar.classList.toggle('collapsed');
-      toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
-    }
-  });
+        // ── Firebase ──
+        const firebaseConfig = {
+            apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+            authDomain:        "real-educsen.firebaseapp.com",
+            projectId:         "real-educsen",
+            storageBucket:     "real-educsen.firebasestorage.app",
+            messagingSenderId: "80660233362",
+            appId:             "1:80660233362:web:5edf5060254170056eba4b"
+        };
+        const app  = initializeApp(firebaseConfig);
+        const db   = getFirestore(app);
+        const auth = getAuth(app);
 
-  mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
-  });
+        // ── Références DOM ──
+        const messagesWrapper = document.getElementById('messagesWrapper');
+        const userInput       = document.getElementById('userInput');
+        const sendBtn         = document.getElementById('sendBtn');
+        const chatContainer   = document.getElementById('chatContainer');
 
-  sidebarOverlay.addEventListener('click', closeMobile);
+        let isTyping         = false;
+        let userId           = null;
+        let lastReportBubble = null;
 
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target))
-      closeMobile();
-  });
+        // ─────────────────────────────────────────────────────────────────
+        // AUTH
+        // ─────────────────────────────────────────────────────────────────
+        onAuthStateChanged(auth, (user) => {
+            if (!user) { window.location.replace('/index.html'); return; }
+            userId = user.uid;
+            const name = user.displayName || user.email || 'Administrateur';
+            document.getElementById('userNameDisplay').textContent = name;
+            document.getElementById('userAvatar').textContent      = name[0].toUpperCase();
+            document.getElementById('userRole').textContent        = 'admin';
+        });
 
-  window.addEventListener('resize', () => {
-    if (window.innerWidth <= 768) {
-      sidebar.classList.remove('collapsed');
-      toggleIcon.textContent = 'chevron_left';
-      closeMobile();
-    } else {
-      closeMobile();
-    }
-  });
-})();
+        // ─────────────────────────────────────────────────────────────────
+        // MESSAGES
+        // ─────────────────────────────────────────────────────────────────
+        function addMessage(text, sender, isHtml = false, isTemp = false) {
+            if (!isTemp) removeTemp();
 
-// ====== AUTH — mise à jour infos user sidebar ======
-document.addEventListener('DOMContentLoaded', () => {
-  firebase.auth().onAuthStateChanged((user) => {
-    if (!user) { window.location.href = '/connexion.html'; return; }
-    const name = user.displayName || user.email || 'Administrateur';
-    document.getElementById('userNameDisplay').textContent = name;
-    document.getElementById('userAvatar').textContent      = name[0].toUpperCase();
-  });
-});
+            const row = document.createElement('div');
+            row.classList.add('message-row', sender);
+            if (isTemp) row.setAttribute('data-temp', 'true');
 
-// ====== CODE BULLETINS (inchangé) ======
-const firebaseConfig = {
-  apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
-  authDomain:        "real-educsen.firebaseapp.com",
-  projectId:         "real-educsen",
-  storageBucket:     "real-educsen.firebasestorage.app",
-  messagingSenderId: "80660233362",
-  appId:             "1:80660233362:web:5edf5060254170056eba4b"
-};
-if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-const db = firebase.firestore();
+            const content = document.createElement('div');
+            content.classList.add('message-content');
 
-const logZone = document.getElementById('log-zone');
-function log(msg, type='ok') {
-  logZone.style.display = 'block';
-  const d = document.createElement('div');
-  d.className = 'log-line'+(type==='error'?' log-error':type==='warn'?' log-warn':type==='info'?' log-info':'');
-  d.textContent = `[${new Date().toLocaleTimeString('fr-FR')}] ${msg}`;
-  logZone.appendChild(d);
-  logZone.scrollTop = logZone.scrollHeight;
-}
+            const bubble = document.createElement('div');
+            bubble.classList.add('message-bubble');
 
-function getAppr(moy) {
-  if (moy===null||moy===undefined||isNaN(moy)) return {label:'—'};
-  if (moy>=16) return {label:'Très Bien'};
-  if (moy>=14) return {label:'Bien'};
-  if (moy>=12) return {label:'Assez Bien'};
-  if (moy>=10) return {label:'Passable'};
-  if (moy>=5)  return {label:'Insuffisant'};
-  return {label:'Très Insuffisant'};
-}
-function fmt(v, d=2) {
-  if (v===null||v===undefined||isNaN(v)) return '—';
-  return parseFloat(v).toFixed(d);
-}
+            if (isHtml) {
+                bubble.classList.add('html-content');
+                bubble.innerHTML = text;
+            } else {
+                bubble.innerHTML = text;
+            }
 
-let _classeIdResolu = null;
-let _debounceTimer  = null;
+            const time = document.createElement('span');
+            time.classList.add('message-time');
+            const now = new Date();
+            time.textContent =
+                now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0');
 
-async function rechercherClasseParNom(nomSaisi) {
-  if (!nomSaisi || nomSaisi.trim() === '') return null;
-  const snapshot = await db.collection('classes').get();
-  const nom = nomSaisi.trim().toLowerCase();
-  for (const doc of snapshot.docs) {
-    const data  = doc.data();
-    const champ = (data.nomClasse || data.nom || '').trim().toLowerCase();
-    if (champ === nom) return { id: doc.id, ...data };
-  }
-  return null;
-}
+            content.appendChild(bubble);
+            if (!isTemp) content.appendChild(time);
+            row.appendChild(content);
+            messagesWrapper.appendChild(row);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
-async function onClasseInput() {
-  clearTimeout(_debounceTimer);
-  _classeIdResolu = null;
-  const input  = document.getElementById('nomClasse');
-  const status = document.getElementById('classeStatus');
-  const hint   = document.getElementById('classeHint');
-  const val    = input.value.trim();
-  input.className = '';
-  status.className = 'input-status';
-  status.innerHTML = '';
-  if (!val) {
-    hint.className   = 'class-hint info';
-    hint.innerHTML   = '<span class="material-icons" style="font-size:13px">info</span> Tapez le nom exact de la classe — l\'ID Firestore sera trouvé automatiquement';
-    return;
-  }
-  status.className = 'input-status loading';
-  status.innerHTML = '<span class="spinner-dark"></span>';
-  hint.className   = 'class-hint info';
-  hint.textContent = 'Recherche en cours…';
-  _debounceTimer = setTimeout(async () => {
-    try {
-      const classe = await rechercherClasseParNom(val);
-      if (classe) {
-        _classeIdResolu = classe.id;
-        input.className  = 'valid';
-        status.className = 'input-status ok';
-        status.innerHTML = '✓';
-        hint.className   = 'class-hint ok';
-        hint.innerHTML   = `<span class="material-icons" style="font-size:13px">check_circle</span> Classe trouvée : <strong>${classe.nomClasse || classe.nom}</strong> (ID : ${classe.id})`;
-      } else {
-        _classeIdResolu = null;
-        input.className  = 'invalid';
-        status.className = 'input-status err';
-        status.innerHTML = '✗';
-        hint.className   = 'class-hint err';
-        hint.innerHTML   = `<span class="material-icons" style="font-size:13px">error</span> Aucune classe trouvée avec ce nom`;
-      }
-    } catch(e) {
-      status.className = 'input-status err';
-      status.innerHTML = '✗';
-      hint.className   = 'class-hint err';
-      hint.textContent = `Erreur Firestore : ${e.message}`;
-    }
-  }, 600);
-}
-
-async function fetchEleves(classeId) {
-  log('Chargement élèves…', 'info');
-  try {
-    const s = await db.collection('classes').doc(classeId).collection('eleves').get();
-    if (s.empty) { log('Aucun élève', 'warn'); return []; }
-    log(`${s.size} élève(s)`);
-    return s.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { log(`${e.message}`, 'error'); return []; }
-}
-
-async function fetchEvals(classeId) {
-  log('Chargement évaluations…', 'info');
-  try {
-    const s = await db.collection('evaluations').where('classeId', '==', classeId).get();
-    if (s.empty) { log('Aucune évaluation', 'warn'); return []; }
-    log(`${s.size} évaluation(s)`);
-    return s.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { log(`${e.message}`, 'error'); return []; }
-}
-
-async function fetchNotes(evalId) {
-  try {
-    const s = await db.collection('evaluations').doc(evalId).collection('notes').get();
-    return s.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch { return []; }
-}
-
-function calculer(eleves, evals, notesMap) {
-  log('Calcul des moyennes…', 'info');
-  const resultats = eleves.map(eleve => {
-    const matieres = {};
-    evals.forEach(ev => {
-      const mat   = ev.matiere || 'Inconnue';
-      const type  = (ev.type || '').toLowerCase();
-      const coeff = parseFloat(ev.coefficients || ev.coefficient) || 1;
-      const notes = notesMap[ev.id] || [];
-      const no    = notes.find(n => n.eleveId === eleve.id || n.eleveId === eleve.matricule);
-      if (!matieres[mat]) matieres[mat] = { coeff, D:[], C:[] };
-      else matieres[mat].coeff = coeff;
-      if (no?.note !== undefined) {
-        const v = parseFloat(no.note);
-        if (!isNaN(v)) {
-          if (type.includes('devoir') || type === 'd') matieres[mat].D.push(v);
-          else matieres[mat].C.push(v);
+            return bubble;
         }
-      }
-    });
-    let tc = 0, tp = 0;
-    Object.values(matieres).forEach(m => {
-      m.moyD = m.D.length ? m.D.reduce((a,b)=>a+b,0)/m.D.length : null;
-      m.moyC = m.C.length ? m.C.reduce((a,b)=>a+b,0)/m.C.length : null;
-      if      (m.moyD!==null && m.moyC!==null) m.moy = (m.moyD + 2*m.moyC)/3;
-      else if (m.moyD!==null)                  m.moy = m.moyD;
-      else if (m.moyC!==null)                  m.moy = m.moyC;
-      else                                     m.moy = null;
-      m.pts = m.moy !== null ? m.moy * m.coeff : null;
-      if (m.pts !== null) { tc += m.coeff; tp += m.pts; }
-    });
-    return { eleve, matieres, tc, tp, mg: tc>0 ? tp/tc : null, rang: null };
-  });
-  [...resultats]
-    .sort((a,b) => b.mg===null ? -1 : a.mg===null ? 1 : b.mg - a.mg)
-    .forEach((r,i) => r.rang = i+1);
-  const ms = resultats.map(r=>r.mg).filter(v=>v!==null);
-  const mc = ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null;
-  log(`Moy. classe : ${fmt(mc)}`);
-  return { resultats, mc };
-}
 
-function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole) {
-  const { eleve, matieres, tc, tp, mg, rang } = res;
-  const nom       = `${eleve.prenom||''} ${eleve.nom||eleve.name||''}`.trim() || eleve.id;
-  const matricule = eleve.matricule || eleve.id || '—';
-  const apGen     = getAppr(mg);
-  const sfx       = rang === 1 ? 'er' : 'ème';
-  const mgv       = mg !== null ? mg : -1;
-  const nomClasse = classe.nomClasse || classe.nom || '—';
-  const effectif  = classe._effectif || '—';
-  const lignes = Object.entries(matieres).map(([n,m]) => {
-    const ap = getAppr(m.moy);
-    return `<tr><td>${n}</td><td>${fmt(m.moyD)}</td><td>${fmt(m.moyC)}</td><td class="moy-cell">${fmt(m.moy)}</td><td>${m.coeff}</td><td>${m.pts!==null ? fmt(m.pts) : '—'}</td><td><span class="appr-tb">${ap.label}</span></td></tr>`;
-  }).join('');
-  const obs =
-    apGen.label==='Très Bien'  ? 'Excellent travail. Continuez ainsi sur cette belle lancée.' :
-    apGen.label==='Bien'       ? 'Bon travail. Persévérez dans vos efforts.' :
-    apGen.label==='Assez Bien' ? 'Travail satisfaisant. Des progrès sont encore possibles.' :
-    apGen.label==='Passable'   ? 'Des lacunes persistent. Un travail régulier est nécessaire.' :
-    'Des difficultés importantes ont été relevées. Un suivi est vivement recommandé.';
-  return `
-<div class="bulletin" id="bul-${eleve.id}">
-  <div class="watermark">OFFICIEL</div>
-  <div class="bul-content">
-    <div class="bul-topbar">
-      <div class="bt-left">
-        <div class="school-name">${nomEcole}</div>
-        ${adresseEcole ? `<div class="school-sub"><strong>Adresse :</strong> ${adresseEcole}</div>` : ''}
-        ${telEcole     ? `<div class="school-sub"><strong>Contact :</strong> ${telEcole}</div>`     : ''}
-      </div>
-      <div class="bt-right">
-        <div class="annee-label">Année scolaire</div>
-        <div class="annee-value">${annee}</div>
-      </div>
-    </div>
-    <div class="bul-title"><div class="bul-title-main">Bulletin de Notes</div></div>
-    <div class="bul-header">
-      <div class="bh-left"><div class="rep-name">République du Sénégal</div><div class="rep-min">Ministère de l'Éducation Nationale</div></div>
-      <div class="bh-center"><div class="semestre-val">${semestre}</div></div>
-      <div class="bh-right"><div class="header-meta">Classe&nbsp;: <strong>${nomClasse}</strong><br>Effectif&nbsp;: <strong>${effectif}</strong><br>Moy. classe&nbsp;: <strong>${fmt(mc)}</strong></div></div>
-    </div>
-    <div class="eleve-band">
-      <div class="eleve-cell"><div class="ef-label">Prénom &amp; Nom</div><div class="ef-value">${nom}</div></div>
-      <div class="eleve-cell"><div class="ef-label">Matricule</div><div class="ef-value">${matricule}</div></div>
-      <div class="eleve-cell"><div class="ef-label">Classe</div><div class="ef-value">${nomClasse}</div></div>
-      <div class="eleve-cell"><div class="ef-label">Statut</div><div class="ef-value">${eleve.redoublant ? 'Redoublant' : 'Nouveau'}</div></div>
-    </div>
-    <table class="notes-table">
-      <thead><tr><th style="width:22%">Matière</th><th>Moy. Devoirs</th><th>Moy. Compos.</th><th>Moy. Matière</th><th>Coeff.</th><th>Points</th><th>Appréciation</th></tr></thead>
-      <tbody>${lignes || '<tr><td colspan="7" style="text-align:center;color:#999;font-style:italic;padding:12px">Aucune note disponible</td></tr>'}</tbody>
-    </table>
-    <div class="recap-row">
-      <div class="recap-cell"><span class="rc-label">Moy. Classe</span><span class="rc-value">${fmt(mc)}</span></div>
-      <div class="recap-cell"><span class="rc-label">Total Coefficients</span><span class="rc-value">${tc}</span></div>
-      <div class="recap-cell"><span class="rc-label">Total Points</span><span class="rc-value">${fmt(tp)}</span></div>
-      <div class="recap-cell hi"><span class="rc-label">Moyenne Générale</span><span class="rc-value">${fmt(mg)}<span style="font-size:11px;font-weight:400"> /20</span></span></div>
-    </div>
-    <div class="rang-ligne">
-      <div class="rang-left">Rang&nbsp;: <span class="rang-val">${rang}<sup>${sfx}</sup></span> / ${effectif}</div>
-      <div class="rang-right">Appréciation&nbsp;: <span class="appr-gen">${apGen.label}</span></div>
-    </div>
-    <div class="bottom-section">
-      <div class="bottom-left">
-        <div class="obs-block"><div class="obs-title">Observations du Conseil des Professeurs</div><div class="obs-content">${obs}</div></div>
-        <div class="obs-block">
-          <div class="obs-title">Distinctions</div>
-          <table class="distinctions-table">
-            <tr><td>Félicitations du Conseil</td><td>${mgv>=16?'✓':''}</td></tr>
-            <tr><td>Tableau d'Honneur</td><td>${mgv>=14&&mgv<16?'✓':''}</td></tr>
-            <tr><td>Encouragements</td><td>${mgv>=12&&mgv<14?'✓':''}</td></tr>
-          </table>
-        </div>
-      </div>
-      <div class="bottom-right">
-        <div class="sign-block"><div class="sign-title">Visa du Chef d'Établissement</div><div class="sign-line"></div><div class="sign-name">Signature &amp; Cachet</div></div>
-        <div class="parents-block"><div class="obs-title">Visa des Parents / Tuteur</div><div style="min-height:44px"></div></div>
-      </div>
-    </div>
-    <div class="bul-footer">Ce bulletin est un document officiel délivré par l'établissement scolaire. Toute modification non autorisée est passible de sanctions. Veuillez en conserver une photocopie.</div>
-  </div>
-</div>`;
-}
+        function removeTemp() {
+            document.querySelectorAll('[data-temp="true"]').forEach(el => el.remove());
+        }
+        function showTyping() {
+            const el = document.createElement('div');
+            el.classList.add('message-row', 'assistant');
+            el.id = 'typingIndicator';
+            el.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+            messagesWrapper.appendChild(el);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        function removeTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
 
-async function lancerGeneration() {
-  const nomSaisi     = document.getElementById('nomClasse').value.trim();
-  const nomEcole     = document.getElementById('nomEcole').value.trim()     || 'Établissement Scolaire';
-  const adresseEcole = document.getElementById('adresseEcole').value.trim() || '';
-  const telEcole     = document.getElementById('telEcole').value.trim()     || '';
-  if (!nomSaisi) { log('Veuillez saisir le nom de la classe', 'warn'); return; }
-  const btn = document.getElementById('btn-generer');
-  btn.disabled  = true;
-  btn.innerHTML = '<span class="spinner"></span> Recherche de la classe…';
-  document.getElementById('bulletins-container').innerHTML = '';
-  document.getElementById('btn-pdf-container').style.display = 'none';
-  try {
-    log(`Recherche de la classe "${nomSaisi}"…`, 'info');
-    const classe = await rechercherClasseParNom(nomSaisi);
-    if (!classe) {
-      log(`Aucune classe trouvée avec le nom "${nomSaisi}"`, 'error');
-      btn.disabled  = false;
-      btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
-      return;
-    }
-    const classeId = classe.id;
-    log(`Classe trouvée : "${classe.nomClasse || classe.nom}" — ID : ${classeId}`);
-    _classeIdResolu = classeId;
-    document.getElementById('classeStatus').className = 'input-status ok';
-    document.getElementById('classeStatus').innerHTML = '✓';
-    btn.innerHTML = '<span class="spinner"></span> Chargement des données…';
-    const eleves = await fetchEleves(classeId);
-    if (!eleves.length) { btn.disabled = false; btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins'; return; }
-    const evals = await fetchEvals(classeId);
-    if (!evals.length) log("Pas d'évaluations — les tableaux seront vides", 'warn');
-    log(`Récupération des notes (${evals.length} éval.)…`, 'info');
-    const notesMap = {};
-    await Promise.all(evals.map(async ev => {
-      notesMap[ev.id] = await fetchNotes(ev.id);
-      log(`  ${ev.matiere||ev.id} | coeff: ${ev.coefficients||ev.coefficient||'?'} | ${notesMap[ev.id].length} note(s)`);
-    }));
-    const annee    = classe.annee    || `${new Date().getFullYear()}–${new Date().getFullYear()+1}`;
-    const semestre = classe.semestre || '1er Semestre';
-    classe._effectif = eleves.length;
-    const { resultats, mc } = calculer(eleves, evals, notesMap);
-    log('Rendu des bulletins…', 'info');
-    const container = document.getElementById('bulletins-container');
-    resultats.forEach(res => {
-      const div = document.createElement('div');
-      div.innerHTML = renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole);
-      container.appendChild(div.firstElementChild);
-    });
-    log(`${resultats.length} bulletin(s) généré(s) avec succès !`);
-    document.getElementById('btn-pdf-container').style.display = 'block';
-  } catch(e) {
-    log(`Erreur : ${e.message}`, 'error');
-    console.error(e);
-  }
-  btn.disabled  = false;
-  btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
-}
+        // ─────────────────────────────────────────────────────────────────
+        // ENVOI
+        // ─────────────────────────────────────────────────────────────────
+        async function handleSend() {
+            const message = userInput.value.trim();
+            if (!message || isTyping) return;
+            if (!auth.currentUser) { window.location.replace('/index.html'); return; }
+            if (!userId) userId = auth.currentUser.uid;
 
-async function exporterPDF() {
-  const bulletins = Array.from(document.querySelectorAll('.bulletin'));
-  if (!bulletins.length) { log('Aucun bulletin à exporter', 'warn'); return; }
-  const btnPdf = document.getElementById('btn-pdf');
-  btnPdf.innerHTML = '<span class="spinner"></span> Export en cours…';
-  btnPdf.disabled  = true;
-  const nomSaisi = document.getElementById('nomClasse').value.trim().replace(/\s+/g,'_');
-  const filename  = `Bulletins_${nomSaisi}_${new Date().toISOString().slice(0,10)}.pdf`;
-  log(`Export PDF — ${bulletins.length} page(s)…`, 'info');
-  try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
-    for (let i = 0; i < bulletins.length; i++) {
-      const bul = bulletins[i];
-      log(`  Page ${i+1}/${bulletins.length}…`, 'info');
-      const saved = { transform: bul.style.transform, marginBottom: bul.style.marginBottom, width: bul.style.width, height: bul.style.height, overflow: bul.style.overflow, boxShadow: bul.style.boxShadow, border: bul.style.border };
-      bul.style.transform = 'none'; bul.style.marginBottom = '0'; bul.style.width = '794px'; bul.style.height = '1122px'; bul.style.overflow = 'hidden'; bul.style.boxShadow = 'none'; bul.style.border = 'none';
-      const canvas = await html2canvas(bul, { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff', width: 794, height: 1122, windowWidth: 794, windowHeight: 1122 });
-      Object.assign(bul.style, saved);
-      if (i > 0) pdf.addPage();
-      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
-      log(`  Page ${i+1} OK`);
-    }
-    pdf.save(filename);
-    log(`"${filename}" téléchargé avec succès !`);
-  } catch(e) {
-    log(`Erreur PDF : ${e.message}`, 'error');
-    console.error(e);
-  }
-  btnPdf.innerHTML = '<span class="material-icons" style="font-size:18px">download</span> Télécharger le PDF';
-  btnPdf.disabled  = false;
-}
+            addMessage(message, 'user');
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            sendBtn.disabled = true;
+            isTyping = true;
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && ['nomClasse','nomEcole','adresseEcole','telEcole'].includes(document.activeElement.id)) {
-    lancerGeneration();
-  }
-});
-</script>
+            try {
+                if (isRecommandationRequest(message)) {
+                    showTyping();
+                    const statusFn = (txt, sndr) => {
+                        removeTyping(); removeTemp();
+                        addMessage(txt, sndr, false, true);
+                    };
+                    const recoHtml = await handleRecommandations(db, userId, statusFn);
+                    removeTyping(); removeTemp();
+                    const bubble = addMessage(recoHtml, 'assistant', true);
+                    showPdfModal(bubble);
 
-<script src="subscription-compat.js"></script>
+                } else if (isEvolutionRequest(message)) {
+                    showTyping();
+                    const parsed  = parseEvolutionRequest(message);
+                    const evoHtml = await handleEvolution(db, userId, parsed.type, parsed.name);
+                    removeTyping();
+                    const bubble = addMessage(evoHtml, 'assistant', true);
+                    showPdfModal(bubble);
+
+                } else {
+                    showTyping();
+                    const response = await assistantJs(message, userId, db);
+                    removeTyping();
+                    addMessage(response, 'assistant');
+                }
+
+            } catch (err) {
+                console.error('Erreur handleSend:', err);
+                removeTyping(); removeTemp();
+                addMessage('Une erreur technique est survenue. Veuillez réessayer.', 'assistant');
+            } finally {
+                isTyping = false;
+                sendBtn.disabled = userInput.value.trim() === '';
+            }
+        }
+
+        userInput.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+            sendBtn.disabled = this.value.trim() === '' || isTyping;
+        });
+        sendBtn.addEventListener('click', handleSend);
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+        });
+
+        // ─────────────────────────────────────────────────────────────────
+        // BIENVENUE
+        // ─────────────────────────────────────────────────────────────────
+        addMessage(
+            'Bonjour, je suis votre assistant pédagogique <strong>Educsen IA</strong>.<br><br>' +
+            'Tapez <strong>aide</strong> pour découvrir toutes les commandes disponibles.',
+            'assistant',
+            true
+        );
+
+        // ─────────────────────────────────────────────────────────────────
+        // THÈME
+        // ─────────────────────────────────────────────────────────────────
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon   = themeToggle.querySelector('i');
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+            themeIcon.className = 'fas fa-sun';
+        }
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+
+        // ─────────────────────────────────────────────────────────────────
+        // MODAL PDF
+        // ─────────────────────────────────────────────────────────────────
+        function showPdfModal(bubble) {
+            lastReportBubble = bubble;
+            setTimeout(() => {
+                document.getElementById('reportModal').style.display = 'flex';
+            }, 400);
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        // EXPORT PDF — RAPPORT ADMINISTRATIF PROFESSIONNEL
+        // Page 1  : En-tête + stats + analyse générale (seule)
+        // Page 2  : Enseignants en difficulté
+        // Page 3  : Enseignants en développement
+        // Page 4  : Enseignants performants
+        // Page 5  : Recommandations prioritaires
+        // Page 6  : Suivi des élèves
+        // Données : getLastRecoData() — aucun parsing DOM
+        // ─────────────────────────────────────────────────────────────────
+        function exportRecommandationsPdf(filename) {
+            filename = filename || 'rapport_pedagogique_educsen.pdf';
+
+            var data = getLastRecoData();
+            if (!data) {
+                alert('Données non disponibles. Veuillez générer les recommandations d\'abord.');
+                return;
+            }
+
+            var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
+            var PW  = 210, PH = 297, MG = 18, TW = PW - MG * 2, CX = PW / 2;
+            var y   = MG;
+            var BOT = PH - 18;
+
+            // ── Helpers de base ──
+            function np() { doc.addPage(); y = MG; }
+            function chk(h) { if (y + h > BOT) np(); }
+
+            function wC(text, fs, bold, after, rgb) {
+                rgb = rgb || [0, 0, 0];
+                doc.setFontSize(fs);
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                var lh = fs * 0.40;
+                doc.splitTextToSize(text, TW).forEach(function(l) {
+                    chk(lh); doc.text(l, CX, y, { align: 'center' }); y += lh;
+                });
+                y += (after || 0);
+                doc.setTextColor(0, 0, 0);
+            }
+
+            function wL(text, fs, bold, after, indent, rgb) {
+                indent = indent || 0;
+                rgb    = rgb    || [0, 0, 0];
+                doc.setFontSize(fs);
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                var lh = fs * 0.40;
+                doc.splitTextToSize(text, TW - indent).forEach(function(l) {
+                    chk(lh); doc.text(l, MG + indent, y); y += lh;
+                });
+                y += (after || 0);
+                doc.setTextColor(0, 0, 0);
+            }
+
+            function wR(text, fs, bold, rgb) {
+                rgb = rgb || [0, 0, 0];
+                doc.setFontSize(fs);
+                doc.setFont('helvetica', bold ? 'bold' : 'normal');
+                doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+                doc.text(text, PW - MG, y, { align: 'right' });
+                doc.setTextColor(0, 0, 0);
+            }
+
+            // ── En-tête courant (pages 2+) ──
+            function runHdr() {
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(100, 100, 100);
+                doc.text('EDUCSEN IA', MG, 13);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Analyse pédagogique  ·  ' + data.anneeScol, PW - MG, 13, { align: 'right' });
+                doc.setTextColor(0, 0, 0);
+                y = 24;
+            }
+
+            // ── Boîte statistique (page 1) ──
+            function statBox(bx, by, bw, bh, val, label, sub, fillRgb) {
+                doc.setFillColor(fillRgb[0], fillRgb[1], fillRgb[2]);
+                doc.setDrawColor(210, 210, 210);
+                doc.setLineWidth(0.2);
+                doc.roundedRect(bx, by, bw, bh, 3, 3, 'FD');
+
+                doc.setFontSize(17);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(25, 25, 25);
+                doc.text(String(val), bx + bw / 2, by + 11, { align: 'center' });
+
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(70, 70, 70);
+                doc.text(label, bx + bw / 2, by + 17, { align: 'center' });
+
+                if (sub) {
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(110, 110, 110);
+                    doc.text(sub, bx + bw / 2, by + 21.5, { align: 'center' });
+                }
+                doc.setTextColor(0, 0, 0);
+            }
+
+            // ── Séparateur discret entre profs ──
+            function profSep() {
+                y += 6;
+                doc.setDrawColor(225, 225, 225);
+                doc.setLineWidth(0.15);
+                doc.line(MG + 10, y, PW - MG - 10, y);
+                y += 6;
+            }
+
+            // ── Bloc d'un professeur ──
+            function renderProf(item, statusRgb) {
+                var pd  = item.pd;
+                var par = item.paragraphs;
+
+                chk(35);
+
+                // Nom + note sur la même ligne
+                doc.setFontSize(13);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(15, 15, 15);
+                var nameMaxW = TW - 18;
+                var nameParts = doc.splitTextToSize(pd.nom, nameMaxW);
+                doc.text(nameParts[0], MG, y);
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(statusRgb[0], statusRgb[1], statusRgb[2]);
+                doc.text(pd.profMoy.toFixed(1) + ' / 20', PW - MG, y, { align: 'right' });
+                doc.setTextColor(0, 0, 0);
+                y += 5.5;
+
+                // Méta
+                var metaParts = [];
+                if (pd.matiere) metaParts.push(pd.matiere);
+                if (pd.classes && pd.classes.length) metaParts.push(pd.classes.join(', '));
+                wL(metaParts.join('   ·   '), 8, false, 5, 0, [110, 110, 110]);
+
+                // Paragraphe admin
+                wL(par.admin, 9.5, false, 0);
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 1 — EN-TÊTE + STATISTIQUES + ANALYSE GÉNÉRALE
+            // ════════════════════════════════════════════════════════════
+            var d       = data;
+            var dateStr = d.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            var years   = d.anneeScol.split('-');
+
+            y = 22;
+
+            // Bloc gauche : Educsen IA + contact
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(12, 12, 12);
+            doc.text('EDUCSEN IA', MG, y);
+
+            // Bloc droit : date
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(80, 80, 80);
+            doc.text(dateStr, PW - MG, y, { align: 'right' });
+
+            y += 6;
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(130, 130, 130);
+            doc.text('221 78 570 29 16', MG, y);
+            doc.text('Année scolaire', PW - MG, y, { align: 'right' });
+
+            y += 5.5;
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 30, 90);
+            doc.text(d.anneeScol, PW - MG, y, { align: 'right' });
+
+            // Années stylisées côté droit (petit, sous l'année)
+            y += 5;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(160, 160, 180);
+            doc.text((years[0] || '') + '  |  ' + (years[1] || ''), PW - MG, y, { align: 'right' });
+
+            doc.setTextColor(0, 0, 0);
+            y += 16;
+
+            // Titre du rapport
+            doc.setFontSize(19);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(10, 10, 10);
+            doc.text("SYNTHÈSE DES PERFORMANCES", CX, y, { align: 'center' });
+            y += 8;
+            doc.text('PÉDAGOGIQUES', CX, y, { align: 'center' });
+            y += 5;
+            doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(120, 120, 120);
+            doc.text('Analyse complète par enseignant  ·  ' + d.anneeScol, CX, y, { align: 'center' });
+            doc.setTextColor(0, 0, 0);
+            y += 13;
+
+            // ── Statistiques : 4 boîtes ──
+            var bW = 37, bH = 26, bGap = 5;
+            var bStart = CX - (4 * bW + 3 * bGap) / 2;
+            statBox(bStart,                  y, bW, bH, d.stats.total,                    'Enseignants',  'analysés',       [239, 246, 255]);
+            statBox(bStart + (bW + bGap),    y, bW, bH, d.stats.moyGlobale.toFixed(1)+'/20','Moyenne',   'générale',       [240, 255, 244]);
+            statBox(bStart + 2*(bW + bGap),  y, bW, bH, d.stats.nbAmeliorer,              'En difficulté','à accompagner', [255, 242, 242]);
+            statBox(bStart + 3*(bW + bGap),  y, bW, bH, d.stats.nbMaintenir,              'Performants',  'à valoriser',   [255, 251, 235]);
+            y += bH + 13;
+
+            // ── Analyse générale (paragraphes Groq) ──
+            var globalParas = d.globalAnalyse
+                .split('|||')
+                .map(function(p) { return p.trim(); })
+                .filter(Boolean);
+
+            globalParas.forEach(function(para, idx) {
+                wL(para, 9.5, false, idx < globalParas.length - 1 ? 5 : 0);
+            });
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 2 — ENSEIGNANTS EN SITUATION DE DIFFICULTÉ
+            // ════════════════════════════════════════════════════════════
+            if (d.profs.ameliorer.length > 0) {
+                np(); runHdr();
+                wC('ENSEIGNANTS EN SITUATION DE DIFFICULTÉ', 13, true, 2);
+                wC('Moyenne inférieure à 10  ·  Accompagnement prioritaire requis', 8, false, 10, [110, 110, 110]);
+
+                d.profs.ameliorer.forEach(function(item, idx) {
+                    if (idx > 0) profSep();
+                    renderProf(item, [185, 28, 28]);
+                });
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 3 — ENSEIGNANTS EN DÉVELOPPEMENT
+            // ════════════════════════════════════════════════════════════
+            if (d.profs.progresser.length > 0) {
+                np(); runHdr();
+                wC('ENSEIGNANTS EN DÉVELOPPEMENT', 13, true, 2);
+                wC('Moyenne entre 10 et 14  ·  Progression à consolider', 8, false, 10, [110, 110, 110]);
+
+                d.profs.progresser.forEach(function(item, idx) {
+                    if (idx > 0) profSep();
+                    renderProf(item, [146, 64, 14]);
+                });
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 4 — ENSEIGNANTS PERFORMANTS
+            // ════════════════════════════════════════════════════════════
+            if (d.profs.maintenir.length > 0) {
+                np(); runHdr();
+                wC('ENSEIGNANTS PERFORMANTS', 13, true, 2);
+                wC('Moyenne supérieure à 14  ·  Résultats à valoriser et maintenir', 8, false, 10, [110, 110, 110]);
+
+                d.profs.maintenir.forEach(function(item, idx) {
+                    if (idx > 0) profSep();
+                    renderProf(item, [21, 128, 61]);
+                });
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 5 — RECOMMANDATIONS PRIORITAIRES
+            // ════════════════════════════════════════════════════════════
+            np(); runHdr();
+            wC('RECOMMANDATIONS PRIORITAIRES', 13, true, 2);
+            wC('Axes d\'intervention recommandés à l\'administration', 8, false, 10, [110, 110, 110]);
+
+            var recos = Array.isArray(d.priorityRecos) ? d.priorityRecos : [String(d.priorityRecos)];
+            recos.forEach(function(reco, idx) {
+                chk(22);
+                // Numéro
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(59, 130, 246);
+                doc.text(String(idx + 1) + '.', MG, y);
+                doc.setTextColor(0, 0, 0);
+                y += 0.5;
+                // Texte indenté
+                wL(reco.replace(/^\d+[\.\)]\s*/, '').trim(), 9.5, false, 9, 7);
+            });
+
+            // ════════════════════════════════════════════════════════════
+            // PAGE 6 — SUIVI DES ÉLÈVES
+            // ════════════════════════════════════════════════════════════
+            np(); runHdr();
+            wC('SUIVI DES ÉLÈVES', 13, true, 2);
+            wC('Synthèse consolidée sur l\'ensemble des évaluations', 8, false, 10, [110, 110, 110]);
+
+            // Élèves à accompagner
+            if (d.elevesAAider.length > 0) {
+                y += 4;
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(146, 64, 14);
+                doc.text('Élèves nécessitant un accompagnement', MG, y);
+                doc.setTextColor(0, 0, 0);
+                y += 7;
+
+                d.elevesAAider.forEach(function(e) {
+                    chk(7);
+                    doc.setFontSize(9.5);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(20, 20, 20);
+                    doc.text(e.nom, MG + 2, y);
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(110, 110, 110);
+                    var info = (e.classe || '') + (e.matiere ? '  ·  ' + e.matiere : '') + '  ·  ' + e.moyenneEleve.toFixed(1) + '/20';
+                    doc.text(info, PW - MG, y, { align: 'right' });
+                    doc.setTextColor(0, 0, 0);
+                    y += 6.5;
+                });
+            }
+
+            // Élèves à valoriser
+            if (d.elevesAFeliciter.length > 0) {
+                y += 10;
+                chk(15);
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(21, 128, 61);
+                doc.text('Élèves à valoriser', MG, y);
+                doc.setTextColor(0, 0, 0);
+                y += 7;
+
+                d.elevesAFeliciter.forEach(function(e) {
+                    chk(7);
+                    doc.setFontSize(9.5);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(20, 20, 20);
+                    doc.text(e.nom, MG + 2, y);
+
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(110, 110, 110);
+                    var info = (e.classe || '') + (e.matiere ? '  ·  ' + e.matiere : '') + '  ·  ' + e.moyenneEleve.toFixed(1) + '/20';
+                    doc.text(info, PW - MG, y, { align: 'right' });
+                    doc.setTextColor(0, 0, 0);
+                    y += 6.5;
+                });
+            }
+
+            // ── Pied de page sur toutes les pages ──
+            var total = doc.internal.getNumberOfPages();
+            for (var i = 1; i <= total; i++) {
+                doc.setPage(i);
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(185, 185, 185);
+                doc.text(
+                    'Educsen IA  ·  Rapport pédagogique  ·  Page ' + i + ' / ' + total,
+                    CX, PH - 8, { align: 'center' }
+                );
+            }
+
+            doc.save(filename);
+        }
+
+        // ─────────────────────────────────────────────────────────────────
+        // BOUTONS MODAL PDF
+        // ─────────────────────────────────────────────────────────────────
+        document.getElementById('downloadReportBtn').addEventListener('click', function () {
+            exportRecommandationsPdf('rapport_pedagogique_educsen.pdf');
+            document.getElementById('reportModal').style.display = 'none';
+        });
+
+        document.getElementById('closeReportModal').addEventListener('click', function () {
+            document.getElementById('reportModal').style.display = 'none';
+        });
+
+        // ─────────────────────────────────────────────────────────────────
+        // SIDEBAR
+        // ─────────────────────────────────────────────────────────────────
+        const sidebar        = document.getElementById('sidebar');
+        const toggleBtn      = document.getElementById('toggleSidebar');
+        const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+        const toggleIcon     = document.getElementById('toggleIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        const openMobile  = () => { sidebar.classList.add('mobile-open');    sidebarOverlay.classList.add('active'); };
+        const closeMobile = () => { sidebar.classList.remove('mobile-open'); sidebarOverlay.classList.remove('active'); };
+
+        toggleBtn.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
+            } else {
+                sidebar.classList.toggle('collapsed');
+                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
+            }
+        });
+        mobileMenuBtn.addEventListener('click', () =>
+            sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile()
+        );
+        sidebarOverlay.addEventListener('click', closeMobile);
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(e.target) &&
+                !mobileMenuBtn.contains(e.target)) closeMobile();
+        });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                toggleIcon.textContent = 'chevron_left';
+                closeMobile();
+            } else {
+                closeMobile();
+            }
+        });
+    </script>
 </body>
 </html>
+
 
