@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,7 +12,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:flex;min-height:100vh;}
 
-/* ══ SIDEBAR (harmonisée avec classes.html) ═══════════════════════════════ */
+/* ══ SIDEBAR ═══════════════════════════════════════════════════════ */
 .sidebar {
     width: 280px;
     background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -30,305 +28,57 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
     z-index: 1000;
     overflow-y: auto;
 }
-
-.sidebar.collapsed {
-    width: 80px;
-}
-
-.sidebar-header {
-    padding: 20px 16px;
-    border-bottom: 1px solid #334155;
-}
-
-.logo-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.logo-area {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    overflow: hidden;
-}
-
-.logo-icon {
-    width: 42px;
-    height: 42px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: white;
-    flex-shrink: 0;
-}
-
-.logo-text {
-    font-size: 1.3rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    transition: opacity 0.2s;
-}
-
-.sidebar.collapsed .logo-text {
-    opacity: 0;
-    width: 0;
-}
-
-.logo-text span {
-    color: #3b82f6;
-}
-
-.toggle-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4b5563;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #e2e8f0;
-    flex-shrink: 0;
-}
-
-.toggle-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: #3b82f6;
-    color: white;
-}
-
-.nav-menu {
-    flex: 1;
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 14px 24px;
-    margin: 0 12px;
-    border-radius: 12px;
-    color: #cbd5e1;
-    text-decoration: none;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.nav-item .nav-icon {
-    font-size: 1.5rem;
-    width: 24px;
-    text-align: center;
-}
-
-.sidebar.collapsed .nav-item {
-    padding: 14px 0;
-    margin: 0 8px;
-    justify-content: center;
-    gap: 0;
-}
-
-.sidebar.collapsed .nav-item .nav-icon {
-    width: 24px;
-    text-align: center;
-}
-
-.sidebar.collapsed .nav-item span:last-child {
-    opacity: 0;
-    width: 0;
-    display: none;
-}
-
-.nav-item.active {
-    background: #3b82f6;
-    color: white;
-    box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3);
-}
-
-.nav-item:hover:not(.active) {
-    background: #334155;
-    color: white;
-}
-
-.sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid #334155;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    white-space: nowrap;
-    margin-bottom: 12px;
-}
-
-.user-avatar {
-    width: 42px;
-    height: 42px;
-    background: #3b82f6;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-
-.user-details {
-    overflow: hidden;
-}
-
-.user-name {
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.user-role {
-    font-size: 0.8rem;
-    color: #94a3b8;
-    text-transform: capitalize;
-}
-
-.sidebar.collapsed .user-details {
-    opacity: 0;
-    width: 0;
-}
-
-.logout-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: rgba(255,255,255,0.1);
-    color: #94a3b8;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 14px;
-    transition: all 0.2s;
-    white-space: nowrap;
-    text-decoration: none;
-}
-
-.logout-btn:hover {
-    background-color: rgba(255,255,255,0.2);
-    color: white;
-}
+.sidebar.collapsed { width: 80px; }
+.sidebar-header { padding: 20px 16px; border-bottom: 1px solid #334155; }
+.logo-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+.logo-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 600; color: white; flex-shrink: 0; }
+.logo-text { font-size: 1.3rem; font-weight: 600; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+.sidebar.collapsed .logo-text { opacity: 0; width: 0; }
+.logo-text span { color: #3b82f6; }
+.toggle-btn { background: rgba(255,255,255,0.1); border: 1px solid #4b5563; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: #e2e8f0; flex-shrink: 0; }
+.toggle-btn:hover { background: rgba(255,255,255,0.2); border-color: #3b82f6; color: white; }
+.nav-menu { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 4px; }
+.nav-item { display: flex; align-items: center; gap: 16px; padding: 14px 24px; margin: 0 12px; border-radius: 12px; color: #cbd5e1; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+.nav-item .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
+.sidebar.collapsed .nav-item { padding: 14px 0; margin: 0 8px; justify-content: center; gap: 0; }
+.sidebar.collapsed .nav-item .nav-icon { width: 24px; text-align: center; }
+.sidebar.collapsed .nav-item span:last-child { opacity: 0; width: 0; display: none; }
+.nav-item.active { background: #3b82f6; color: white; box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3); }
+.nav-item:hover:not(.active) { background: #334155; color: white; }
+.sidebar-footer { padding: 20px; border-top: 1px solid #334155; }
+.user-info { display: flex; align-items: center; gap: 12px; white-space: nowrap; margin-bottom: 12px; }
+.user-avatar { width: 42px; height: 42px; background: #3b82f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.2rem; flex-shrink: 0; }
+.user-details { overflow: hidden; }
+.user-name { font-weight: 500; font-size: 0.95rem; }
+.user-role { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
+.sidebar.collapsed .user-details { opacity: 0; width: 0; }
+.logout-btn { width: 100%; padding: 10px; background-color: rgba(255,255,255,0.1); color: #94a3b8; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; transition: all 0.2s; white-space: nowrap; text-decoration: none; }
+.logout-btn:hover { background-color: rgba(255,255,255,0.2); color: white; }
 
 /* ---------- OVERLAY MOBILE ---------- */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-.sidebar-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* ---------- TOPBAR MOBILE (sticky) ---------- */
-.mobile-topbar {
-    display: none;
-    position: sticky;
-    top: 0;
-    z-index: 998;
-    background: #fff;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 0 16px;
-    height: 60px;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,.07);
-}
-
-.topbar-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.topbar-logo .logo-icon {
-    width: 34px;
-    height: 34px;
-    font-size: 1.05rem;
-}
-
-.topbar-logo-text {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.topbar-logo-text em {
-    color: #3b82f6;
-    font-style: normal;
-}
-
-.topbar-menu-btn {
-    background: none;
-    border: none;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #334155;
-    border-radius: 8px;
-    transition: background .2s;
-}
-
-.topbar-menu-btn:hover {
-    background: #f1f5f9;
-}
+/* ---------- TOPBAR MOBILE ---------- */
+.mobile-topbar { display: none; position: sticky; top: 0; z-index: 998; background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 16px; height: 60px; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+.topbar-logo { display: flex; align-items: center; gap: 10px; }
+.topbar-logo .logo-icon { width: 34px; height: 34px; font-size: 1.05rem; }
+.topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+.topbar-logo-text em { color: #3b82f6; font-style: normal; }
+.topbar-menu-btn { background: none; border: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #334155; border-radius: 8px; transition: background .2s; }
+.topbar-menu-btn:hover { background: #f1f5f9; }
 
 /* ---------- PAGE WRAPPER ---------- */
-.page-wrapper {
-    flex: 1;
-    margin-left: 280px;
-    display: flex;
-    flex-direction: column;
-    transition: margin-left 0.3s ease;
-    min-width: 0;
-}
-
-.sidebar.collapsed ~ .page-wrapper {
-    margin-left: 80px;
-}
-
-.main-content {
-    padding: 30px 32px;
-    display: flex;
-    flex-direction: column;
-}
+.page-wrapper { flex: 1; margin-left: 280px; display: flex; flex-direction: column; transition: margin-left 0.3s ease; min-width: 0; }
+.sidebar.collapsed ~ .page-wrapper { margin-left: 80px; }
+.main-content { padding: 30px 32px; display: flex; flex-direction: column; }
 
 /* ══ PAGE HEADER ══════════════════════════════════════════════════ */
 .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;}
 .page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#2563eb,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;}
 
-/* ══ DESIGN TOKENS (conservés) ═══════════════════════════════════ */
+/* ══ DESIGN TOKENS ════════════════════════════════════════════════ */
 :root{
     --blue:#2563eb;--blue-l:#3b82f6;--blue-soft:#eff6ff;--blue-mid:#dbeafe;
     --purple:#7c3aed;--green:#059669;--green-soft:#f0fdf4;--green-mid:#bbf7d0;
@@ -339,6 +89,261 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
     --grad-g:linear-gradient(135deg,#059669 0%,#10b981 100%);
     --t:all .2s ease;--r:14px;--rl:20px;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   ★ SECTION ACCUEIL — NOUVEAU
+══════════════════════════════════════════════════════════════════ */
+#secAccueil {
+    animation: up .35s ease;
+}
+
+.accueil-hero {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e8f0fe 50%, #f3f0ff 100%);
+    box-shadow: 0 4px 24px rgba(37,99,235,.08);
+    border-radius: 24px;
+    padding: 3rem 2.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 20px 60px rgba(15,23,42,.25);
+}
+
+/* Décorations de fond */
+.accueil-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(59,130,246,.18) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.accueil-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(124,58,237,.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.accueil-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: rgba(37,99,235,.1);    border: 1px solid rgba(59,130,246,.3);
+    border-radius: 30px;
+    padding: .35rem 1rem;
+    font-size: .75rem;
+    font-weight: 700;
+color: #2563eb;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+}
+
+.accueil-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+   color: #0f172a;
+    line-height: 1.2;
+    margin-bottom: .7rem;
+    position: relative;
+    z-index: 1;
+}
+
+.accueil-title span {
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.accueil-sub {
+    font-size: .95rem;
+    color: #475569;
+    line-height: 1.6;
+    max-width: 520px;
+    margin-bottom: 2.2rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Grille des deux boutons principaux */
+.accueil-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.acc-btn {
+    border-radius: 18px;
+    padding: 1.6rem 1.5rem;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    text-align: left;
+    transition: all .25s cubic-bezier(.34,1.2,.64,1);
+    position: relative;
+    overflow: hidden;
+}
+
+.acc-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity .2s;
+    border-radius: 18px;
+}
+
+.acc-btn:hover { transform: translateY(-4px); }
+.acc-btn:hover::after { opacity: 1; }
+.acc-btn:active { transform: translateY(-1px); }
+
+/* Bouton Ajouter (bleu → violet) */
+.acc-btn-add {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    color: white;
+    box-shadow: 0 8px 32px rgba(37,99,235,.4), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.acc-btn-add::after {
+    background: linear-gradient(135deg, rgba(255,255,255,.08), transparent);
+}
+.acc-btn-add:hover {
+    box-shadow: 0 14px 40px rgba(37,99,235,.55);
+}
+
+/* Bouton Vérifier (vert émeraude) */
+.acc-btn-check {
+    background: linear-gradient(135deg, #059669 0%, #0891b2 100%);
+    color: white;
+    box-shadow: 0 8px 32px rgba(5,150,105,.35), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.acc-btn-check::after {
+    background: linear-gradient(135deg, rgba(255,255,255,.08), transparent);
+}
+.acc-btn-check:hover {
+    box-shadow: 0 14px 40px rgba(5,150,105,.5);
+}
+
+.acc-btn-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    transition: transform .25s;
+    backdrop-filter: blur(4px);
+}
+.acc-btn:hover .acc-btn-icon { transform: scale(1.1) rotate(-4deg); }
+
+.acc-btn-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: .3rem;
+    letter-spacing: -.01em;
+}
+
+.acc-btn-desc {
+    font-size: .78rem;
+    opacity: .8;
+    line-height: 1.5;
+}
+
+.acc-btn-arrow {
+    position: absolute;
+    bottom: 1.2rem; right: 1.3rem;
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,.18);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem;
+    transition: all .25s;
+}
+.acc-btn:hover .acc-btn-arrow {
+    background: rgba(255,255,255,.3);
+    transform: translate(2px,-2px);
+}
+
+/* Stats rapides sous le hero */
+.accueil-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.acc-stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    transition: var(--t);
+}
+.acc-stat-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    transform: translateY(-2px);
+}
+.acc-stat-ico {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.acc-stat-ico.blue { background: var(--blue-soft); color: var(--blue); }
+.acc-stat-ico.green { background: var(--green-soft); color: var(--green); }
+.acc-stat-ico.purple { background: #f5f3ff; color: var(--purple); }
+
+.acc-stat-val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: .15rem;
+}
+.acc-stat-lbl {
+    font-size: .74rem;
+    color: var(--ink3);
+    font-weight: 500;
+}
+
+/* ══ BREADCRUMB de retour ═════════════════════════════════════════ */
+.back-bar {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: 20px;
+    animation: up .2s ease;
+}
+.back-bar-btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: .5rem 1rem;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ink2);
+    cursor: pointer;
+    font-family: inherit;
+    transition: var(--t);
+}
+.back-bar-btn:hover { border-color: var(--blue-l); color: var(--blue); background: var(--blue-soft); }
+.back-crumb {
+    font-size: .82rem;
+    color: var(--ink3);
+    display: flex; align-items: center; gap: .4rem;
+}
+.back-crumb strong { color: var(--ink2); font-weight: 600; }
 
 /* ══ STEPPER ══════════════════════════════════════════════════════ */
 .stepper-wrap{background:white;border:1px solid var(--border);border-radius:var(--rl);margin-bottom:24px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);}
@@ -376,125 +381,33 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
 .finp:focus{border-color:var(--blue-l);box-shadow:0 0 0 3px rgba(59,130,246,.12);}
 
 /* ══ CARDS TYPE ÉVALUATION ════════════════════════════════════════ */
-.eval-type-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:1.1rem;
-    margin-top:.2rem;
-}
-
-.eval-type-card{
-    position:relative;
-    border:2.5px solid var(--border);
-    border-radius:var(--rl);
-    padding:1.6rem 1.4rem 1.4rem;
-    cursor:pointer;
-    transition:all .22s ease;
-    background:var(--white);
-    text-align:center;
-    overflow:hidden;
-    user-select:none;
-}
-
-.eval-type-card::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    opacity:0;
-    transition:opacity .22s ease;
-    border-radius:calc(var(--rl) - 2px);
-}
-
-.eval-type-card.devoir::before{
-    background:linear-gradient(135deg,#eff6ff 0%,#f0fdf4 100%);
-}
-
-.eval-type-card.examen::before{
-    background:linear-gradient(135deg,#fdf4ff 0%,#fff7ed 100%);
-}
-
-.eval-type-card:hover{
-    border-color:var(--blue-l);
-    transform:translateY(-3px);
-    box-shadow:0 8px 28px rgba(37,99,235,.12);
-}
-
+.eval-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-top:.2rem;}
+.eval-type-card{position:relative;border:2.5px solid var(--border);border-radius:var(--rl);padding:1.6rem 1.4rem 1.4rem;cursor:pointer;transition:all .22s ease;background:var(--white);text-align:center;overflow:hidden;user-select:none;}
+.eval-type-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s ease;border-radius:calc(var(--rl) - 2px);}
+.eval-type-card.devoir::before{background:linear-gradient(135deg,#eff6ff 0%,#f0fdf4 100%);}
+.eval-type-card.examen::before{background:linear-gradient(135deg,#fdf4ff 0%,#fff7ed 100%);}
+.eval-type-card:hover{border-color:var(--blue-l);transform:translateY(-3px);box-shadow:0 8px 28px rgba(37,99,235,.12);}
 .eval-type-card:hover::before{opacity:1;}
-
-.eval-type-card.selected.devoir{
-    border-color:var(--blue);
-    box-shadow:0 0 0 4px rgba(37,99,235,.12),0 8px 28px rgba(37,99,235,.15);
-    transform:translateY(-2px);
-}
-
+.eval-type-card.selected.devoir{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12),0 8px 28px rgba(37,99,235,.15);transform:translateY(-2px);}
 .eval-type-card.selected.devoir::before{opacity:1;}
-
-.eval-type-card.selected.examen{
-    border-color:var(--purple);
-    box-shadow:0 0 0 4px rgba(124,58,237,.12),0 8px 28px rgba(124,58,237,.15);
-    transform:translateY(-2px);
-}
-
-.eval-type-card.selected.examen::before{
-    background:linear-gradient(135deg,#fdf4ff 0%,#ede9fe 100%);
-    opacity:1;
-}
-
+.eval-type-card.selected.examen{border-color:var(--purple);box-shadow:0 0 0 4px rgba(124,58,237,.12),0 8px 28px rgba(124,58,237,.15);transform:translateY(-2px);}
+.eval-type-card.selected.examen::before{background:linear-gradient(135deg,#fdf4ff 0%,#ede9fe 100%);opacity:1;}
 .eval-type-card-inner{position:relative;z-index:1;}
-
-.eval-type-icon{
-    width:58px;height:58px;
-    border-radius:16px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.5rem;
-    margin:0 auto .9rem;
-    transition:var(--t);
-}
-
-.eval-type-card.devoir .eval-type-icon{
-    background:linear-gradient(135deg,#dbeafe,#bbf7d0);
-    color:var(--blue);
-}
-
-.eval-type-card.examen .eval-type-icon{
-    background:linear-gradient(135deg,#ede9fe,#fde68a);
-    color:var(--purple);
-}
-
+.eval-type-icon{width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto .9rem;transition:var(--t);}
+.eval-type-card.devoir .eval-type-icon{background:linear-gradient(135deg,#dbeafe,#bbf7d0);color:var(--blue);}
+.eval-type-card.examen .eval-type-icon{background:linear-gradient(135deg,#ede9fe,#fde68a);color:var(--purple);}
 .eval-type-card.selected .eval-type-icon{transform:scale(1.08);}
-
-.eval-type-name{
-    font-size:1.05rem;
-    font-weight:800;
-    color:var(--ink);
-    margin-bottom:.35rem;
-    letter-spacing:-.01em;
-    transition:var(--t);
-}
-
+.eval-type-name{font-size:1.05rem;font-weight:800;color:var(--ink);margin-bottom:.35rem;letter-spacing:-.01em;transition:var(--t);}
 .eval-type-card.selected.devoir .eval-type-name{color:var(--blue);}
 .eval-type-card.selected.examen .eval-type-name{color:var(--purple);}
-
 .eval-type-desc{font-size:.76rem;color:var(--ink3);line-height:1.5;}
-
-.eval-type-check{
-    position:absolute;top:.9rem;right:.9rem;
-    width:24px;height:24px;
-    border-radius:50%;
-    display:none;align-items:center;justify-content:center;
-    font-size:.65rem;color:white;font-weight:800;
-}
-
+.eval-type-check{position:absolute;top:.9rem;right:.9rem;width:24px;height:24px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.65rem;color:white;font-weight:800;}
 .eval-type-card.selected.devoir .eval-type-check{display:flex;background:var(--blue);}
 .eval-type-card.selected.examen .eval-type-check{display:flex;background:var(--purple);}
 
 /* ══ DATE FIELD ═══════════════════════════════════════════════════ */
 .date-field-wrap{margin-top:1.4rem;}
-.date-auto-hint{
-    display:flex;align-items:center;gap:.45rem;
-    font-size:.75rem;color:var(--green);font-weight:600;
-    margin-top:.4rem;
-}
+.date-auto-hint{display:flex;align-items:center;gap:.45rem;font-size:.75rem;color:var(--green);font-weight:600;margin-top:.4rem;}
 
 /* ══ BUTTONS ══════════════════════════════════════════════════════ */
 .btn-p{background:var(--grad);color:#fff;border:none;padding:.78rem 2rem;border-radius:11px;font-weight:700;font-size:.9rem;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:.55rem;transition:var(--t);box-shadow:0 4px 14px rgba(37,99,235,.3);}
@@ -505,18 +418,7 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
 .btn-g{background:var(--grad-g);color:#fff;border:none;padding:.78rem 2rem;border-radius:11px;font-weight:700;font-size:.9rem;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:.55rem;transition:var(--t);box-shadow:0 4px 14px rgba(5,150,105,.3);}
 .btn-g:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(5,150,105,.38);}
 .btn-g:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-
-/* ★ BOUTON TERMINER */
-.btn-done{
-    background:linear-gradient(135deg,#059669 0%,#10b981 100%);
-    color:#fff;border:none;
-    padding:.85rem 2.2rem;
-    border-radius:11px;font-weight:800;font-size:.95rem;font-family:inherit;
-    cursor:pointer;display:inline-flex;align-items:center;gap:.6rem;
-    transition:var(--t);
-    box-shadow:0 5px 18px rgba(5,150,105,.38);
-    animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
-}
+.btn-done{background:linear-gradient(135deg,#059669 0%,#10b981 100%);color:#fff;border:none;padding:.85rem 2.2rem;border-radius:11px;font-weight:800;font-size:.95rem;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:.6rem;transition:var(--t);box-shadow:0 5px 18px rgba(5,150,105,.38);animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
 .btn-done:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(5,150,105,.46);}
 @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
 
@@ -554,26 +456,8 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
 .lwarn{font-size:.74rem;color:#9a3412;margin-top:.6rem;display:flex;align-items:center;gap:.4rem;}
 .btn-rg{background:transparent;border:1.5px solid var(--blue-l);color:var(--blue);padding:.5rem 1.2rem;border-radius:9px;font-size:.8rem;font-weight:700;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:var(--t);margin-top:.9rem;}
 .btn-rg:hover{background:var(--blue-soft);}
-
-/* ★ ZONE TERMINER ─ après copie */
-.done-zone{
-    margin-top:1.4rem;
-    background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);
-    border:2px solid var(--green-mid);
-    border-radius:var(--rl);
-    padding:1.6rem 1.5rem;
-    text-align:center;
-    animation:up .3s ease;
-}
-.done-zone-icon{
-    width:54px;height:54px;
-    background:var(--grad-g);
-    border-radius:16px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.4rem;color:white;
-    margin:0 auto .9rem;
-    box-shadow:0 6px 18px rgba(5,150,105,.3);
-}
+.done-zone{margin-top:1.4rem;background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);border:2px solid var(--green-mid);border-radius:var(--rl);padding:1.6rem 1.5rem;text-align:center;animation:up .3s ease;}
+.done-zone-icon{width:54px;height:54px;background:var(--grad-g);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:white;margin:0 auto .9rem;box-shadow:0 6px 18px rgba(5,150,105,.3);}
 .done-zone-title{font-size:1rem;font-weight:800;color:#064e3b;margin-bottom:.3rem;}
 .done-zone-sub{font-size:.8rem;color:#065f46;margin-bottom:1.2rem;line-height:1.5;}
 
@@ -656,6 +540,10 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
     .cb{padding:1.2rem;}
     .ch{padding:1.1rem 1.2rem;}
     .cf{padding:.9rem 1.2rem;}
+    .accueil-actions{grid-template-columns:1fr;}
+    .accueil-stats{grid-template-columns:1fr;}
+    .accueil-title{font-size:1.5rem;}
+    .accueil-hero{padding:2rem 1.5rem 1.8rem;}
 }
 @media(max-width:480px){
     .mgrid{grid-template-columns:1fr;}
@@ -663,6 +551,7 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
     .sl{display:none;}
     .sn{margin:0 auto;}
     .step{justify-content:center;}
+    .accueil-stats{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
@@ -722,227 +611,287 @@ body{font-family:'Inter',sans-serif;background:#f3f4f6;color:#1e293b;display:fle
     </header>
 
     <main class="main-content">
-        <div class="page-header"><h1>Saisie des notes</h1></div>
 
-        <!-- STEPPER -->
-        <div class="stepper-wrap">
-            <div class="stp">
-                <div class="step active" id="st1"><div class="sn" id="sn1">1</div><span class="sl">Contexte</span></div>
-                <div class="step" id="st2"><div class="sn" id="sn2">2</div><span class="sl">Mode</span></div>
-                <div class="step" id="st3"><div class="sn" id="sn3">3</div><span class="sl">Saisie</span></div>
-            </div>
-        </div>
+        <!-- ═══════════════════════════════════════════════════════
+             ★ SECTION ACCUEIL — affiché au chargement
+        ════════════════════════════════════════════════════════ -->
+        <div id="secAccueil">
 
-        <!-- ═══ SEC 1 : CONTEXTE ══════════════════════════════ -->
-        <div id="sec1" class="card">
-            <div class="ch">
-                <div class="ci"><i class="fas fa-search"></i></div>
-                <div><div class="ct">Sélection du contexte</div><div class="cs">Classe, matière et paramètres de l'évaluation</div></div>
-            </div>
-            <div class="cb">
-                <!-- Classe -->
-                <div class="field">
-                    <label class="flbl" for="selC">Classe</label>
-                    <div class="sw"><select class="fsel" id="selC"><option value="">— Chargement… —</option></select></div>
+            <!-- Hero -->
+            <div class="accueil-hero">
+                <div class="accueil-badge">
+                    <i class="fas fa-star"></i> Gestion des évaluations
                 </div>
-                <!-- Matière -->
-                <div class="field">
-                    <label class="flbl" for="selM">Matière</label>
-                    <div class="sw"><select class="fsel" id="selM" disabled><option value="">— Sélectionnez d'abord une classe —</option></select></div>
+                <div class="accueil-title">
+                    Que souhaitez-vous<br><span>faire aujourd'hui ?</span>
+                </div>
+                <div class="accueil-sub">
+                    Ajoutez de nouvelles notes ou consultez et vérifiez les évaluations déjà enregistrées pour vos classes.
                 </div>
 
-                <!-- ★ TYPE D'ÉVALUATION en cartes -->
-                <div class="field">
-                    <label class="flbl">Type d'évaluation</label>
-                    <div class="eval-type-grid">
-
-                        <div class="eval-type-card devoir" id="card-devoir" onclick="pickEvalType('Devoir')">
-                            <div class="eval-type-check"><i class="fas fa-check"></i></div>
-                            <div class="eval-type-card-inner">
-                                <div class="eval-type-icon"><i class="fas fa-pencil-alt"></i></div>
-                                <div class="eval-type-name">Devoir</div>
-                                <div class="eval-type-desc">Évaluation courante, en classe ou à la maison</div>
-                            </div>
+                <div class="accueil-actions">
+                    <!-- Bouton Ajouter des notes -->
+                    <button class="acc-btn acc-btn-add" onclick="lancerSaisie()">
+                        <div class="acc-btn-icon">
+                            <i class="fas fa-plus-circle"></i>
                         </div>
+                        <div class="acc-btn-title">Ajouter des notes</div>
+                        <div class="acc-btn-desc">Saisissez une nouvelle évaluation — manuellement, par import ou en déléguant au professeur.</div>
+                        <div class="acc-btn-arrow"><i class="fas fa-arrow-right"></i></div>
+                    </button>
 
-                        <div class="eval-type-card examen" id="card-examen" onclick="pickEvalType('Examen')">
-                            <div class="eval-type-check"><i class="fas fa-check"></i></div>
-                            <div class="eval-type-card-inner">
-                                <div class="eval-type-icon"><i class="fas fa-file-alt"></i></div>
-                                <div class="eval-type-name">Examen</div>
-                                <div class="eval-type-desc">Évaluation officielle, noté avec coefficient renforcé</div>
-                            </div>
+                    <!-- Bouton Vérifier les notes -->
+                    <button class="acc-btn acc-btn-check" onclick="location.href='/user-admin/devoir.html'">
+                        <div class="acc-btn-icon">
+                            <i class="fas fa-clipboard-check"></i>
                         </div>
-
-                    </div>
-                </div>
-
-                <!-- ★ DATE auto -->
-                <div class="date-field-wrap field">
-                    <label class="flbl" for="inpDate">Date</label>
-                    <input class="finp" type="date" id="inpDate">
-                    <div class="date-auto-hint" id="dateAutoHint">
-                        <i class="fas fa-magic"></i> Date du jour saisie automatiquement — modifiable
-                    </div>
-                </div>
-            </div>
-            <div class="cf">
-                <span></span>
-                <button class="btn-p" id="btnCtxNext" disabled>Continuer <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <!-- ═══ SEC 2 : MODE ══════════════════════════════════ -->
-        <div id="sec2" class="card hidden">
-            <div class="ch">
-                <div class="ci"><i class="fas fa-sliders-h"></i></div>
-                <div><div class="ct">Mode de saisie</div><div class="cs">Choisissez comment les notes seront saisies</div></div>
-            </div>
-            <div class="cb">
-                <div id="chip2" class="chip"><i class="fas fa-tag"></i><span id="c2t">—</span></div>
-                <div class="mgrid">
-                    <div class="mc" id="mc-deleg" onclick="pickMode('deleg')">
-                        <div class="mchk"><i class="fas fa-check"></i></div>
-                        <div class="mi"><i class="fas fa-paper-plane"></i></div>
-                        <div class="mn">Déléguer</div>
-                        <div class="md">Générez un lien sécurisé et envoyez-le au professeur. Il saisit les notes lui-même.</div>
-                    </div>
-                    <div class="mc" id="mc-import" onclick="pickMode('import')">
-                        <div class="mchk"><i class="fas fa-check"></i></div>
-                        <div class="mi"><i class="fas fa-file-excel"></i></div>
-                        <div class="mn">Importer</div>
-                        <div class="md">Importez un fichier Excel (.xlsx) ou CSV contenant les notes.</div>
-                    </div>
-                    <div class="mc" id="mc-manuel" onclick="pickMode('manuel')">
-                        <div class="mchk"><i class="fas fa-check"></i></div>
-                        <div class="mi"><i class="fas fa-pencil-alt"></i></div>
-                        <div class="mn">Manuel</div>
-                        <div class="md">Saisissez les notes directement ici, élève par élève.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="cf">
-                <button class="btn-s" onclick="goSec(1)"><i class="fas fa-arrow-left"></i> Précédent</button>
-                <button class="btn-p" id="btnModeNext" disabled>Continuer <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <!-- ═══ SEC 3A : DÉLÉGUER ═════════════════════════════ -->
-        <div id="sec3d" class="card hidden">
-            <div class="ch">
-                <div class="ci" style="background:#f5f3ff;color:#7c3aed"><i class="fas fa-paper-plane"></i></div>
-                <div><div class="ct">Déléguer la saisie au professeur</div><div class="cs">Un lien sécurisé usage unique sera généré</div></div>
-            </div>
-            <div class="cb">
-                <div id="chip3d" class="chip"><i class="fas fa-tag"></i><span id="c3dt">—</span></div>
-                <div class="deleg-box">
-                    <div class="dbi"><i class="fas fa-link"></i></div>
-                    <div class="dt">Générer un lien de saisie sécurisé</div>
-                    <div class="ds">
-                        Le professeur recevra un lien unique donnant accès à la liste des élèves.
-                        Il saisit les notes, valide, et les résultats sont enregistrés dans
-                        <strong>Évaluations</strong>. Le lien est ensuite <strong>définitivement désactivé</strong>.
-                    </div>
-                    <button class="btn-gl" id="btnGL"><i class="fas fa-link"></i> Générer le lien de saisie</button>
-                </div>
-
-                <!-- Zone lien généré -->
-                <div id="lrev" class="lrev hidden">
-                    <div class="llbl"><i class="fas fa-check-circle"></i> Lien prêt — envoyez-le au professeur</div>
-                    <div class="lrow">
-                        <input class="lval" id="lval" type="text" readonly>
-                        <button class="btn-cp" id="btnCP" onclick="cpLink()"><i class="fas fa-copy"></i> Copier</button>
-                    </div>
-                    <div class="lwarn"><i class="fas fa-shield-alt"></i> Usage unique — désactivé après validation du professeur.</div>
-                    <button class="btn-rg" id="btnRG"><i class="fas fa-redo"></i> Régénérer un nouveau lien</button>
-                </div>
-
-                <!-- ★ ZONE TERMINER (visible après copie) -->
-                <div id="doneZone" class="done-zone hidden">
-                    <div class="done-zone-icon"><i class="fas fa-check-double"></i></div>
-                    <div class="done-zone-title">Lien envoyé au professeur ?</div>
-                    <div class="done-zone-sub">
-                        Une fois que le professeur a reçu le lien, cliquez sur <strong>Terminer</strong>.<br>
-                        Les notes seront automatiquement enregistrées à sa validation.
-                    </div>
-                    <button class="btn-done" onclick="location.href='/user-admin/notes.html'">
-                        <i class="fas fa-check-circle"></i> Terminer
+                        <div class="acc-btn-title">Vérifier les notes</div>
+                        <div class="acc-btn-desc">Consultez, filtrez et analysez toutes les évaluations déjà enregistrées.</div>
+                        <div class="acc-btn-arrow"><i class="fas fa-arrow-right"></i></div>
                     </button>
                 </div>
+            </div>
 
+            <!-- Stats rapides -->
+            <div class="accueil-stats">
+                <div class="acc-stat-card">
+                    <div class="acc-stat-ico blue"><i class="fas fa-layer-group"></i></div>
+                    <div>
+                        <div class="acc-stat-val" id="statEvals">—</div>
+                        <div class="acc-stat-lbl">Évaluations ce mois</div>
+                    </div>
+                </div>
+                <div class="acc-stat-card">
+                    <div class="acc-stat-ico green"><i class="fas fa-users"></i></div>
+                    <div>
+                        <div class="acc-stat-val" id="statClasses">—</div>
+                        <div class="acc-stat-lbl">Classes actives</div>
+                    </div>
+                </div>
+                <div class="acc-stat-card">
+                    <div class="acc-stat-ico purple"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <div class="acc-stat-val" id="statMoy">—</div>
+                        <div class="acc-stat-lbl">Moyenne générale</div>
+                    </div>
+                </div>
             </div>
-            <div class="cf" id="cfDeleg">
-                <button class="btn-s" onclick="goSec(2)"><i class="fas fa-arrow-left"></i> Précédent</button>
-                <span id="delegWaitTxt" style="font-size:.78rem;color:var(--ink3);font-style:italic;">En attente du professeur…</span>
-            </div>
-        </div>
 
-        <!-- ═══ SEC 3B : IMPORT ═══════════════════════════════ -->
-        <div id="sec3i" class="card hidden">
-            <div class="ch">
-                <div class="ci" style="background:#f0fdf4;color:#059669"><i class="fas fa-file-import"></i></div>
-                <div><div class="ct">Importer les notes</div><div class="cs">Excel (.xlsx) ou CSV</div></div>
-            </div>
-            <div class="cb">
-                <div id="chip3i" class="chip"><i class="fas fa-tag"></i><span id="c3it">—</span></div>
-                <div class="info-note">
-                    <i class="fas fa-info-circle" style="flex-shrink:0;margin-top:.1rem;"></i>
-                    Colonnes requises : <strong>Nom</strong>, <strong>Prénom</strong>, <strong>Note</strong>.
-                    Mettez <strong>ABS</strong> dans la colonne note pour un élève absent.
-                </div>
-                <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
-                    <div class="dzi"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <div class="dzt">Glissez votre fichier ici</div>
-                    <div class="dzs">ou cliquez pour parcourir</div>
-                    <div class="fmts"><span class="fmt">Excel .xlsx</span><span class="fmt">CSV .csv</span></div>
-                </div>
-                <input type="file" id="fi" accept=".xlsx,.csv">
-                <div id="iz" class="hidden">
-                    <div class="mg">
-                        <div class="mf"><label class="mfl">Colonne Nom</label><select class="mfs" id="mNom"></select></div>
-                        <div class="mf"><label class="mfl">Colonne Prénom</label><select class="mfs" id="mPrn"></select></div>
-                        <div class="mf"><label class="mfl">Colonne Note</label><select class="mfs" id="mNote"></select></div>
-                    </div>
-                    <div class="prev-box">
-                        <div class="ph"><span class="pt" id="ptt">0 lignes</span><button class="btn-cl" onclick="clrImport()"><i class="fas fa-times"></i> Effacer</button></div>
-                        <div class="ps"><table class="ptbl" id="ptbl"><thead></thead><tbody></tbody></table></div>
-                    </div>
-                </div>
-            </div>
-            <div class="cf">
-                <button class="btn-s" onclick="goSec(2)"><i class="fas fa-arrow-left"></i> Précédent</button>
-                <button class="btn-g" id="btnSI" disabled><i class="fas fa-check-circle"></i> Enregistrer</button>
-            </div>
-        </div>
+        </div><!-- fin #secAccueil -->
 
-        <!-- ═══ SEC 3C : MANUEL ═══════════════════════════════ -->
-        <div id="sec3m" class="card hidden">
-            <div class="ch">
-                <div class="ci" style="background:#fef9c3;color:#d97706"><i class="fas fa-pencil-alt"></i></div>
-                <div><div class="ct">Saisie manuelle</div><div class="cs">Remplissez la note de chaque élève</div></div>
-            </div>
-            <div class="cb">
-                <div id="chip3m" class="chip"><i class="fas fa-tag"></i><span id="c3mt">—</span></div>
-                <div class="prog"><div class="pf" id="pf" style="width:0%"></div></div>
-                <div class="nt">
-                    <div class="nth">
-                        <span class="nthc">#</span><span class="nthc">Nom</span>
-                        <span class="nthc">Prénom</span><span class="nthc">Note /20</span><span class="nthc">Absent</span>
-                    </div>
-                    <div class="nrs" id="nrs"></div>
-                    <div class="stats">
-                        <div class="stat"><i class="fas fa-check-circle" style="color:#059669"></i><strong id="stOk">0</strong> saisies</div>
-                        <div class="stat"><i class="fas fa-user-slash" style="color:#d97706"></i><strong id="stAbs">0</strong> absents</div>
-                        <div class="stat"><i class="fas fa-clock" style="color:#cbd5e1"></i><strong id="stPend">0</strong> restantes</div>
-                        <div class="stat" style="margin-left:auto"><i class="fas fa-calculator" style="color:#2563eb"></i>Moy. <strong id="stMoy">—</strong></div>
-                    </div>
+        <!-- ═══════════════════════════════════════════════════════
+             ★ SECTION SAISIE — masquée au départ
+        ════════════════════════════════════════════════════════ -->
+        <div id="secSaisie" class="hidden">
+
+            <!-- Barre de retour -->
+            <div class="back-bar">
+                <button class="back-bar-btn" onclick="retourAccueil()">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </button>
+                <div class="back-crumb">
+                    <i class="fas fa-chevron-right" style="font-size:.65rem;color:var(--border2)"></i>
+                    <strong>Ajouter des notes</strong>
                 </div>
             </div>
-            <div class="cf">
-                <button class="btn-s" onclick="goSec(2)"><i class="fas fa-arrow-left"></i> Précédent</button>
-                <button class="btn-g" id="btnSM" disabled><i class="fas fa-check-circle"></i> Enregistrer</button>
+
+            <!-- STEPPER -->
+            <div class="stepper-wrap">
+                <div class="stp">
+                    <div class="step active" id="st1"><div class="sn" id="sn1">1</div><span class="sl">Contexte</span></div>
+                    <div class="step" id="st2"><div class="sn" id="sn2">2</div><span class="sl">Mode</span></div>
+                    <div class="step" id="st3"><div class="sn" id="sn3">3</div><span class="sl">Saisie</span></div>
+                </div>
             </div>
-        </div>
+
+            <!-- ═══ SEC 1 : CONTEXTE ══════════════════════════════ -->
+            <div id="sec1" class="card">
+                <div class="ch">
+                    <div class="ci"><i class="fas fa-search"></i></div>
+                    <div><div class="ct">Sélection du contexte</div><div class="cs">Classe, matière et paramètres de l'évaluation</div></div>
+                </div>
+                <div class="cb">
+                    <div class="field">
+                        <label class="flbl" for="selC">Classe</label>
+                        <div class="sw"><select class="fsel" id="selC"><option value="">— Chargement… —</option></select></div>
+                    </div>
+                    <div class="field">
+                        <label class="flbl" for="selM">Matière</label>
+                        <div class="sw"><select class="fsel" id="selM" disabled><option value="">— Sélectionnez d'abord une classe —</option></select></div>
+                    </div>
+                    <div class="field">
+                        <label class="flbl">Type d'évaluation</label>
+                        <div class="eval-type-grid">
+                            <div class="eval-type-card devoir" id="card-devoir" onclick="pickEvalType('Devoir')">
+                                <div class="eval-type-check"><i class="fas fa-check"></i></div>
+                                <div class="eval-type-card-inner">
+                                    <div class="eval-type-icon"><i class="fas fa-pencil-alt"></i></div>
+                                    <div class="eval-type-name">Devoir</div>
+                                    <div class="eval-type-desc">Évaluation courante, en classe ou à la maison</div>
+                                </div>
+                            </div>
+                            <div class="eval-type-card examen" id="card-examen" onclick="pickEvalType('Examen')">
+                                <div class="eval-type-check"><i class="fas fa-check"></i></div>
+                                <div class="eval-type-card-inner">
+                                    <div class="eval-type-icon"><i class="fas fa-file-alt"></i></div>
+                                    <div class="eval-type-name">Examen</div>
+                                    <div class="eval-type-desc">Évaluation officielle, noté avec coefficient renforcé</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="date-field-wrap field">
+                        <label class="flbl" for="inpDate">Date</label>
+                        <input class="finp" type="date" id="inpDate">
+                        <div class="date-auto-hint" id="dateAutoHint">
+                            <i class="fas fa-magic"></i> Date du jour saisie automatiquement — modifiable
+                        </div>
+                    </div>
+                </div>
+                <div class="cf">
+                    <span></span>
+                    <button class="btn-p" id="btnCtxNext" disabled>Continuer <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ═══ SEC 2 : MODE ══════════════════════════════════ -->
+            <div id="sec2" class="card hidden">
+                <div class="ch">
+                    <div class="ci"><i class="fas fa-sliders-h"></i></div>
+                    <div><div class="ct">Mode de saisie</div><div class="cs">Choisissez comment les notes seront saisies</div></div>
+                </div>
+                <div class="cb">
+                    <div id="chip2" class="chip"><i class="fas fa-tag"></i><span id="c2t">—</span></div>
+                    <div class="mgrid">
+                        <div class="mc" id="mc-deleg" onclick="pickMode('deleg')">
+                            <div class="mchk"><i class="fas fa-check"></i></div>
+                            <div class="mi"><i class="fas fa-paper-plane"></i></div>
+                            <div class="mn">Déléguer</div>
+                            <div class="md">Générez un lien sécurisé et envoyez-le au professeur. Il saisit les notes lui-même.</div>
+                        </div>
+                        <div class="mc" id="mc-import" onclick="pickMode('import')">
+                            <div class="mchk"><i class="fas fa-check"></i></div>
+                            <div class="mi"><i class="fas fa-file-excel"></i></div>
+                            <div class="mn">Importer</div>
+                            <div class="md">Importez un fichier Excel (.xlsx) ou CSV contenant les notes.</div>
+                        </div>
+                        <div class="mc" id="mc-manuel" onclick="pickMode('manuel')">
+                            <div class="mchk"><i class="fas fa-check"></i></div>
+                            <div class="mi"><i class="fas fa-pencil-alt"></i></div>
+                            <div class="mn">Manuel</div>
+                            <div class="md">Saisissez les notes directement ici, élève par élève.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cf">
+                    <button class="btn-s" onclick="goSec(1)"><i class="fas fa-arrow-left"></i> Précédent</button>
+                    <button class="btn-p" id="btnModeNext" disabled>Continuer <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ═══ SEC 3A : DÉLÉGUER ═════════════════════════════ -->
+            <div id="sec3d" class="card hidden">
+                <div class="ch">
+                    <div class="ci" style="background:#f5f3ff;color:#7c3aed"><i class="fas fa-paper-plane"></i></div>
+                    <div><div class="ct">Déléguer la saisie au professeur</div><div class="cs">Un lien sécurisé usage unique sera généré</div></div>
+                </div>
+                <div class="cb">
+                    <div id="chip3d" class="chip"><i class="fas fa-tag"></i><span id="c3dt">—</span></div>
+                    <div class="deleg-box">
+                        <div class="dbi"><i class="fas fa-link"></i></div>
+                        <div class="dt">Générer un lien de saisie sécurisé</div>
+                        <div class="ds">Le professeur recevra un lien unique donnant accès à la liste des élèves. Il saisit les notes, valide, et les résultats sont enregistrés dans <strong>Évaluations</strong>. Le lien est ensuite <strong>définitivement désactivé</strong>.</div>
+                        <button class="btn-gl" id="btnGL"><i class="fas fa-link"></i> Générer le lien de saisie</button>
+                    </div>
+                    <div id="lrev" class="lrev hidden">
+                        <div class="llbl"><i class="fas fa-check-circle"></i> Lien prêt — envoyez-le au professeur</div>
+                        <div class="lrow">
+                            <input class="lval" id="lval" type="text" readonly>
+                            <button class="btn-cp" id="btnCP" onclick="cpLink()"><i class="fas fa-copy"></i> Copier</button>
+                        </div>
+                        <div class="lwarn"><i class="fas fa-shield-alt"></i> Usage unique — désactivé après validation du professeur.</div>
+                        <button class="btn-rg" id="btnRG"><i class="fas fa-redo"></i> Régénérer un nouveau lien</button>
+                    </div>
+                    <div id="doneZone" class="done-zone hidden">
+                        <div class="done-zone-icon"><i class="fas fa-check-double"></i></div>
+                        <div class="done-zone-title">Lien envoyé au professeur ?</div>
+                        <div class="done-zone-sub">Une fois que le professeur a reçu le lien, cliquez sur <strong>Terminer</strong>.<br>Les notes seront automatiquement enregistrées à sa validation.</div>
+                        <button class="btn-done" onclick="location.href='/user-admin/notes.html'"><i class="fas fa-check-circle"></i> Terminer</button>
+                    </div>
+                </div>
+                <div class="cf" id="cfDeleg">
+                    <button class="btn-s" onclick="goSec(2)"><i class="fas fa-arrow-left"></i> Précédent</button>
+                    <span id="delegWaitTxt" style="font-size:.78rem;color:var(--ink3);font-style:italic;">En attente du professeur…</span>
+                </div>
+            </div>
+
+            <!-- ═══ SEC 3B : IMPORT ═══════════════════════════════ -->
+            <div id="sec3i" class="card hidden">
+                <div class="ch">
+                    <div class="ci" style="background:#f0fdf4;color:#059669"><i class="fas fa-file-import"></i></div>
+                    <div><div class="ct">Importer les notes</div><div class="cs">Excel (.xlsx) ou CSV</div></div>
+                </div>
+                <div class="cb">
+                    <div id="chip3i" class="chip"><i class="fas fa-tag"></i><span id="c3it">—</span></div>
+                    <div class="info-note">
+                        <i class="fas fa-info-circle" style="flex-shrink:0;margin-top:.1rem;"></i>
+                        Colonnes requises : <strong>Nom</strong>, <strong>Prénom</strong>, <strong>Note</strong>. Mettez <strong>ABS</strong> dans la colonne note pour un élève absent.
+                    </div>
+                    <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
+                        <div class="dzi"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="dzt">Glissez votre fichier ici</div>
+                        <div class="dzs">ou cliquez pour parcourir</div>
+                        <div class="fmts"><span class="fmt">Excel .xlsx</span><span class="fmt">CSV .csv</span></div>
+                    </div>
+                    <input type="file" id="fi" accept=".xlsx,.csv">
+                    <div id="iz" class="hidden">
+                        <div class="mg">
+                            <div class="mf"><label class="mfl">Colonne Nom</label><select class="mfs" id="mNom"></select></div>
+                            <div class="mf"><label class="mfl">Colonne Prénom</label><select class="mfs" id="mPrn"></select></div>
+                            <div class="mf"><label class="mfl">Colonne Note</label><select class="mfs" id="mNote"></select></div>
+                        </div>
+                        <div class="prev-box">
+                            <div class="ph"><span class="pt" id="ptt">0 lignes</span><button class="btn-cl" onclick="clrImport()"><i class="fas fa-times"></i> Effacer</button></div>
+                            <div class="ps"><table class="ptbl" id="ptbl"><thead></thead><tbody></tbody></table></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cf">
+                    <button class="btn-s" onclick="goSec(2)"><i class="fas fa-arrow-left"></i> Précédent</button>
+                    <button class="btn-g" id="btnSI" disabled><i class="fas fa-check-circle"></i> Enregistrer</button>
+                </div>
+            </div>
+
+            <!-- ═══ SEC 3C : MANUEL ═══════════════════════════════ -->
+            <div id="sec3m" class="card hidden">
+                <div class="ch">
+                    <div class="ci" style="background:#fef9c3;color:#d97706"><i class="fas fa-pencil-alt"></i></div>
+                    <div><div class="ct">Saisie manuelle</div><div class="cs">Remplissez la note de chaque élève</div></div>
+                </div>
+                <div class="cb">
+                    <div id="chip3m" class="chip"><i class="fas fa-tag"></i><span id="c3mt">—</span></div>
+                    <div class="prog"><div class="pf" id="pf" style="width:0%"></div></div>
+                    <div class="nt">
+                        <div class="nth">
+                            <span class="nthc">#</span><span class="nthc">Nom</span>
+                            <span class="nthc">Prénom</span><span class="nthc">Note /20</span><span class="nthc">Absent</span>
+                        </div>
+                        <div class="nrs" id="nrs"></div>
+                        <div class="stats">
+                            <div class="stat"><i class="fas fa-check-circle" style="color:#059669"></i><strong id="stOk">0</strong> saisies</div>
+                            <div class="stat"><i class="fas fa-user-slash" style="color:#d97706"></i><strong id="stAbs">0</strong> absents</div>
+                            <div class="stat"><i class="fas fa-clock" style="color:#cbd5e1"></i><strong id="stPend">0</strong> restantes</div>
+                            <div class="stat" style="margin-left:auto"><i class="fas fa-calculator" style="color:#2563eb"></i>Moy. <strong id="stMoy">—</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cf">
+                    <button class="btn-s" onclick="goSec(2)"><i class="fas fa-arrow-left"></i> Précédent</button>
+                    <button class="btn-g" id="btnSM" disabled><i class="fas fa-check-circle"></i> Enregistrer</button>
+                </div>
+            </div>
+
+        </div><!-- fin #secSaisie -->
 
         <div id="msgBar" class="msg inf hidden"><i class="fas fa-info-circle"></i><span id="msgTxt">—</span></div>
     </main>
@@ -959,11 +908,23 @@ const cfg={apiKey:"AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",authDomain:"real-edu
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
 
 let user=null,classes=[],curC=null,curM=null,eleves=[],mode=null,nst={},iData=[],iHdr=[];
-let evalType=null; // ★ 'Devoir' | 'Examen'
+let evalType=null;
 
 const $=id=>document.getElementById(id);
 function showMsg(t,tp='inf'){$('msgTxt').innerHTML=t;$('msgBar').className=`msg ${tp}`;$('msgBar').classList.remove('hidden');}
 function hideMsg(){$('msgBar').classList.add('hidden');}
+
+/* ★ NAVIGATION ACCUEIL ↔ SAISIE */
+window.lancerSaisie=function(){
+    $('secAccueil').classList.add('hidden');
+    $('secSaisie').classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+};
+window.retourAccueil=function(){
+    $('secSaisie').classList.add('hidden');
+    $('secAccueil').classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+};
 
 /* ★ DATE AUTO au chargement */
 (function setAutoDate(){
@@ -996,7 +957,7 @@ function setStepper(a){
     });
 }
 
-/* NAV */
+/* NAV STEPS */
 function goSec(n){
     ['sec1','sec2','sec3d','sec3i','sec3m'].forEach(id=>$(id).classList.add('hidden'));
     if(n===1){$('sec1').classList.remove('hidden');setStepper(1);}
@@ -1012,21 +973,42 @@ function ctxTxt(){
 }
 function updChips(){const t=ctxTxt();['c2t','c3dt','c3it','c3mt'].forEach(id=>$(id).textContent=t);}
 
-/* LOAD */
+/* LOAD CLASSES */
 async function loadClasses(){
     try{
         const snap=await getDocs(query(collection(db,'classes'),where('createdBy','==',user.uid)));
         classes=[];snap.forEach(d=>{const v=d.data();classes.push({id:d.id,nomClasse:v.nomClasse||'?',matieres:v.matieres||[]});});
         const sel=$('selC');sel.innerHTML='<option value="">— Choisissez une classe —</option>';
         classes.sort((a,b)=>a.nomClasse.localeCompare(b.nomClasse)).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.nomClasse;sel.appendChild(o);});
+        // ★ Mettre à jour la stat classes
+        $('statClasses').textContent=classes.length;
     }catch(e){console.error(e);showMsg('Erreur chargement classes.','err');}
 }
+
 async function loadEleves(cid){
     try{
         const snap=await getDocs(collection(db,'classes',cid,'eleves'));
         eleves=[];snap.forEach(d=>{const v=d.data();eleves.push({id:d.id,nom:v.nom||'',prenom:v.prenom||''});});
         eleves.sort((a,b)=>a.nom.localeCompare(b.nom)||a.prenom.localeCompare(b.prenom));
     }catch(e){console.error(e);showMsg('Erreur chargement élèves.','err');}
+}
+
+/* ★ STATS ACCUEIL */
+async function loadStats(){
+    try{
+        const now=new Date();
+        const debut=new Date(now.getFullYear(),now.getMonth(),1);
+        const snap=await getDocs(query(collection(db,'evaluations'),where('createdBy','==',user.uid)));
+        let total=0,sumMoy=0,cntMoy=0;
+        snap.forEach(d=>{
+            const v=d.data();
+            const ts=v.createdAt?.toDate?.();
+            if(ts&&ts>=debut)total++;
+            if(v.moyenneClasse){const m=parseFloat(v.moyenneClasse);if(!isNaN(m)){sumMoy+=m;cntMoy++;}}
+        });
+        $('statEvals').textContent=total;
+        $('statMoy').textContent=cntMoy>0?(sumMoy/cntMoy).toFixed(1)+'/20':'—';
+    }catch(e){console.error(e);}
 }
 
 /* SEC 1 */
@@ -1073,8 +1055,7 @@ async function doGenLink(){
             classeId:curC.id,nomClasse:curC.nomClasse,
             matiereNom:curM.nom,coefficient:curM.coefficient||1,
             professeurId:curM.professeurId||null,professeurNom:curM.professeurNom||null,
-            type:evalType,  // ★ utilise la variable evalType
-            date:dateTs,titre:buildTitre(),
+            type:evalType,date:dateTs,titre:buildTitre(),
             eleves:eleves.map((e,i)=>({id:e.id,nom:e.nom,prenom:e.prenom,index:i})),
             used:false,createdBy:user.uid,createdAt:serverTimestamp()
         });
@@ -1089,27 +1070,20 @@ async function doGenLink(){
     }
 }
 
-/* ★ COPIER + afficher zone Terminer */
 window.cpLink=async function(){
     const v=$('lval').value;
     try{await navigator.clipboard.writeText(v);}catch{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);}
     const b=$('btnCP');
-    b.className='btn-cp ok';
-    b.innerHTML='<i class="fas fa-check"></i> Copié !';
-    // ★ Afficher la zone Terminer après copie
+    b.className='btn-cp ok';b.innerHTML='<i class="fas fa-check"></i> Copié !';
     $('doneZone').classList.remove('hidden');
-    // Masquer le texte "En attente…" du footer
     $('delegWaitTxt').classList.add('hidden');
     setTimeout(()=>{b.className='btn-cp';b.innerHTML='<i class="fas fa-copy"></i> Copier';},2200);
 };
 
 $('btnGL').addEventListener('click',doGenLink);
 $('btnRG').addEventListener('click',async()=>{
-    $('lrev').classList.add('hidden');
-    $('doneZone').classList.add('hidden');
-    $('delegWaitTxt').classList.remove('hidden');
-    const b=$('btnGL');b.classList.remove('hidden');b.disabled=false;
-    b.innerHTML='<i class="fas fa-link"></i> Générer le lien de saisie';
+    $('lrev').classList.add('hidden');$('doneZone').classList.add('hidden');$('delegWaitTxt').classList.remove('hidden');
+    const b=$('btnGL');b.classList.remove('hidden');b.disabled=false;b.innerHTML='<i class="fas fa-link"></i> Générer le lien de saisie';
     hideMsg();await doGenLink();
 });
 
@@ -1123,8 +1097,7 @@ async function saveEvaluation(notesArray){
         classeId:curC.id,classeNom:curC.nomClasse,
         matiere:curM.nom,coefficient:curM.coefficient||1,
         professeurId:curM.professeurId||null,
-        type:evalType,  // ★ utilise evalType
-        date:dateTs,titre:buildTitre(),
+        type:evalType,date:dateTs,titre:buildTitre(),
         moyenneClasse:moy,createdBy:user.uid,createdAt:serverTimestamp()
     });
     const batch=writeBatch(db);
@@ -1205,11 +1178,13 @@ onAuthStateChanged(auth,async u=>{
     if(u){
         $('userName').textContent=u.email||'Utilisateur';
         $('userAvatar').textContent=(u.email?.[0]||'U').toUpperCase();
-        await loadClasses();hideMsg();
+        await loadClasses();
+        await loadStats();
+        hideMsg();
     }else{showMsg('🔐 Connectez-vous.','err');setTimeout(()=>location.href='connexion.html',800);}
 });
 
-/* SIDEBAR (identique aux autres pages) */
+/* SIDEBAR */
 const sidebar=document.getElementById('sidebar');
 const toggleBtn=document.getElementById('toggleSidebar');
 const toggleIcon=document.getElementById('toggleIcon');
@@ -1220,43 +1195,16 @@ function openMobileSidebar(){sidebar.classList.add('mobile-open');sidebarOverlay
 function closeMobileSidebar(){sidebar.classList.remove('mobile-open');sidebarOverlay.classList.remove('active');}
 
 if(toggleBtn){toggleBtn.addEventListener('click',()=>{
-    if(window.innerWidth<=768){
-        sidebar.classList.contains('mobile-open')?closeMobileSidebar():openMobileSidebar();
-    }else{
-        sidebar.classList.toggle('collapsed');
-        toggleIcon.textContent=sidebar.classList.contains('collapsed')?'chevron_right':'chevron_left';
-    }
+    if(window.innerWidth<=768){sidebar.classList.contains('mobile-open')?closeMobileSidebar():openMobileSidebar();}
+    else{sidebar.classList.toggle('collapsed');toggleIcon.textContent=sidebar.classList.contains('collapsed')?'chevron_right':'chevron_left';}
 });}
-
 if(mobileMenuBtn){mobileMenuBtn.addEventListener('click',()=>{
-    if(sidebar.classList.contains('mobile-open')){
-        closeMobileSidebar();
-    }else{
-        openMobileSidebar();
-        if(sidebar.classList.contains('collapsed')){
-            sidebar.classList.remove('collapsed');
-            toggleIcon.textContent='chevron_left';
-        }
-    }
+    if(sidebar.classList.contains('mobile-open')){closeMobileSidebar();}
+    else{openMobileSidebar();if(sidebar.classList.contains('collapsed')){sidebar.classList.remove('collapsed');toggleIcon.textContent='chevron_left';}}
 });}
-
 if(sidebarOverlay){sidebarOverlay.addEventListener('click',closeMobileSidebar);}
-
-document.addEventListener('click',e=>{
-    if(window.innerWidth<=768){
-        if(!sidebar.contains(e.target)&&mobileMenuBtn&&!mobileMenuBtn.contains(e.target))closeMobileSidebar();
-    }
-});
-
-function handleResize(){
-    if(window.innerWidth<=768){
-        sidebar.classList.remove('collapsed');
-        toggleIcon.textContent='chevron_left';
-        closeMobileSidebar();
-    }else{
-        closeMobileSidebar();
-    }
-}
+document.addEventListener('click',e=>{if(window.innerWidth<=768){if(!sidebar.contains(e.target)&&mobileMenuBtn&&!mobileMenuBtn.contains(e.target))closeMobileSidebar();}});
+function handleResize(){if(window.innerWidth<=768){sidebar.classList.remove('collapsed');toggleIcon.textContent='chevron_left';closeMobileSidebar();}else{closeMobileSidebar();}}
 window.addEventListener('resize',handleResize);
 handleResize();
 </script>
