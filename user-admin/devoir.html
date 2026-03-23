@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/icon-192x192.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devoirs · Edusen</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Inter',sans-serif;
+  background:#f3f4f6;
+  color:#1e293b;
+  min-height:100vh;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NOUVEAU HEADER AVEC BOUTON RETOUR (remplace l'ancien sidebar)
+   ───────────────────────────────────────────────────────────── */
+.top-nav {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 24px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.btn-back-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  color: #1e293b;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  border-radius: 40px;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+  font-family: 'Inter', sans-serif;
+}
+.btn-back-nav i {
+  font-size: 0.9rem;
+}
+.btn-back-nav:hover {
+  background: #eef2ff;
+  border-color: #cbd5e1;
+  color: #2563eb;
+  transform: translateX(-2px);
+}
+.page-title-nav h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.3px;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 5px 12px 5px 8px;
+  border-radius: 40px;
+  border: 1px solid #e2e8f0;
+}
+.user-avatar-mini {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: white;
+}
+.user-name-mini {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+.logout-mini {
+  color: #64748b;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 30px;
+  transition: all 0.2s;
+}
+.logout-mini:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PAGE CONTENU PRINCIPAL (plus de margin-left, full width)
+   ───────────────────────────────────────────────────────────── */
+.main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 32px 48px;
+  width: 100%;
+}
+
+/* ══ TOKENS & GLOBAL ═════════════════════════════════════════ */
+:root{
+  --blue:#2563eb;--blue-l:#3b82f6;--blue-soft:#eff6ff;--blue-mid:#dbeafe;
+  --purple:#7c3aed;--green:#059669;--green-soft:#f0fdf4;--green-mid:#bbf7d0;
+  --amber:#d97706;--amber-soft:#fffbeb;--amber-mid:#fde68a;
+  --red:#dc2626;--red-soft:#fef2f2;
+  --surface:#f3f4f6;--white:#fff;--ink:#0f172a;--ink2:#334155;--ink3:#64748b;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --grad:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
+  --r:12px;--rl:16px;--t:all .2s ease;
+}
+.hidden{display:none!important;}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ CLASS TABS ══════════════════════════════════════════════ */
+.tabs-wrap{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:var(--rl);
+  padding:6px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-bottom: 24px;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+}
+.tab-btn{
+  padding:9px 20px;
+  border-radius:10px;
+  border:none;
+  background:transparent;
+  font-family:'Inter',sans-serif;
+  font-size:.84rem;
+  font-weight:600;
+  color:var(--ink3);
+  cursor:pointer;
+  transition:var(--t);
+  white-space:nowrap;
+}
+.tab-btn:hover:not(.active){
+  background:var(--surface);
+  color:var(--ink);
+}
+.tab-btn.active{
+  background:var(--grad);
+  color:white;
+  box-shadow:0 4px 12px rgba(37,99,235,.3);
+}
+
+/* ══ SUMMARY BAR ═════════════════════════════════════════════ */
+.summary-bar{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom: 24px;
+}
+.stat-pill{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:40px;
+  padding:8px 18px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.8rem;
+  font-weight:500;
+  color:var(--ink3);
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+.stat-pill strong{
+  font-weight:700;
+  color:var(--ink);
+}
+.stat-pill .pill-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+}
+
+/* ══ SUBJECTS GRID ═══════════════════════════════════════════ */
+.subjects-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:20px;
+}
+.subject-card{
+  background:white;
+  border-radius:var(--rl);
+  border:1.5px solid var(--border);
+  padding:20px 22px 18px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+  transition:var(--t);
+  animation:up .25s ease;
+  position:relative;
+  overflow:hidden;
+}
+.subject-card::after{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  width:3px;
+  height:100%;
+  background:var(--grad);
+}
+.subject-card:hover{
+  box-shadow:0 8px 28px rgba(37,99,235,.12);
+  transform:translateY(-2px);
+  border-color:#bcd5f8;
+}
+.sc-name{
+  font-size:.98rem;
+  font-weight:700;
+  color:var(--ink);
+  margin-bottom:3px;
+}
+.sc-prof{
+  font-size:.76rem;
+  color:var(--ink3);
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.sc-badges{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.badge{
+  padding:5px 11px;
+  border-radius:8px;
+  font-size:.73rem;
+  font-weight:700;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+.badge.dev{
+  background:#eff6ff;
+  color:#1d4ed8;
+  border:1px solid #bfdbfe;
+}
+.badge.exam{
+  background:#fdf4ff;
+  color:#7c3aed;
+  border:1px solid #e9d5ff;
+}
+.badge.none{
+  background:var(--surface);
+  color:var(--ink3);
+  border:1px solid var(--border);
+}
+.btn-voir{
+  width:100%;
+  padding:10px 16px;
+  border-radius:10px;
+  background:var(--grad);
+  color:white;
+  border:none;
+  font-family:'Inter',sans-serif;
+  font-size:.84rem;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  transition:var(--t);
+  box-shadow:0 3px 10px rgba(37,99,235,.25);
+}
+.btn-voir:hover:not(:disabled){
+  box-shadow:0 6px 18px rgba(37,99,235,.38);
+  transform:translateY(-1px);
+}
+.btn-voir:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+  background:#94a3b8;
+}
+
+/* ══ DETAIL VIEW ═════════════════════════════════════════════ */
+.detail-header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom: 20px;
+}
+.btn-back{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:10px 18px;
+  border-radius:10px;
+  background:white;
+  border:1.5px solid var(--border);
+  color:var(--ink2);
+  font-family:'Inter',sans-serif;
+  font-size:.85rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:var(--t);
+}
+.btn-back:hover{
+  border-color:var(--blue-l);
+  color:var(--blue);
+  background:var(--blue-soft);
+}
+.detail-title{
+  font-size:1.25rem;
+  font-weight:700;
+  color:var(--ink);
+}
+.detail-sub{
+  font-size:.78rem;
+  color:var(--ink3);
+  margin-top:2px;
+}
+
+/* ══ TABLE CARD ══════════════════════════════════════════════ */
+.table-card{
+  background:white;
+  border-radius:var(--rl);
+  border:1.5px solid var(--border);
+  box-shadow:0 4px 16px rgba(0,0,0,.06);
+  overflow:hidden;
+  animation:up .25s ease;
+}
+.table-card-head{
+  padding:16px 22px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.tch-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.tch-icon{
+  width:36px;
+  height:36px;
+  background:var(--blue-soft);
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--blue);
+  font-size:.95rem;
+}
+.tch-title{
+  font-size:.95rem;
+  font-weight:700;
+  color:var(--ink);
+}
+.tch-sub{
+  font-size:.75rem;
+  color:var(--ink3);
+}
+.stats-mini{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.sm-item{
+  font-size:.78rem;
+  color:var(--ink3);
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.sm-item strong{
+  color:var(--ink);
+  font-weight:700;
+}
+
+/* ══ TABLE ═══════════════════════════════════════════════════ */
+.table-scroll{
+  overflow-x:auto;
+}
+table.dt{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.84rem;
+}
+.dt thead tr{
+  background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+}
+.dt thead th{
+  padding:13px 16px;
+  text-align:left;
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.65);
+  white-space:nowrap;
+}
+.dt thead th.col-num{
+  width:40px;
+}
+.dt thead th.col-eval{
+  color:#93c5fd;
+  border-left:1px solid rgba(255,255,255,.12);
+}
+.dt thead th.col-exam{
+  color:#c4b5fd;
+  border-left:1px solid rgba(255,255,255,.12);
+}
+.dt tbody tr{
+  border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.dt tbody tr:last-child{
+  border-bottom:none;
+}
+.dt tbody tr:hover{
+  background:#f8faff;
+}
+.dt tbody td{
+  padding:11px 16px;
+  vertical-align:middle;
+}
+.dt tbody td.col-nom{
+  font-weight:700;
+  color:var(--ink);
+}
+.dt tbody td.col-prenom{
+  color:var(--ink3);
+}
+.dt tbody td.col-eval{
+  border-left:1px solid var(--border);
+}
+.dt tbody td.col-exam{
+  border-left:1px solid var(--border);
+}
+.cell-num{
+  width:28px;
+  height:28px;
+  background:var(--blue-mid);
+  color:var(--blue);
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.73rem;
+  font-weight:700;
+}
+.note-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:52px;
+  padding:5px 10px;
+  border-radius:8px;
+  font-weight:700;
+  font-size:.82rem;
+}
+.note-chip.high{
+  background:#dcfce7;
+  color:#15803d;
+}
+.note-chip.mid{
+  background:#fef9c3;
+  color:#854d0e;
+}
+.note-chip.low{
+  background:#fee2e2;
+  color:#991b1b;
+}
+.note-chip.abs{
+  background:var(--amber-soft);
+  color:var(--amber);
+  font-size:.72rem;
+}
+.note-chip.empty{
+  background:var(--surface);
+  color:#94a3b8;
+  font-weight:400;
+  font-size:.76rem;
+}
+.loader-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:70px 20px;
+  gap:14px;
+}
+.spinner{
+  width:34px;
+  height:34px;
+  border:3px solid var(--border);
+  border-top-color:var(--blue);
+  border-radius:50%;
+  animation:spin .65s linear infinite;
+}
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+.loader-txt{
+  font-size:.88rem;
+  color:var(--ink3);
+}
+.empty-state{
+  text-align:center;
+  padding:60px 20px;
+}
+.empty-icon{
+  font-size:2.8rem;
+  margin-bottom:12px;
+  opacity:.35;
+}
+.empty-title{
+  font-size:.95rem;
+  font-weight:600;
+  color:var(--ink2);
+  margin-bottom:4px;
+}
+.empty-sub{
+  font-size:.8rem;
+  color:var(--ink3);
+}
+.msg{
+  padding:1rem 1.4rem;
+  border-radius:var(--r);
+  font-size:.86rem;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  border:1px solid var(--border);
+  background:#fff;
+  margin-bottom: 20px;
+}
+.msg.ok{
+  background:var(--green-soft);
+  border-color:var(--green-mid);
+  color:#14532d;
+}
+.msg.err{
+  background:var(--red-soft);
+  border-color:#fecaca;
+  color:#991b1b;
+}
+.msg.inf{
+  background:var(--blue-soft);
+  border-color:var(--blue-mid);
+  color:#1e3a8a;
+}
+
+/* ══ RESPONSIVE ═════════════════════════════════════════════ */
+@media(max-width:768px){
+  .main-container{
+    padding:16px 16px 32px;
+  }
+  .top-nav{
+    padding:0 16px;
+    height: 60px;
+  }
+  .page-title-nav h1{
+    font-size: 1.2rem;
+  }
+  .btn-back-nav{
+    padding: 5px 12px;
+    font-size: 0.8rem;
+  }
+  .user-name-mini{
+    display: none;
+  }
+  .user-badge{
+    padding: 4px 6px;
+  }
+  .subjects-grid{
+    grid-template-columns:1fr;
+  }
+  .dt thead th:nth-child(3),
+  .dt tbody td:nth-child(3){
+    display:none;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- NOUVEAU HEADER AVEC BOUTON RETOUR VERS NOTES.HTML -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="./notes.html" class="btn-back-nav">
+      <i class="fas fa-arrow-left"></i> Retour aux notes
+    </a>
+    <div class="page-title-nav">
+      <h1>Devoirs & Évaluations</h1>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="user-badge" id="userBadge">
+      <div class="user-avatar-mini" id="navUserAvatar">E</div>
+      <span class="user-name-mini" id="navUserName">Chargement...</span>
+    </div>
+    <a href="connexion.html" class="logout-mini" title="Déconnexion">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</nav>
+
+<main class="main-container">
+  <!-- Zone message -->
+  <div id="msgBar" class="msg inf hidden">
+    <i class="fas fa-info-circle"></i><span id="msgTxt"></span>
+  </div>
+
+  <!-- Class tabs -->
+  <div id="tabsWrap" class="tabs-wrap">
+    <div class="loader-wrap" style="padding:12px 20px;flex-direction:row;gap:10px;">
+      <div class="spinner" style="width:20px;height:20px;border-width:2px;"></div>
+      <span style="font-size:.82rem;color:var(--ink3);">Chargement des classes…</span>
+    </div>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="viewList">
+    <div class="loader-wrap" id="listLoader">
+      <div class="spinner"></div>
+      <span class="loader-txt">Chargement des matières…</span>
+    </div>
+    <div id="summaryBar" class="summary-bar hidden"></div>
+    <div id="subjectsGrid" class="subjects-grid hidden"></div>
+    <div id="listEmpty" class="empty-state hidden">
+      <div class="empty-icon">📭</div>
+      <div class="empty-title">Aucune matière trouvée</div>
+      <div class="empty-sub">Cette classe n'a pas encore de matières enregistrées.</div>
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="viewDetail" class="hidden">
+    <div class="detail-header">
+      <button class="btn-back" id="btnBack"><i class="fas fa-arrow-left"></i> Retour</button>
+      <div class="detail-title-wrap">
+        <div class="detail-title" id="detailTitle">—</div>
+        <div class="detail-sub" id="detailSub">—</div>
+      </div>
+    </div>
+
+    <div id="detailLoader" class="loader-wrap">
+      <div class="spinner"></div>
+      <span class="loader-txt">Chargement des notes…</span>
+    </div>
+
+    <div id="tableCard" class="table-card hidden">
+      <div class="table-card-head">
+        <div class="tch-left">
+          <div class="tch-icon"><i class="fas fa-table"></i></div>
+          <div>
+            <div class="tch-title" id="tcTitle">—</div>
+            <div class="tch-sub" id="tcSub">—</div>
+          </div>
+        </div>
+        <div class="stats-mini" id="statsMini"></div>
+      </div>
+      <div class="table-scroll">
+        <table class="dt" id="mainTable">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="detailEmpty" class="table-card hidden">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">Aucune évaluation pour cette matière</div>
+        <div class="empty-sub">Les notes apparaîtront ici une fois saisies depuis la page Notes.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="importmap">
+  {"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js","firebase/auth":"https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js","firebase/firestore":"https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"}}
+</script>
+<script type="module">
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
+
+// Firebase config
+const cfg = {
+  apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+  authDomain: "real-educsen.firebaseapp.com",
+  projectId: "real-educsen",
+  storageBucket: "real-educsen.firebasestorage.app",
+  messagingSenderId: "80660233362",
+  appId: "1:80660233362:web:5edf5060254170056eba4b"
+};
+const app = initializeApp(cfg);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// State
+let user = null;
+let classes = [];
+let curClasse = null;
+let cache = {};
+
+// DOM helpers
+const $ = id => document.getElementById(id);
+function showMsg(t, tp = 'inf') {
+  const msgDiv = $('msgBar');
+  $('msgTxt').textContent = t;
+  msgDiv.className = `msg ${tp}`;
+  msgDiv.classList.remove('hidden');
+}
+function hideMsg() { $('msgBar').classList.add('hidden'); }
+function show(id) { $(id).classList.remove('hidden'); }
+function hide(id) { $(id).classList.add('hidden'); }
+
+// Auth & load classes
+onAuthStateChanged(auth, async u => {
+  user = u;
+  if (u) {
+    const displayName = u.email || 'Utilisateur';
+    const initial = (u.email?.[0] || 'U').toUpperCase();
+    $('navUserName').textContent = displayName.split('@')[0];
+    $('navUserAvatar').textContent = initial;
+    await loadClasses();
+  } else {
+    showMsg('🔐 Veuillez vous connecter.', 'err');
+    setTimeout(() => location.href = 'connexion.html', 800);
+  }
+});
+
+// Load classes (filtered by createdBy)
+async function loadClasses() {
+  try {
+    const q = query(collection(db, 'classes'), where('createdBy', '==', user.uid));
+    const snap = await getDocs(q);
+    classes = [];
+    snap.forEach(doc => {
+      const data = doc.data();
+      classes.push({
+        id: doc.id,
+        nomClasse: data.nomClasse || 'Sans nom',
+        matieres: data.matieres || [],
+        nombreEleves: data.nombreEleves || 0
+      });
+    });
+    classes.sort((a, b) => a.nomClasse.localeCompare(b.nomClasse));
+    renderTabs();
+    if (classes.length > 0) selectClasse(classes[0]);
+    else {
+      $('tabsWrap').innerHTML = '<span style="padding:12px 20px;font-size:.83rem;color:var(--ink3);">Aucune classe trouvée.</span>';
+      hide('listLoader');
+    }
+  } catch (e) {
+    console.error(e);
+    showMsg('Erreur chargement des classes.', 'err');
+    hide('listLoader');
+  }
+}
+
+function renderTabs() {
+  const wrap = $('tabsWrap');
+  wrap.innerHTML = '';
+  classes.forEach(cl => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (cl.id === curClasse?.id ? ' active' : '');
+    btn.textContent = cl.nomClasse;
+    btn.onclick = () => selectClasse(cl);
+    wrap.appendChild(btn);
+  });
+}
+
+async function selectClasse(cl) {
+  if (curClasse?.id === cl.id) return;
+  curClasse = cl;
+
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === cl.nomClasse);
+  });
+
+  backToList(false);
+
+  show('listLoader');
+  hide('summaryBar');
+  hide('subjectsGrid');
+  hide('listEmpty');
+  hideMsg();
+
+  if (cache[cl.id]) {
+    renderList(cl, cache[cl.id]);
+    return;
+  }
+
+  try {
+    const [elevesSnap, evalsSnap] = await Promise.all([
+      getDocs(collection(db, 'classes', cl.id, 'eleves')),
+      getDocs(query(collection(db, 'evaluations'), where('classeId', '==', cl.id)))
+    ]);
+
+    const eleves = [];
+    elevesSnap.forEach(d => {
+      const v = d.data();
+      eleves.push({ id: d.id, nom: v.nom || '', prenom: v.prenom || '' });
+    });
+    eleves.sort((a, b) => a.nom.localeCompare(b.nom) || a.prenom.localeCompare(b.prenom));
+
+    const evalsByMatiere = {};
+    evalsSnap.forEach(d => {
+      const v = d.data();
+      const mat = v.matiere;
+      if (!mat) return;
+      if (!evalsByMatiere[mat]) evalsByMatiere[mat] = [];
+      evalsByMatiere[mat].push({ id: d.id, ...v });
+    });
+
+    Object.values(evalsByMatiere).forEach(arr => {
+      arr.sort((a, b) => (a.date?.toDate?.() || 0) - (b.date?.toDate?.() || 0));
+    });
+
+    cache[cl.id] = { eleves, evalsByMatiere };
+    renderList(cl, cache[cl.id]);
+  } catch (e) {
+    console.error(e);
+    showMsg('Erreur chargement des données.', 'err');
+    hide('listLoader');
+  }
+}
+
+function renderList(cl, { eleves, evalsByMatiere }) {
+  hide('listLoader');
+  const matieres = cl.matieres || [];
+  if (!matieres.length) { show('listEmpty'); return; }
+
+  const totalDevoirs = Object.values(evalsByMatiere).reduce((s, arr) => s + arr.filter(e => e.type === 'Devoir').length, 0);
+  const totalExamens = Object.values(evalsByMatiere).reduce((s, arr) => s + arr.filter(e => e.type === 'Examen').length, 0);
+  const sb = $('summaryBar');
+  sb.innerHTML = `
+    <div class="stat-pill"><div class="pill-dot" style="background:#3b82f6"></div><strong>${eleves.length}</strong> élèves</div>
+    <div class="stat-pill"><div class="pill-dot" style="background:#e2e8f0"></div><strong>${matieres.length}</strong> matières</div>
+    <div class="stat-pill"><div class="pill-dot" style="background:#2563eb"></div><strong>${totalDevoirs}</strong> devoir${totalDevoirs !== 1 ? 's' : ''}</div>
+    <div class="stat-pill"><div class="pill-dot" style="background:#7c3aed"></div><strong>${totalExamens}</strong> examen${totalExamens !== 1 ? 's' : ''}</div>
+  `;
+  show('summaryBar');
+
+  const grid = $('subjectsGrid');
+  grid.innerHTML = '';
+  matieres.forEach(mat => {
+    const evals = evalsByMatiere[mat.nom] || [];
+    const nDev = evals.filter(e => e.type === 'Devoir').length;
+    const nExam = evals.filter(e => e.type === 'Examen').length;
+    const hasData = evals.length > 0;
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    card.innerHTML = `
+      <div class="sc-name">${escapeHtml(mat.nom)}</div>
+      <div class="sc-prof"><i class="fas fa-chalkboard-teacher" style="opacity:.5"></i>${escapeHtml(mat.professeurNom || '—')}</div>
+      <div class="sc-badges">
+        ${nDev > 0 ? `<span class="badge dev"><i class="fas fa-pencil-alt"></i>${nDev} devoir${nDev > 1 ? 's' : ''}</span>` : ''}
+        ${nExam > 0 ? `<span class="badge exam"><i class="fas fa-file-alt"></i>${nExam} examen${nExam > 1 ? 's' : ''}</span>` : ''}
+        ${!hasData ? `<span class="badge none"><i class="fas fa-minus"></i>Aucune note</span>` : ''}
+      </div>
+      <button class="btn-voir" ${!hasData ? 'disabled' : ''}><i class="fas fa-eye"></i> Voir les notes</button>
+    `;
+    if (hasData) {
+      card.querySelector('.btn-voir').onclick = () => openDetail(mat, evals, eleves);
+    }
+    grid.appendChild(card);
+  });
+  show('subjectsGrid');
+}
+
+async function openDetail(mat, evals, eleves) {
+  hide('viewList');
+  show('viewDetail');
+  $('detailTitle').textContent = mat.nom;
+  $('detailSub').textContent = `${curClasse.nomClasse} · ${mat.professeurNom || '—'}`;
+  show('detailLoader');
+  hide('tableCard');
+  hide('detailEmpty');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  try {
+    const notesByEval = {};
+    await Promise.all(evals.map(async ev => {
+      const notesSnap = await getDocs(collection(db, 'evaluations', ev.id, 'notes'));
+      const map = {};
+      notesSnap.forEach(nd => {
+        const v = nd.data();
+        if (v.eleveId) map[v.eleveId] = { note: v.note ?? null, absent: v.absent || false };
+      });
+      notesByEval[ev.id] = map;
+    }));
+    hide('detailLoader');
+    renderTable(mat, evals, eleves, notesByEval);
+  } catch (e) {
+    console.error(e);
+    hide('detailLoader');
+    showMsg('Erreur chargement des notes.', 'err');
+  }
+}
+
+function renderTable(mat, evals, eleves, notesByEval) {
+  if (!evals.length) { show('detailEmpty'); return; }
+  const devoirs = evals.filter(e => e.type === 'Devoir');
+  const examens = evals.filter(e => e.type === 'Examen');
+
+  $('tcTitle').textContent = mat.nom;
+  $('tcSub').textContent = `${eleves.length} élève${eleves.length > 1 ? 's' : ''} · ${devoirs.length} devoir${devoirs.length !== 1 ? 's' : ''} · ${examens.length} examen${examens.length !== 1 ? 's' : ''}`;
+
+  const sm = $('statsMini');
+  sm.innerHTML = '';
+  evals.forEach((ev, idx) => {
+    const nbLabel = ev.type === 'Devoir' ? (devoirs.indexOf(ev) + 1) : (examens.indexOf(ev) + 1);
+    const label = `${ev.type} ${nbLabel}`;
+    const map = notesByEval[ev.id] || {};
+    const vals = Object.values(map).filter(n => !n.absent && n.note !== null).map(n => Number(n.note));
+    const moy = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : '—';
+    const div = document.createElement('div');
+    div.className = 'sm-item';
+    div.innerHTML = `<span>${label}</span><strong>${moy !== '—' ? moy + '/20' : '—'}</strong>`;
+    sm.appendChild(div);
+  });
+
+  const thead = $('tableHead');
+  thead.innerHTML = '';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<th class="col-num">#</th><th>Nom</th><th>Prénom</th>`;
+  devoirs.forEach((ev, i) => {
+    const th = document.createElement('th');
+    th.className = 'col-eval';
+    th.textContent = `Devoir ${i + 1}`;
+    th.title = ev.titre || '';
+    tr.appendChild(th);
+  });
+  examens.forEach((ev, i) => {
+    const th = document.createElement('th');
+    th.className = 'col-exam';
+    th.textContent = `Examen ${i + 1}`;
+    th.title = ev.titre || '';
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+
+  const tbody = $('tableBody');
+  tbody.innerHTML = '';
+  eleves.forEach((el, idx) => {
+    const row = document.createElement('tr');
+    let cells = `<td><div class="cell-num">${idx + 1}</div></td><td class="col-nom">${escapeHtml(el.nom || '—')}</td><td class="col-prenom">${escapeHtml(el.prenom || '—')}</td>`;
+    devoirs.forEach(ev => {
+      const entry = (notesByEval[ev.id] || {})[el.id];
+      cells += `<td class="col-eval">${noteChip(entry)}</td>`;
+    });
+    examens.forEach(ev => {
+      const entry = (notesByEval[ev.id] || {})[el.id];
+      cells += `<td class="col-exam">${noteChip(entry)}</td>`;
+    });
+    row.innerHTML = cells;
+    tbody.appendChild(row);
+  });
+  show('tableCard');
+}
+
+function noteChip(entry) {
+  if (!entry) return `<span class="note-chip empty">—</span>`;
+  if (entry.absent) return `<span class="note-chip abs">ABS</span>`;
+  if (entry.note === null || entry.note === undefined) return `<span class="note-chip empty">—</span>`;
+  const n = Number(entry.note);
+  const cls = n >= 14 ? 'high' : n >= 10 ? 'mid' : 'low';
+  return `<span class="note-chip ${cls}">${n}/20</span>`;
+}
+
+function backToList(scroll = true) {
+  hide('viewDetail');
+  show('viewList');
+  if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$('btnBack').onclick = () => backToList();
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+</script>
+</body>
+</html>
