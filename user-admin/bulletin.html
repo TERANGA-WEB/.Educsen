@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -43,7 +44,7 @@
     }
     .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-    /* ====== SIDEBAR — identique dashboard ====== */
+    /* ====== SIDEBAR ====== */
     .sidebar {
       width: 280px;
       background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -158,7 +159,7 @@
 
     .main-content { padding: 30px; width: 100%; }
 
-    /* ====== STYLES PAGE (conservés) ====== */
+    /* ====== STYLES PAGE ====== */
     .page-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 28px; background: white; padding: 25px 30px;
@@ -275,7 +276,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Styles bulletin (inchangés) */
+    /* ====== Styles bulletin ====== */
     .bulletin { width: 794px; height: 1122px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1; box-shadow: 0 8px 40px rgba(0,0,0,0.12); padding: 24px 40px 50px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; position: relative; }
     .watermark { position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%) rotate(-35deg); font-size: 90px; font-weight: 900; color: rgba(0,0,0,0.025); white-space: nowrap; pointer-events: none; z-index: 0; }
     .bul-content { position: relative; z-index: 1; }
@@ -435,7 +436,7 @@
     </button>
   </header>
 
-  <!-- MAIN CONTENT (inchangé) -->
+  <!-- MAIN CONTENT -->
   <main class="main-content" id="mainContent">
 
     <div class="page-header">
@@ -507,7 +508,7 @@
 </div>
 
 <script>
-// ====== SIDEBAR JS — identique dashboard ======
+// ====== SIDEBAR JS ======
 (function() {
   const sidebar        = document.getElementById('sidebar');
   const toggleBtn      = document.getElementById('toggleSidebar');
@@ -549,7 +550,7 @@
   });
 })();
 
-// ====== AUTH — mise à jour infos user sidebar ======
+// ====== AUTH ======
 document.addEventListener('DOMContentLoaded', () => {
   firebase.auth().onAuthStateChanged((user) => {
     if (!user) { window.location.href = '/connexion.html'; return; }
@@ -559,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ====== CODE BULLETINS (inchangé) ======
+// ====== FIREBASE ======
 const firebaseConfig = {
   apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
   authDomain:        "real-educsen.firebaseapp.com",
@@ -571,6 +572,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.firestore();
 
+// ====== LOGS ======
 const logZone = document.getElementById('log-zone');
 function log(msg, type='ok') {
   logZone.style.display = 'block';
@@ -581,6 +583,7 @@ function log(msg, type='ok') {
   logZone.scrollTop = logZone.scrollHeight;
 }
 
+// ====== HELPERS ======
 function getAppr(moy) {
   if (moy===null||moy===undefined||isNaN(moy)) return {label:'—'};
   if (moy>=16) return {label:'Très Bien'};
@@ -595,6 +598,7 @@ function fmt(v, d=2) {
   return parseFloat(v).toFixed(d);
 }
 
+// ====== RECHERCHE CLASSE PAR NOM ======
 let _classeIdResolu = null;
 let _debounceTimer  = null;
 
@@ -656,24 +660,25 @@ async function onClasseInput() {
   }, 600);
 }
 
+// ====== FETCH DONNÉES ======
 async function fetchEleves(classeId) {
   log('Chargement élèves…', 'info');
   try {
     const s = await db.collection('classes').doc(classeId).collection('eleves').get();
     if (s.empty) { log('Aucun élève', 'warn'); return []; }
-    log(`${s.size} élève(s)`);
+    log(`${s.size} élève(s) trouvé(s)`);
     return s.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { log(`${e.message}`, 'error'); return []; }
+  } catch(e) { log(`Erreur élèves : ${e.message}`, 'error'); return []; }
 }
 
 async function fetchEvals(classeId) {
   log('Chargement évaluations…', 'info');
   try {
     const s = await db.collection('evaluations').where('classeId', '==', classeId).get();
-    if (s.empty) { log('Aucune évaluation', 'warn'); return []; }
-    log(`${s.size} évaluation(s)`);
+    if (s.empty) { log('Aucune évaluation trouvée', 'warn'); return []; }
+    log(`${s.size} évaluation(s) trouvée(s)`);
     return s.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { log(`${e.message}`, 'error'); return []; }
+  } catch(e) { log(`Erreur évaluations : ${e.message}`, 'error'); return []; }
 }
 
 async function fetchNotes(evalId) {
@@ -683,48 +688,94 @@ async function fetchNotes(evalId) {
   } catch { return []; }
 }
 
-function calculer(eleves, evals, notesMap) {
-  log('Calcul des moyennes…', 'info');
+// ====== CALCUL DES MOYENNES ======
+// ⚠️ CORRECTION : les coefficients sont lus depuis classes.matieres en PRIORITÉ
+// Si une matière n'est pas dans classes.matieres, on tombe en fallback sur l'évaluation elle-même
+function calculer(eleves, evals, notesMap, coeffMap = {}) {
+  log('Calcul des moyennes avec coefficients officiels…', 'info');
+
+  // Afficher la map des coefficients utilisée
+  const coeffEntries = Object.entries(coeffMap);
+  if (coeffEntries.length > 0) {
+    log(`Coefficients chargés depuis classes.matieres : ${coeffEntries.map(([k,v]) => `${k}(${v})`).join(', ')}`, 'info');
+  } else {
+    log('Aucun coefficient trouvé dans classes.matieres → fallback sur les évaluations', 'warn');
+  }
+
   const resultats = eleves.map(eleve => {
     const matieres = {};
+
     evals.forEach(ev => {
-      const mat   = ev.matiere || 'Inconnue';
-      const type  = (ev.type || '').toLowerCase();
-      const coeff = parseFloat(ev.coefficients || ev.coefficient) || 1;
+      const mat  = ev.matiere || 'Inconnue';
+      const type = (ev.type || '').toLowerCase();
+
+      // ✅ CORRECTION PRINCIPALE :
+      // 1) Cherche le coeff dans classes.matieres (coeffMap) — source officielle
+      // 2) Sinon, fallback sur le champ de l'évaluation
+      // 3) Sinon, 1 par défaut
+      const coeffDepuisClasse = coeffMap[mat];
+      const coeffDepuisEval   = parseFloat(ev.coefficients || ev.coefficient);
+      const coeff = (coeffDepuisClasse !== undefined)
+        ? coeffDepuisClasse
+        : (!isNaN(coeffDepuisEval) ? coeffDepuisEval : 1);
+
       const notes = notesMap[ev.id] || [];
       const no    = notes.find(n => n.eleveId === eleve.id || n.eleveId === eleve.matricule);
-      if (!matieres[mat]) matieres[mat] = { coeff, D:[], C:[] };
-      else matieres[mat].coeff = coeff;
+
+      if (!matieres[mat]) {
+        matieres[mat] = { coeff, D: [], C: [] };
+      } else {
+        // Si la matière existe déjà, on s'assure que le coeff est celui de classes.matieres
+        if (coeffDepuisClasse !== undefined) {
+          matieres[mat].coeff = coeffDepuisClasse;
+        }
+      }
+
       if (no?.note !== undefined) {
         const v = parseFloat(no.note);
         if (!isNaN(v)) {
-          if (type.includes('devoir') || type === 'd') matieres[mat].D.push(v);
-          else matieres[mat].C.push(v);
+          if (type.includes('devoir') || type === 'd') {
+            matieres[mat].D.push(v);
+          } else {
+            matieres[mat].C.push(v);
+          }
         }
       }
     });
+
+    // Calcul moyenne par matière
     let tc = 0, tp = 0;
     Object.values(matieres).forEach(m => {
-      m.moyD = m.D.length ? m.D.reduce((a,b)=>a+b,0)/m.D.length : null;
-      m.moyC = m.C.length ? m.C.reduce((a,b)=>a+b,0)/m.C.length : null;
-      if      (m.moyD!==null && m.moyC!==null) m.moy = (m.moyD + 2*m.moyC)/3;
-      else if (m.moyD!==null)                  m.moy = m.moyD;
-      else if (m.moyC!==null)                  m.moy = m.moyC;
-      else                                     m.moy = null;
+      m.moyD = m.D.length ? m.D.reduce((a,b) => a+b, 0) / m.D.length : null;
+      m.moyC = m.C.length ? m.C.reduce((a,b) => a+b, 0) / m.C.length : null;
+
+      // Formule : (moy_devoirs + 2×moy_compos) / 3
+      if      (m.moyD !== null && m.moyC !== null) m.moy = (m.moyD + 2 * m.moyC) / 3;
+      else if (m.moyD !== null)                    m.moy = m.moyD;
+      else if (m.moyC !== null)                    m.moy = m.moyC;
+      else                                         m.moy = null;
+
       m.pts = m.moy !== null ? m.moy * m.coeff : null;
       if (m.pts !== null) { tc += m.coeff; tp += m.pts; }
     });
-    return { eleve, matieres, tc, tp, mg: tc>0 ? tp/tc : null, rang: null };
+
+    return { eleve, matieres, tc, tp, mg: tc > 0 ? tp / tc : null, rang: null };
   });
+
+  // Classement
   [...resultats]
-    .sort((a,b) => b.mg===null ? -1 : a.mg===null ? 1 : b.mg - a.mg)
-    .forEach((r,i) => r.rang = i+1);
-  const ms = resultats.map(r=>r.mg).filter(v=>v!==null);
-  const mc = ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null;
-  log(`Moy. classe : ${fmt(mc)}`);
+    .sort((a,b) => b.mg === null ? -1 : a.mg === null ? 1 : b.mg - a.mg)
+    .forEach((r, i) => r.rang = i + 1);
+
+  // Moyenne de classe
+  const ms = resultats.map(r => r.mg).filter(v => v !== null);
+  const mc = ms.length ? ms.reduce((a,b) => a+b, 0) / ms.length : null;
+  log(`Moyenne de classe : ${fmt(mc)}`);
+
   return { resultats, mc };
 }
 
+// ====== RENDU HTML D'UN BULLETIN ======
 function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole) {
   const { eleve, matieres, tc, tp, mg, rang } = res;
   const nom       = `${eleve.prenom||''} ${eleve.nom||eleve.name||''}`.trim() || eleve.id;
@@ -734,16 +785,27 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
   const mgv       = mg !== null ? mg : -1;
   const nomClasse = classe.nomClasse || classe.nom || '—';
   const effectif  = classe._effectif || '—';
-  const lignes = Object.entries(matieres).map(([n,m]) => {
+
+  const lignes = Object.entries(matieres).map(([n, m]) => {
     const ap = getAppr(m.moy);
-    return `<tr><td>${n}</td><td>${fmt(m.moyD)}</td><td>${fmt(m.moyC)}</td><td class="moy-cell">${fmt(m.moy)}</td><td>${m.coeff}</td><td>${m.pts!==null ? fmt(m.pts) : '—'}</td><td><span class="appr-tb">${ap.label}</span></td></tr>`;
+    return `<tr>
+      <td>${n}</td>
+      <td>${fmt(m.moyD)}</td>
+      <td>${fmt(m.moyC)}</td>
+      <td class="moy-cell">${fmt(m.moy)}</td>
+      <td>${m.coeff}</td>
+      <td>${m.pts !== null ? fmt(m.pts) : '—'}</td>
+      <td><span class="appr-tb">${ap.label}</span></td>
+    </tr>`;
   }).join('');
+
   const obs =
     apGen.label==='Très Bien'  ? 'Excellent travail. Continuez ainsi sur cette belle lancée.' :
     apGen.label==='Bien'       ? 'Bon travail. Persévérez dans vos efforts.' :
     apGen.label==='Assez Bien' ? 'Travail satisfaisant. Des progrès sont encore possibles.' :
     apGen.label==='Passable'   ? 'Des lacunes persistent. Un travail régulier est nécessaire.' :
     'Des difficultés importantes ont été relevées. Un suivi est vivement recommandé.';
+
   return `
 <div class="bulletin" id="bul-${eleve.id}">
   <div class="watermark">OFFICIEL</div>
@@ -761,9 +823,18 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
     </div>
     <div class="bul-title"><div class="bul-title-main">Bulletin de Notes</div></div>
     <div class="bul-header">
-      <div class="bh-left"><div class="rep-name">République du Sénégal</div><div class="rep-min">Ministère de l'Éducation Nationale</div></div>
+      <div class="bh-left">
+        <div class="rep-name">République du Sénégal</div>
+        <div class="rep-min">Ministère de l'Éducation Nationale</div>
+      </div>
       <div class="bh-center"><div class="semestre-val">${semestre}</div></div>
-      <div class="bh-right"><div class="header-meta">Classe&nbsp;: <strong>${nomClasse}</strong><br>Effectif&nbsp;: <strong>${effectif}</strong><br>Moy. classe&nbsp;: <strong>${fmt(mc)}</strong></div></div>
+      <div class="bh-right">
+        <div class="header-meta">
+          Classe&nbsp;: <strong>${nomClasse}</strong><br>
+          Effectif&nbsp;: <strong>${effectif}</strong><br>
+          Moy. classe&nbsp;: <strong>${fmt(mc)}</strong>
+        </div>
+      </div>
     </div>
     <div class="eleve-band">
       <div class="eleve-cell"><div class="ef-label">Prénom &amp; Nom</div><div class="ef-value">${nom}</div></div>
@@ -772,7 +843,17 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
       <div class="eleve-cell"><div class="ef-label">Statut</div><div class="ef-value">${eleve.redoublant ? 'Redoublant' : 'Nouveau'}</div></div>
     </div>
     <table class="notes-table">
-      <thead><tr><th style="width:22%">Matière</th><th>Moy. Devoirs</th><th>Moy. Compos.</th><th>Moy. Matière</th><th>Coeff.</th><th>Points</th><th>Appréciation</th></tr></thead>
+      <thead>
+        <tr>
+          <th style="width:22%">Matière</th>
+          <th>Moy. Devoirs</th>
+          <th>Moy. Compos.</th>
+          <th>Moy. Matière</th>
+          <th>Coeff.</th>
+          <th>Points</th>
+          <th>Appréciation</th>
+        </tr>
+      </thead>
       <tbody>${lignes || '<tr><td colspan="7" style="text-align:center;color:#999;font-style:italic;padding:12px">Aucune note disponible</td></tr>'}</tbody>
     </table>
     <div class="recap-row">
@@ -787,7 +868,10 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
     </div>
     <div class="bottom-section">
       <div class="bottom-left">
-        <div class="obs-block"><div class="obs-title">Observations du Conseil des Professeurs</div><div class="obs-content">${obs}</div></div>
+        <div class="obs-block">
+          <div class="obs-title">Observations du Conseil des Professeurs</div>
+          <div class="obs-content">${obs}</div>
+        </div>
         <div class="obs-block">
           <div class="obs-title">Distinctions</div>
           <table class="distinctions-table">
@@ -798,8 +882,15 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
         </div>
       </div>
       <div class="bottom-right">
-        <div class="sign-block"><div class="sign-title">Visa du Chef d'Établissement</div><div class="sign-line"></div><div class="sign-name">Signature &amp; Cachet</div></div>
-        <div class="parents-block"><div class="obs-title">Visa des Parents / Tuteur</div><div style="min-height:44px"></div></div>
+        <div class="sign-block">
+          <div class="sign-title">Visa du Chef d'Établissement</div>
+          <div class="sign-line"></div>
+          <div class="sign-name">Signature &amp; Cachet</div>
+        </div>
+        <div class="parents-block">
+          <div class="obs-title">Visa des Parents / Tuteur</div>
+          <div style="min-height:44px"></div>
+        </div>
       </div>
     </div>
     <div class="bul-footer">Ce bulletin est un document officiel délivré par l'établissement scolaire. Toute modification non autorisée est passible de sanctions. Veuillez en conserver une photocopie.</div>
@@ -807,46 +898,85 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
 </div>`;
 }
 
+// ====== GÉNÉRATION PRINCIPALE ======
 async function lancerGeneration() {
   const nomSaisi     = document.getElementById('nomClasse').value.trim();
   const nomEcole     = document.getElementById('nomEcole').value.trim()     || 'Établissement Scolaire';
   const adresseEcole = document.getElementById('adresseEcole').value.trim() || '';
   const telEcole     = document.getElementById('telEcole').value.trim()     || '';
+
   if (!nomSaisi) { log('Veuillez saisir le nom de la classe', 'warn'); return; }
+
   const btn = document.getElementById('btn-generer');
   btn.disabled  = true;
   btn.innerHTML = '<span class="spinner"></span> Recherche de la classe…';
   document.getElementById('bulletins-container').innerHTML = '';
   document.getElementById('btn-pdf-container').style.display = 'none';
+
   try {
     log(`Recherche de la classe "${nomSaisi}"…`, 'info');
     const classe = await rechercherClasseParNom(nomSaisi);
+
     if (!classe) {
       log(`Aucune classe trouvée avec le nom "${nomSaisi}"`, 'error');
       btn.disabled  = false;
       btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
       return;
     }
+
     const classeId = classe.id;
     log(`Classe trouvée : "${classe.nomClasse || classe.nom}" — ID : ${classeId}`);
     _classeIdResolu = classeId;
     document.getElementById('classeStatus').className = 'input-status ok';
     document.getElementById('classeStatus').innerHTML = '✓';
+
+    // ✅ ÉTAPE CLÉ : Construire la map des coefficients depuis classes.matieres
+    const coeffMap = {};
+    if (classe.matieres && Array.isArray(classe.matieres)) {
+      classe.matieres.forEach(m => {
+        const nomMat = m.nom;
+        // On nettoie le coefficient : trim() pour enlever les espaces, puis parseFloat
+        const coeff  = parseFloat((m.coefficient || '').toString().trim());
+        if (nomMat) {
+          coeffMap[nomMat] = isNaN(coeff) ? 1 : coeff;
+        }
+      });
+      log(`${Object.keys(coeffMap).length} matière(s) avec coefficient(s) trouvée(s) dans classes.matieres`, 'info');
+    } else {
+      log('Aucun tableau matieres dans ce document classe — utilisation des coefficients des évaluations', 'warn');
+    }
+
     btn.innerHTML = '<span class="spinner"></span> Chargement des données…';
+
     const eleves = await fetchEleves(classeId);
-    if (!eleves.length) { btn.disabled = false; btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins'; return; }
+    if (!eleves.length) {
+      btn.disabled  = false;
+      btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
+      return;
+    }
+
     const evals = await fetchEvals(classeId);
     if (!evals.length) log("Pas d'évaluations — les tableaux seront vides", 'warn');
+
     log(`Récupération des notes (${evals.length} éval.)…`, 'info');
     const notesMap = {};
     await Promise.all(evals.map(async ev => {
       notesMap[ev.id] = await fetchNotes(ev.id);
-      log(`  ${ev.matiere||ev.id} | coeff: ${ev.coefficients||ev.coefficient||'?'} | ${notesMap[ev.id].length} note(s)`);
+      // Afficher quelle source de coeff est utilisée pour chaque évaluation
+      const matNom   = ev.matiere || '?';
+      const coeffSrc = coeffMap[matNom] !== undefined
+        ? `coeff: ${coeffMap[matNom]} (depuis classes.matieres)`
+        : `coeff: ${ev.coefficients || ev.coefficient || '1 (défaut)'} (depuis évaluation)`;
+      log(`  ${matNom} | ${coeffSrc} | ${notesMap[ev.id].length} note(s)`);
     }));
+
     const annee    = classe.annee    || `${new Date().getFullYear()}–${new Date().getFullYear()+1}`;
     const semestre = classe.semestre || '1er Semestre';
     classe._effectif = eleves.length;
-    const { resultats, mc } = calculer(eleves, evals, notesMap);
+
+    // ✅ On passe coeffMap à calculer()
+    const { resultats, mc } = calculer(eleves, evals, notesMap, coeffMap);
+
     log('Rendu des bulletins…', 'info');
     const container = document.getElementById('bulletins-container');
     resultats.forEach(res => {
@@ -854,49 +984,89 @@ async function lancerGeneration() {
       div.innerHTML = renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole);
       container.appendChild(div.firstElementChild);
     });
-    log(`${resultats.length} bulletin(s) généré(s) avec succès !`);
+
+    log(`✅ ${resultats.length} bulletin(s) généré(s) avec succès !`);
     document.getElementById('btn-pdf-container').style.display = 'block';
+
   } catch(e) {
     log(`Erreur : ${e.message}`, 'error');
     console.error(e);
   }
+
   btn.disabled  = false;
   btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins';
 }
 
+// ====== EXPORT PDF ======
 async function exporterPDF() {
   const bulletins = Array.from(document.querySelectorAll('.bulletin'));
   if (!bulletins.length) { log('Aucun bulletin à exporter', 'warn'); return; }
+
   const btnPdf = document.getElementById('btn-pdf');
   btnPdf.innerHTML = '<span class="spinner"></span> Export en cours…';
   btnPdf.disabled  = true;
-  const nomSaisi = document.getElementById('nomClasse').value.trim().replace(/\s+/g,'_');
+
+  const nomSaisi = document.getElementById('nomClasse').value.trim().replace(/\s+/g, '_');
   const filename  = `Bulletins_${nomSaisi}_${new Date().toISOString().slice(0,10)}.pdf`;
+
   log(`Export PDF — ${bulletins.length} page(s)…`, 'info');
   try {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+
     for (let i = 0; i < bulletins.length; i++) {
       const bul = bulletins[i];
       log(`  Page ${i+1}/${bulletins.length}…`, 'info');
-      const saved = { transform: bul.style.transform, marginBottom: bul.style.marginBottom, width: bul.style.width, height: bul.style.height, overflow: bul.style.overflow, boxShadow: bul.style.boxShadow, border: bul.style.border };
-      bul.style.transform = 'none'; bul.style.marginBottom = '0'; bul.style.width = '794px'; bul.style.height = '1122px'; bul.style.overflow = 'hidden'; bul.style.boxShadow = 'none'; bul.style.border = 'none';
-      const canvas = await html2canvas(bul, { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff', width: 794, height: 1122, windowWidth: 794, windowHeight: 1122 });
+
+      const saved = {
+        transform:    bul.style.transform,
+        marginBottom: bul.style.marginBottom,
+        width:        bul.style.width,
+        height:       bul.style.height,
+        overflow:     bul.style.overflow,
+        boxShadow:    bul.style.boxShadow,
+        border:       bul.style.border
+      };
+
+      bul.style.transform    = 'none';
+      bul.style.marginBottom = '0';
+      bul.style.width        = '794px';
+      bul.style.height       = '1122px';
+      bul.style.overflow     = 'hidden';
+      bul.style.boxShadow    = 'none';
+      bul.style.border       = 'none';
+
+      const canvas = await html2canvas(bul, {
+        scale:       2,
+        useCORS:     true,
+        allowTaint:  true,
+        logging:     false,
+        backgroundColor: '#ffffff',
+        width:       794,
+        height:      1122,
+        windowWidth: 794,
+        windowHeight:1122
+      });
+
       Object.assign(bul.style, saved);
+
       if (i > 0) pdf.addPage();
       pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
       log(`  Page ${i+1} OK`);
     }
+
     pdf.save(filename);
-    log(`"${filename}" téléchargé avec succès !`);
+    log(`✅ "${filename}" téléchargé avec succès !`);
   } catch(e) {
     log(`Erreur PDF : ${e.message}`, 'error');
     console.error(e);
   }
+
   btnPdf.innerHTML = '<span class="material-icons" style="font-size:18px">download</span> Télécharger le PDF';
   btnPdf.disabled  = false;
 }
 
+// ====== RACCOURCI CLAVIER ======
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && ['nomClasse','nomEcole','adresseEcole','telEcole'].includes(document.activeElement.id)) {
     lancerGeneration();
