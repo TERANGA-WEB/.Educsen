@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -672,81 +671,92 @@ async function fetchNotes(evalId) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FONCTION CALCULER — CORRIGÉE
-// Une matière n'apparaît dans le bulletin QUE si l'élève a au moins une note
-// numérique valide. Les lignes absentes (absent:true, note null/undefined/"")
-// et les évaluations sans entrée sont intégralement ignorées.
+// Vérifie si une note est valide (non absente, non nulle, numérique)
+// ─────────────────────────────────────────────────────────────────────────────
+function noteValide(noteObj) {
+  if (!noteObj) return false;
+  if (noteObj.absent === true) return false;
+  if (noteObj.note === null || noteObj.note === undefined || noteObj.note === '') return false;
+  const n = parseFloat(noteObj.note);
+  return !isNaN(n);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FONCTION CALCULER
+// Règles :
+//  1. Une matière n'est comptée QUE si l'élève a au moins 1 note valide dedans
+//  2. Les notes absentes sont ignorées dans le calcul de la moyenne matière
+//  3. Les matières sans aucune note valide sont exclues du total coeff et points
+//  4. L'ordre d'affichage des matières suit l'ordre d'apparition dans les évals
 // ─────────────────────────────────────────────────────────────────────────────
 function calculer(eleves, evals, notesMap, matieresMap) {
-  log('Calcul des moyennes (pondération par coeff matière + coeff évaluation)…', 'info');
+  log('Calcul des moyennes…', 'info');
+
+  // Ordre d'apparition des matières dans les évaluations (insertion order)
+  const ordreMatiere = [];
+  evals.forEach(ev => {
+    const m = ev.matiere || 'Inconnue';
+    if (!ordreMatiere.includes(m)) ordreMatiere.push(m);
+  });
+
+  // Grouper les évals par matière
+  const evalParMatiere = new Map();
+  evals.forEach(ev => {
+    const matiere = ev.matiere || 'Inconnue';
+    if (!evalParMatiere.has(matiere)) evalParMatiere.set(matiere, []);
+    evalParMatiere.get(matiere).push(ev);
+  });
 
   const resultats = eleves.map(eleve => {
-    // matieresData : Map<nomMatiere, { totalPondere, totalPoids, coeffMatiere }>
+    // Map<nomMatiere, { totalPondere, totalPoids, coeffMatiere }>
+    // On utilise un objet ordonné selon ordreMatiere
     const matieresData = new Map();
 
-// ── ÉTAPE 1 : grouper les évals par matière ──────────────────────────────
-const evalParMatiere = new Map();
-evals.forEach(ev => {
-  const matiere = ev.matiere || 'Inconnue';
-  if (!evalParMatiere.has(matiere)) evalParMatiere.set(matiere, []);
-  evalParMatiere.get(matiere).push(ev);
-});
+    ordreMatiere.forEach(matiere => {
+      const evsDeLaMatiere = evalParMatiere.get(matiere) || [];
 
-// ── ÉTAPE 2 : pour chaque matière, vérifier si AU MOINS UNE note valide ──
-evalParMatiere.forEach((evsDeLaMatiere, matiere) => {
-  let auMoinsUneNoteValide = false;
+      // ── Pré-vérification : au moins une note valide pour cet élève dans cette matière ?
+      const auMoinsUneNoteValide = evsDeLaMatiere.some(ev => {
+        const notes   = notesMap[ev.id] || [];
+        const noteObj = notes.find(n =>
+          n.eleveId === eleve.id || n.eleveId === eleve.matricule
+        );
+        return noteValide(noteObj);
+      });
 
-  // Pré-vérification : est-ce que cet élève a au moins 1 note réelle ?
-  for (const ev of evsDeLaMatiere) {
-    const notes   = notesMap[ev.id] || [];
-    const noteObj = notes.find(n =>
-      n.eleveId === eleve.id || n.eleveId === eleve.matricule
-    );
-    if (!noteObj) continue;
-    if (noteObj.absent === true) continue;
-    if (noteObj.note === null || noteObj.note === undefined || noteObj.note === '') continue;
-    const note = parseFloat(noteObj.note);
-    if (isNaN(note)) continue;
-    auMoinsUneNoteValide = true;
-    break;
-  }
+      // Si aucune note valide → matière ignorée pour cet élève
+      if (!auMoinsUneNoteValide) return;
 
-  // ── Si TOUTES les notes de cette matière sont absentes → on ignore ──
-  if (!auMoinsUneNoteValide) return;
+      // Calcul de la moyenne pondérée de la matière (uniquement notes valides)
+      let totalPondere = 0;
+      let totalPoids   = 0;
 
-  // ── Sinon, on calcule normalement ────────────────────────────────────
-  evsDeLaMatiere.forEach(ev => {
-    const coeffEval = parseFloat(ev.coefficients || ev.coefficient) || 1;
-    const notes     = notesMap[ev.id] || [];
-    const noteObj   = notes.find(n =>
-      n.eleveId === eleve.id || n.eleveId === eleve.matricule
-    );
+      evsDeLaMatiere.forEach(ev => {
+        const coeffEval = parseFloat(ev.coefficients || ev.coefficient) || 1;
+        const notes     = notesMap[ev.id] || [];
+        const noteObj   = notes.find(n =>
+          n.eleveId === eleve.id || n.eleveId === eleve.matricule
+        );
 
-    if (!noteObj) return;
-    if (noteObj.absent === true) return;
-    if (noteObj.note === null || noteObj.note === undefined || noteObj.note === '') return;
-    const note = parseFloat(noteObj.note);
-    if (isNaN(note)) return;
+        if (!noteValide(noteObj)) return; // ignorer absences
 
-    if (!matieresData.has(matiere)) {
+        const note = parseFloat(noteObj.note);
+        totalPondere += note * coeffEval;
+        totalPoids   += coeffEval;
+      });
+
+      if (totalPoids === 0) return; // sécurité
+
       const coeffMatiere = matieresMap.get(matiere) || 1;
-      matieresData.set(matiere, { totalPondere: 0, totalPoids: 0, coeffMatiere });
-    }
-    const data = matieresData.get(matiere);
-    data.totalPondere += note * coeffEval;
-    data.totalPoids   += coeffEval;
-  });
-});
+      matieresData.set(matiere, { totalPondere, totalPoids, coeffMatiere });
+    });
 
+    // Calcul totaux
     let totalPoints = 0;
     let totalCoefs  = 0;
-    const matieresDetail = {};
+    const matieresDetail = {}; // garde l'ordre d'insertion de matieresData
 
     for (const [matiere, data] of matieresData.entries()) {
-      // Sécurité : exclure toute matière dont le poids total est nul
-      // (ne devrait pas arriver avec le guard ci-dessus, mais défense en profondeur)
-      if (data.totalPoids === 0) continue;
-
       const moyenneMatiere = data.totalPondere / data.totalPoids;
       const points         = moyenneMatiere * data.coeffMatiere;
 
@@ -762,23 +772,34 @@ evalParMatiere.forEach((evsDeLaMatiere, matiere) => {
 
     const moyenneGenerale = totalCoefs > 0 ? totalPoints / totalCoefs : null;
 
-    return { eleve, matieres: matieresDetail, tc: totalCoefs, tp: totalPoints, mg: moyenneGenerale, rang: null };
+    return {
+      eleve,
+      matieres: matieresDetail,
+      tc: totalCoefs,
+      tp: totalPoints,
+      mg: moyenneGenerale,
+      rang: null
+    };
   });
 
-  // Calcul des rangs (les élèves sans moyenne vont en fin de liste)
-  resultats.sort((a, b) =>
-    b.mg === null ? -1 : a.mg === null ? 1 : b.mg - a.mg
-  );
-  resultats.forEach((r, idx) => r.rang = idx + 1);
+  // Calcul des rangs — seuls les élèves avec une moyenne sont classés
+  const avecMoyenne    = resultats.filter(r => r.mg !== null);
+  const sansMoyenne    = resultats.filter(r => r.mg === null);
 
-  // Moyenne de classe (uniquement les élèves avec au moins une note)
-  const notesValides   = resultats.map(r => r.mg).filter(v => v !== null);
-  const moyenneClasse  = notesValides.length
+  avecMoyenne.sort((a, b) => b.mg - a.mg);
+  avecMoyenne.forEach((r, idx) => r.rang = idx + 1);
+  sansMoyenne.forEach(r => r.rang = null); // pas de rang
+
+  const tous = [...avecMoyenne, ...sansMoyenne];
+
+  // Moyenne de classe
+  const notesValides  = avecMoyenne.map(r => r.mg);
+  const moyenneClasse = notesValides.length
     ? notesValides.reduce((a, b) => a + b, 0) / notesValides.length
     : null;
   log(`Moy. classe : ${fmt(moyenneClasse)}`);
 
-  return { resultats, mc: moyenneClasse };
+  return { resultats: tous, mc: moyenneClasse };
 }
 
 function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole) {
@@ -786,10 +807,14 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
   const nom       = `${eleve.prenom||''} ${eleve.nom||eleve.name||''}`.trim() || eleve.id;
   const matricule = eleve.matricule || eleve.id || '—';
   const apGen     = getAppr(mg);
-  const sfx       = rang === 1 ? 'er' : 'ème';
   const mgv       = mg !== null ? mg : -1;
   const nomClasse = classe.nomClasse || classe.nom || '—';
   const effectif  = classe._effectif || '—';
+
+  // Rang affiché : "—" si pas de moyenne
+  const rangAffiche = rang !== null
+    ? `<span class="rang-val">${rang}<sup>${rang === 1 ? 'er' : 'ème'}</sup></span> / ${effectif}`
+    : `<span class="rang-val">—</span>`;
 
   const lignes = Object.entries(matieres).map(([n, m]) => {
     const ap = getAppr(m.moyenne);
@@ -851,7 +876,7 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
       <div class="recap-cell hi"><span class="rc-label">Moyenne Générale</span><span class="rc-value">${fmt(mg)}<span style="font-size:11px;font-weight:400"> /20</span></span></div>
     </div>
     <div class="rang-ligne">
-      <div class="rang-left">Rang&nbsp;: <span class="rang-val">${rang}<sup>${sfx}</sup></span> / ${effectif}</div>
+      <div class="rang-left">Rang&nbsp;: ${rangAffiche}</div>
       <div class="rang-right">Appréciation&nbsp;: <span class="appr-gen">${apGen.label}</span></div>
     </div>
     <div class="bottom-section">
