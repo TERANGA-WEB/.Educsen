@@ -16,80 +16,23 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --primary:      #3b82f6;
-      --primary-dark: #2563eb;
-      --sidebar-w:    280px;
-      --sidebar-coll: 80px;
-      --topbar-h:     60px;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f8fafc;
-      min-height: 100vh;
-      display: flex;
-      color: #1e293b;
-    }
-
-    .sidebar-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.52);
-      z-index: 999; opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
+    :root { --primary: #3b82f6; --primary-dark: #2563eb; --sidebar-w: 280px; --sidebar-coll: 80px; --topbar-h: 60px; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; min-height: 100vh; display: flex; color: #1e293b; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.52); z-index: 999; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
     .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-
-    .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-      color: white;
-      display: flex; flex-direction: column;
-      transition: width 0.3s ease;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-      height: 100vh;
-      position: fixed; left: 0; top: 0;
-      overflow-y: auto; z-index: 1000;
-    }
+    .sidebar { width: 280px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); color: white; display: flex; flex-direction: column; transition: width 0.3s ease; box-shadow: 4px 0 20px rgba(0,0,0,0.15); height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; z-index: 1000; }
     .sidebar.collapsed { width: 80px; }
-
     .sidebar-header { padding: 20px 16px; border-bottom: 1px solid #334155; }
     .logo-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
     .logo-area { display: flex; align-items: center; gap: 12px; overflow: hidden; }
-
-    .sidebar .logo-icon {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; font-weight: 600; color: white; flex-shrink: 0;
-    }
-    .sidebar .logo-text {
-      font-size: 1.3rem; font-weight: 600;
-      white-space: nowrap; overflow: hidden;
-      transition: opacity 0.2s; color: white;
-    }
+    .sidebar .logo-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 600; color: white; flex-shrink: 0; }
+    .sidebar .logo-text { font-size: 1.3rem; font-weight: 600; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; color: white; }
     .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
     .sidebar .logo-text span { color: #3b82f6; }
-
-    .toggle-btn {
-      background: rgba(255,255,255,0.1); border: 1px solid #4b5563;
-      border-radius: 50%; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s; color: #e2e8f0; flex-shrink: 0;
-    }
+    .toggle-btn { background: rgba(255,255,255,0.1); border: 1px solid #4b5563; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: #e2e8f0; flex-shrink: 0; }
     .toggle-btn:hover { background: rgba(255,255,255,0.2); border-color: #3b82f6; color: white; }
-
     .nav-menu { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 4px; }
-
-    .nav-item {
-      display: flex; align-items: center; gap: 16px;
-      padding: 14px 24px; margin: 0 12px; border-radius: 12px;
-      color: #cbd5e1; text-decoration: none;
-      transition: all 0.2s; white-space: nowrap;
-    }
+    .nav-item { display: flex; align-items: center; gap: 16px; padding: 14px 24px; margin: 0 12px; border-radius: 12px; color: #cbd5e1; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
     .nav-item .nav-icon { font-size: 1.5rem; width: 24px; text-align: center; }
     .nav-item span:last-child { transition: opacity 0.2s; }
     .sidebar.collapsed .nav-item span:last-child { opacity: 0; width: 0; display: none; }
@@ -97,179 +40,69 @@
     .sidebar.collapsed .nav-item .nav-icon { width: 24px; text-align: center; }
     .nav-item.active { background: #3b82f6; color: white; box-shadow: 0 8px 16px -4px rgba(59,130,246,0.3); }
     .nav-item:hover:not(.active) { background: #334155; color: white; }
-
     .sidebar-footer { padding: 20px; border-top: 1px solid #334155; }
     .user-info { display: flex; align-items: center; gap: 12px; white-space: nowrap; margin-bottom: 12px; }
-    .user-avatar {
-      width: 42px; height: 42px; background: #3b82f6; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: 1.2rem; flex-shrink: 0;
-    }
+    .user-avatar { width: 42px; height: 42px; background: #3b82f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.2rem; flex-shrink: 0; }
     .user-details { overflow: hidden; }
     .user-name { font-weight: 500; font-size: 0.95rem; }
-    .user-role  { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
+    .user-role { font-size: 0.8rem; color: #94a3b8; text-transform: capitalize; }
     .sidebar.collapsed .user-details { opacity: 0; width: 0; }
-
-    .logout-btn {
-      width: 100%; padding: 10px;
-      background-color: rgba(255,255,255,0.1); color: #94a3b8;
-      border: none; border-radius: 6px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      gap: 8px; font-size: 14px; transition: all 0.2s;
-      white-space: nowrap; text-decoration: none;
-    }
+    .logout-btn { width: 100%; padding: 10px; background-color: rgba(255,255,255,0.1); color: #94a3b8; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; transition: all 0.2s; white-space: nowrap; text-decoration: none; }
     .logout-btn:hover { background-color: rgba(255,255,255,0.2); color: white; }
-
-    .mobile-topbar {
-      display: none;
-      position: sticky; top: 0; z-index: 998;
-      background: #fff; border-bottom: 1px solid #e2e8f0;
-      padding: 0 16px; height: 60px;
-      align-items: center; justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,.07);
-    }
+    .mobile-topbar { display: none; position: sticky; top: 0; z-index: 998; background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 16px; height: 60px; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
     .topbar-logo { display: flex; align-items: center; gap: 10px; }
-    .topbar-logo .logo-icon {
-      width: 34px; height: 34px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.05rem; font-weight: 700; color: #fff;
-    }
+    .topbar-logo .logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; font-weight: 700; color: #fff; }
     .topbar-logo-text { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
     .topbar-logo-text em { color: #3b82f6; font-style: normal; }
-    .topbar-menu-btn {
-      background: none; border: none; width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #334155; border-radius: 8px; transition: background .2s;
-    }
+    .topbar-menu-btn { background: none; border: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #334155; border-radius: 8px; transition: background .2s; }
     .topbar-menu-btn:hover { background: #f1f5f9; }
-
-    .page-wrapper {
-      flex: 1; margin-left: 280px;
-      transition: margin-left 0.3s ease;
-      min-width: 0; display: flex; flex-direction: column;
-    }
+    .page-wrapper { flex: 1; margin-left: 280px; transition: margin-left 0.3s ease; min-width: 0; display: flex; flex-direction: column; }
     .sidebar.collapsed ~ .page-wrapper { margin-left: 80px; }
-
     .main-content { padding: 30px; width: 100%; }
-
-    .page-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 28px; background: white; padding: 25px 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
-      border: 1px solid #e2e8f0;
-    }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; background: white; padding: 25px 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
     .page-title { font-size: 26px; font-weight: 700; color: #1e293b; letter-spacing: -0.5px; }
     .page-subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
-    .page-icon {
-      width: 52px; height: 52px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 14px; display: flex; align-items: center;
-      justify-content: center; color: white; font-size: 1.7rem;
-    }
-
-    .card {
-      background: white; border-radius: 16px; padding: 30px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
-      border: 1px solid #e2e8f0; margin-bottom: 24px;
-    }
-    .card-title {
-      font-size: 16px; font-weight: 700; color: #1e293b;
-      border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 22px;
-      display: flex; align-items: center; gap: 10px;
-    }
+    .page-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.7rem; }
+    .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; margin-bottom: 24px; }
+    .card-title { font-size: 16px; font-weight: 700; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
     .card-title .material-icons { color: #3b82f6; font-size: 20px; }
-
     .fields-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
     .field-full { grid-column: 1 / -1; }
     .fld { display: flex; flex-direction: column; gap: 7px; }
     .fld label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #64748b; }
-
     .input-wrapper { position: relative; }
     .input-wrapper input { width: 100%; padding-right: 44px; }
-    .input-status {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      width: 24px; height: 24px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; display: none;
-    }
-    .input-status.ok      { background: #d1fae5; color: #059669; display: flex; }
-    .input-status.err     { background: #fee2e2; color: #dc2626; display: flex; }
+    .input-status { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; display: none; }
+    .input-status.ok { background: #d1fae5; color: #059669; display: flex; }
+    .input-status.err { background: #fee2e2; color: #dc2626; display: flex; }
     .input-status.loading { background: #dbeafe; color: #3b82f6; display: flex; }
-
     .class-hint { font-size: 11px; margin-top: 4px; min-height: 16px; display: flex; align-items: center; gap: 5px; }
-    .class-hint.ok   { color: #059669; }
-    .class-hint.err  { color: #dc2626; }
-    .class-hint.info { color: #64748b; }
-
-    .fld input {
-      padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px;
-      font-size: 14px; color: #1e293b; background: #f8fafc;
-      font-family: 'Inter', sans-serif; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
+    .class-hint.ok { color: #059669; } .class-hint.err { color: #dc2626; } .class-hint.info { color: #64748b; }
+    .fld input { padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; color: #1e293b; background: #f8fafc; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .fld input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
     .fld input::placeholder { color: #94a3b8; }
-    .fld input.valid   { border-color: #10b981; }
-    .fld input.invalid { border-color: #ef4444; }
-
-    .btn-primary {
-      padding: 12px 28px; background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
-      cursor: pointer; font-family: 'Inter', sans-serif;
-      display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 4px 12px rgba(59,130,246,0.3); transition: all 0.2s;
-    }
+    .fld input.valid { border-color: #10b981; } .fld input.invalid { border-color: #ef4444; }
+    .btn-primary { padding: 12px 28px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(59,130,246,0.3); transition: all 0.2s; }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.4); }
     .btn-primary:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
-
-    .btn-success {
-      padding: 12px 28px; background: linear-gradient(135deg, #10b981, #059669);
-      color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
-      cursor: pointer; font-family: 'Inter', sans-serif;
-      display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.2s;
-    }
+    .btn-success { padding: 12px 28px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.2s; }
     .btn-success:hover { transform: translateY(-1px); }
     .btn-success:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
-
-    #log-zone {
-      margin-top: 18px; background: #0f172a; border-radius: 10px;
-      padding: 12px 16px; font-family: 'Courier New', monospace;
-      font-size: 12px; color: #a8ffb0; max-height: 200px;
-      overflow-y: auto; display: none; border: 1px solid #1e293b;
-    }
-    .log-line  { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    #log-zone { margin-top: 18px; background: #0f172a; border-radius: 10px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #a8ffb0; max-height: 200px; overflow-y: auto; display: none; border: 1px solid #1e293b; }
+    .log-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .log-error { color: #f87171; } .log-warn { color: #fbbf24; } .log-info { color: #60a5fa; }
-
     #btn-pdf-container { display: none; margin-bottom: 24px; }
-    .pdf-bar {
-      background: white; border-radius: 16px; padding: 20px 28px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-      border: 1px solid #e2e8f0;
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    .pdf-bar { background: white; border-radius: 16px; padding: 20px 28px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
     .pdf-info { display: flex; align-items: center; gap: 14px; }
     .pdf-info .material-icons { font-size: 30px; color: #10b981; }
     .pdf-info-title { font-size: 14px; font-weight: 700; color: #1e293b; }
-    .pdf-info-sub   { font-size: 12px; color: #64748b; margin-top: 2px; }
-
+    .pdf-info-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
     #bulletins-container { display: flex; flex-direction: column; align-items: center; gap: 32px; padding-bottom: 60px; }
-
-    .spinner {
-      display: inline-block; width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
-      border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle;
-    }
-    .spinner-dark {
-      display: inline-block; width: 12px; height: 12px;
-      border: 2px solid rgba(59,130,246,0.3); border-top-color: #3b82f6;
-      border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle;
-    }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+    .spinner-dark { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(59,130,246,0.3); border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── BULLETIN ── */
     .bulletin { width: 794px; height: 1122px; overflow: hidden; background: #fff; border: 1px solid #cbd5e1; box-shadow: 0 8px 40px rgba(0,0,0,0.12); padding: 24px 40px 50px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; position: relative; }
     .watermark { position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%) rotate(-35deg); font-size: 90px; font-weight: 900; color: rgba(0,0,0,0.025); white-space: nowrap; pointer-events: none; z-index: 0; }
     .bul-content { position: relative; z-index: 1; }
@@ -277,7 +110,7 @@
     .bt-left, .bt-right { display: table-cell; vertical-align: top; }
     .bt-right { text-align: right; }
     .school-name { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #000; line-height: 1.35; }
-    .school-sub  { font-size: 9.5px; color: #555; margin-top: 2px; }
+    .school-sub { font-size: 9.5px; color: #555; margin-top: 2px; }
     .annee-label { font-size: 9px; text-transform: uppercase; letter-spacing: .8px; color: #666; }
     .annee-value { font-size: 14px; font-weight: 900; color: #000; margin-top: 2px; }
     .bul-title { text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 28px; }
@@ -286,7 +119,7 @@
     .bh-left,.bh-center,.bh-right { display: table-cell; width: 33%; vertical-align: middle; }
     .bh-center { text-align: center; } .bh-right { text-align: right; }
     .rep-name { font-size: 12px; font-weight: 900; color: #000; line-height: 1.4; }
-    .rep-min  { font-size: 9.5px; color: #444; margin-top: 2px; font-style: italic; }
+    .rep-min { font-size: 9.5px; color: #444; margin-top: 2px; font-style: italic; }
     .semestre-val { font-size: 12px; font-weight: 700; color: #333; font-style: italic; }
     .header-meta { font-size: 11px; line-height: 1.85; color: #222; }
     .header-meta strong { font-weight: 700; color: #000; }
@@ -310,12 +143,12 @@
     .recap-cell.hi { background: #000; border-color: #000; }
     .recap-cell.hi .rc-label { color: #ccc; } .recap-cell.hi .rc-value { color: #fff; }
     .rang-ligne { display: table; width: 100%; border: 1px solid #ccc; background: #fafafa; padding: 6px 10px; margin-bottom: 10px; font-size: 11.5px; }
-    .rang-left  { display: table-cell; vertical-align: middle; }
+    .rang-left { display: table-cell; vertical-align: middle; }
     .rang-right { display: table-cell; vertical-align: middle; text-align: right; }
     .rang-val { font-size: 14px; font-weight: 900; }
     .appr-gen { font-style: italic; font-weight: 900; font-size: 12px; }
     .bottom-section { display: table; width: 100%; border-spacing: 8px; border-collapse: separate; }
-    .bottom-left  { display: table-cell; width: 58%; vertical-align: top; }
+    .bottom-left { display: table-cell; width: 58%; vertical-align: top; }
     .bottom-right { display: table-cell; width: 42%; vertical-align: top; }
     .obs-block { border: 1px solid #ccc; padding: 8px 10px; margin-bottom: 8px; }
     .obs-title { font-size: 8.5px; text-transform: uppercase; letter-spacing: .8px; font-weight: 700; color: #333; margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
@@ -323,17 +156,16 @@
     .distinctions-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
     .distinctions-table td { border: 1px solid #ccc; padding: 4px 8px; }
     .distinctions-table td:first-child { font-weight: 700; background: #f5f5f5; width: 75%; }
-    .distinctions-table td:last-child  { text-align: center; font-weight: 900; font-size: 13px; }
+    .distinctions-table td:last-child { text-align: center; font-weight: 900; font-size: 13px; }
     .sign-block { border: 1px solid #ccc; padding: 10px 10px 8px; text-align: center; margin-bottom: 8px; }
     .sign-title { font-size: 8.5px; text-transform: uppercase; letter-spacing: .8px; font-weight: 700; color: #333; margin-bottom: 36px; }
-    .sign-line  { border-top: 1.5px solid #000; width: 80%; margin: 0 auto; }
-    .sign-name  { font-size: 9px; color: #555; margin-top: 3px; }
+    .sign-line { border-top: 1.5px solid #000; width: 80%; margin: 0 auto; }
+    .sign-name { font-size: 9px; color: #555; margin-top: 3px; }
     .parents-block { border: 1px solid #ccc; padding: 8px 10px; }
     .bul-footer { margin-top: 250px; border-top: 2px solid #000; padding-top: 6px; font-size: 9px; color: #333; text-align: center; font-style: italic; line-height: 1.4; }
 
     @media (max-width: 860px) { .bulletin { transform: scale(.88); transform-origin: top center; margin-bottom: -80px; } }
     @media (max-width: 660px) { .bulletin { transform: scale(.64); transform-origin: top center; margin-bottom: -230px; } }
-
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); width: 280px !important; transition: transform 0.3s ease; }
       .sidebar.mobile-open { transform: translateX(0); }
@@ -363,42 +195,16 @@
       </button>
     </div>
   </div>
-
   <nav class="nav-menu">
-    <a href="/userdashboard.html" class="nav-item">
-      <span class="nav-icon material-icons">dashboard</span>
-      <span>Dashboard</span>
-    </a>
-    <a href="/user-admin/assistant.html" class="nav-item">
-      <span class="nav-icon material-icons">smart_toy</span>
-      <span>Assistant</span>
-    </a>
-    <a href="/user-admin/rapport.html" class="nav-item">
-      <span class="nav-icon material-icons">assessment</span>
-      <span>Rapport</span>
-    </a>
-    <a href="/user-admin/classes.html" class="nav-item">
-      <span class="nav-icon material-icons">school</span>
-      <span>Classes</span>
-    </a>
-    <a href="/user-admin/professeurs.html" class="nav-item">
-      <span class="nav-icon material-icons">person</span>
-      <span>Professeurs</span>
-    </a>
-    <a href="/user-admin/notes.html" class="nav-item">
-      <span class="nav-icon material-icons">assignment</span>
-      <span>Notes</span>
-    </a>
-    <a href="/user-admin/bulletin.html" class="nav-item active">
-      <span class="nav-icon material-icons">receipt_long</span>
-      <span>Bulletins</span>
-    </a>
-    <a href="/user-admin/parametres.html" class="nav-item">
-      <span class="nav-icon material-icons">settings</span>
-      <span>Paramètres</span>
-    </a>
+    <a href="/userdashboard.html" class="nav-item"><span class="nav-icon material-icons">dashboard</span><span>Dashboard</span></a>
+    <a href="/user-admin/assistant.html" class="nav-item"><span class="nav-icon material-icons">smart_toy</span><span>Assistant</span></a>
+    <a href="/user-admin/rapport.html" class="nav-item"><span class="nav-icon material-icons">assessment</span><span>Rapport</span></a>
+    <a href="/user-admin/classes.html" class="nav-item"><span class="nav-icon material-icons">school</span><span>Classes</span></a>
+    <a href="/user-admin/professeurs.html" class="nav-item"><span class="nav-icon material-icons">person</span><span>Professeurs</span></a>
+    <a href="/user-admin/notes.html" class="nav-item"><span class="nav-icon material-icons">assignment</span><span>Notes</span></a>
+    <a href="/user-admin/bulletin.html" class="nav-item active"><span class="nav-icon material-icons">receipt_long</span><span>Bulletins</span></a>
+    <a href="/user-admin/parametres.html" class="nav-item"><span class="nav-icon material-icons">settings</span><span>Paramètres</span></a>
   </nav>
-
   <div class="sidebar-footer">
     <div class="user-info" id="userInfo">
       <div class="user-avatar" id="userAvatar">AD</div>
@@ -407,15 +213,11 @@
         <div class="user-role" id="userRole">admin</div>
       </div>
     </div>
-    <a href="/index.html" class="logout-btn">
-      <span class="material-icons">logout</span>
-      <span>Déconnexion</span>
-    </a>
+    <a href="/index.html" class="logout-btn"><span class="material-icons">logout</span><span>Déconnexion</span></a>
   </div>
 </aside>
 
 <div class="page-wrapper" id="pageWrapper">
-
   <header class="mobile-topbar" id="mobileTopbar">
     <div class="topbar-logo">
       <div class="logo-icon">E</div>
@@ -427,7 +229,6 @@
   </header>
 
   <main class="main-content" id="mainContent">
-
     <div class="page-header">
       <div>
         <div class="page-title">Bulletins de Notes</div>
@@ -437,30 +238,15 @@
     </div>
 
     <div class="card">
-      <div class="card-title">
-        <span class="material-icons">tune</span>
-        Paramètres de génération
-      </div>
+      <div class="card-title"><span class="material-icons">tune</span>Paramètres de génération</div>
       <div class="fields-grid">
-        <div class="fld">
-          <label for="nomEcole">Nom de l'École</label>
-          <input type="text" id="nomEcole" placeholder="ex: Lycée Blaise Diagne"/>
-        </div>
-        <div class="fld">
-          <label for="adresseEcole">Adresse de l'École</label>
-          <input type="text" id="adresseEcole" placeholder="ex: Rue 10 x 17, Médina"/>
-        </div>
-        <div class="fld">
-          <label for="telEcole">Contact de l'École</label>
-          <input type="text" id="telEcole" placeholder="ex: +221 33 820 00 00"/>
-        </div>
+        <div class="fld"><label for="nomEcole">Nom de l'École</label><input type="text" id="nomEcole" placeholder="ex: Lycée Blaise Diagne"/></div>
+        <div class="fld"><label for="adresseEcole">Adresse de l'École</label><input type="text" id="adresseEcole" placeholder="ex: Rue 10 x 17, Médina"/></div>
+        <div class="fld"><label for="telEcole">Contact de l'École</label><input type="text" id="telEcole" placeholder="ex: +221 33 820 00 00"/></div>
         <div class="fld field-full">
           <label for="nomClasse">Nom de la Classe</label>
           <div class="input-wrapper">
-            <input type="text" id="nomClasse"
-                   placeholder="ex: 6ème A, Terminale S2, 3ème B…"
-                   oninput="onClasseInput()"
-                   autocomplete="off"/>
+            <input type="text" id="nomClasse" placeholder="ex: 6ème A, Terminale S2, 3ème B…" oninput="onClasseInput()" autocomplete="off"/>
             <div class="input-status" id="classeStatus"></div>
           </div>
           <div class="class-hint info" id="classeHint">
@@ -470,8 +256,7 @@
         </div>
       </div>
       <button class="btn-primary" id="btn-generer" onclick="lancerGeneration()">
-        <span class="material-icons" style="font-size:18px">play_arrow</span>
-        Générer les Bulletins
+        <span class="material-icons" style="font-size:18px">play_arrow</span>Générer les Bulletins
       </button>
       <div id="log-zone"></div>
     </div>
@@ -486,8 +271,7 @@
           </div>
         </div>
         <button class="btn-success" id="btn-pdf" onclick="exporterPDF()">
-          <span class="material-icons" style="font-size:18px">download</span>
-          Télécharger le PDF
+          <span class="material-icons" style="font-size:18px">download</span>Télécharger le PDF
         </button>
       </div>
     </div>
@@ -498,44 +282,21 @@
 
 <script>
 (function() {
-  const sidebar        = document.getElementById('sidebar');
-  const toggleBtn      = document.getElementById('toggleSidebar');
-  const toggleIcon     = document.getElementById('toggleIcon');
-  const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleSidebar');
+  const toggleIcon = document.getElementById('toggleIcon');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-  const openMobile  = () => { sidebar.classList.add('mobile-open');    sidebarOverlay.classList.add('active'); };
+  const openMobile  = () => { sidebar.classList.add('mobile-open'); sidebarOverlay.classList.add('active'); };
   const closeMobile = () => { sidebar.classList.remove('mobile-open'); sidebarOverlay.classList.remove('active'); };
-
   toggleBtn.addEventListener('click', () => {
-    if (window.innerWidth <= 768) {
-      sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
-    } else {
-      sidebar.classList.toggle('collapsed');
-      toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left';
-    }
+    if (window.innerWidth <= 768) { sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile(); }
+    else { sidebar.classList.toggle('collapsed'); toggleIcon.textContent = sidebar.classList.contains('collapsed') ? 'chevron_right' : 'chevron_left'; }
   });
-
-  mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile();
-  });
-
+  mobileMenuBtn.addEventListener('click', () => { sidebar.classList.contains('mobile-open') ? closeMobile() : openMobile(); });
   sidebarOverlay.addEventListener('click', closeMobile);
-
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target))
-      closeMobile();
-  });
-
-  window.addEventListener('resize', () => {
-    if (window.innerWidth <= 768) {
-      sidebar.classList.remove('collapsed');
-      toggleIcon.textContent = 'chevron_left';
-      closeMobile();
-    } else {
-      closeMobile();
-    }
-  });
+  document.addEventListener('click', (e) => { if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) closeMobile(); });
+  window.addEventListener('resize', () => { if (window.innerWidth <= 768) { sidebar.classList.remove('collapsed'); toggleIcon.textContent = 'chevron_left'; closeMobile(); } else { closeMobile(); } });
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -543,17 +304,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!user) { window.location.href = '/connexion.html'; return; }
     const name = user.displayName || user.email || 'Administrateur';
     document.getElementById('userNameDisplay').textContent = name;
-    document.getElementById('userAvatar').textContent      = name[0].toUpperCase();
+    document.getElementById('userAvatar').textContent = name[0].toUpperCase();
   });
 });
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
-  authDomain:        "real-educsen.firebaseapp.com",
-  projectId:         "real-educsen",
-  storageBucket:     "real-educsen.firebasestorage.app",
+  apiKey: "AIzaSyD7B-0O9mOdbIDQV-g6hsZx07G2ZvzKoxo",
+  authDomain: "real-educsen.firebaseapp.com",
+  projectId: "real-educsen",
+  storageBucket: "real-educsen.firebasestorage.app",
   messagingSenderId: "80660233362",
-  appId:             "1:80660233362:web:5edf5060254170056eba4b"
+  appId: "1:80660233362:web:5edf5060254170056eba4b"
 };
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.firestore();
@@ -590,7 +351,7 @@ async function rechercherClasseParNom(nomSaisi) {
   const snapshot = await db.collection('classes').get();
   const nom = nomSaisi.trim().toLowerCase();
   for (const doc of snapshot.docs) {
-    const data  = doc.data();
+    const data = doc.data();
     const champ = (data.nomClasse || data.nom || '').trim().toLowerCase();
     if (champ === nom) return { id: doc.id, ...data };
   }
@@ -608,36 +369,36 @@ async function onClasseInput() {
   status.className = 'input-status';
   status.innerHTML = '';
   if (!val) {
-    hint.className   = 'class-hint info';
-    hint.innerHTML   = '<span class="material-icons" style="font-size:13px">info</span> Tapez le nom exact de la classe — l\'ID Firestore sera trouvé automatiquement';
+    hint.className = 'class-hint info';
+    hint.innerHTML = '<span class="material-icons" style="font-size:13px">info</span> Tapez le nom exact de la classe — l\'ID Firestore sera trouvé automatiquement';
     return;
   }
   status.className = 'input-status loading';
   status.innerHTML = '<span class="spinner-dark"></span>';
-  hint.className   = 'class-hint info';
+  hint.className = 'class-hint info';
   hint.textContent = 'Recherche en cours…';
   _debounceTimer = setTimeout(async () => {
     try {
       const classe = await rechercherClasseParNom(val);
       if (classe) {
         _classeIdResolu = classe.id;
-        input.className  = 'valid';
+        input.className = 'valid';
         status.className = 'input-status ok';
         status.innerHTML = '✓';
-        hint.className   = 'class-hint ok';
-        hint.innerHTML   = `<span class="material-icons" style="font-size:13px">check_circle</span> Classe trouvée : <strong>${classe.nomClasse || classe.nom}</strong> (ID : ${classe.id})`;
+        hint.className = 'class-hint ok';
+        hint.innerHTML = `<span class="material-icons" style="font-size:13px">check_circle</span> Classe trouvée : <strong>${classe.nomClasse || classe.nom}</strong> (ID : ${classe.id})`;
       } else {
         _classeIdResolu = null;
-        input.className  = 'invalid';
+        input.className = 'invalid';
         status.className = 'input-status err';
         status.innerHTML = '✗';
-        hint.className   = 'class-hint err';
-        hint.innerHTML   = `<span class="material-icons" style="font-size:13px">error</span> Aucune classe trouvée avec ce nom`;
+        hint.className = 'class-hint err';
+        hint.innerHTML = `<span class="material-icons" style="font-size:13px">error</span> Aucune classe trouvée avec ce nom`;
       }
     } catch(e) {
       status.className = 'input-status err';
       status.innerHTML = '✗';
-      hint.className   = 'class-hint err';
+      hint.className = 'class-hint err';
       hint.textContent = `Erreur Firestore : ${e.message}`;
     }
   }, 600);
@@ -677,22 +438,21 @@ function noteValide(noteObj) {
   if (!noteObj) return false;
   if (noteObj.absent === true) return false;
   if (noteObj.note === null || noteObj.note === undefined || noteObj.note === '') return false;
-  const n = parseFloat(noteObj.note);
-  return !isNaN(n);
+  return !isNaN(parseFloat(noteObj.note));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FONCTION CALCULER
-// Règles :
-//  1. Une matière n'est comptée QUE si l'élève a au moins 1 note valide dedans
-//  2. Les notes absentes sont ignorées dans le calcul de la moyenne matière
-//  3. Les matières sans aucune note valide sont exclues du total coeff et points
-//  4. L'ordre d'affichage des matières suit l'ordre d'apparition dans les évals
+// Pour chaque élève et chaque matière :
+//  - Moy. Devoirs  = moyenne pondérée des évals type "Devoir"
+//  - Note Examen   = note de l'éval type "Examen"
+//  - Moy. Matière  = moyenne pondérée globale (Devoirs + Examen via coefficients)
+//  - Matière ignorée si AUCUNE note valide pour cet élève
 // ─────────────────────────────────────────────────────────────────────────────
 function calculer(eleves, evals, notesMap, matieresMap) {
   log('Calcul des moyennes…', 'info');
 
-  // Ordre d'apparition des matières dans les évaluations (insertion order)
+  // Ordre d'apparition des matières (pour préserver l'ordre du tableau)
   const ordreMatiere = [];
   evals.forEach(ev => {
     const m = ev.matiere || 'Inconnue';
@@ -708,62 +468,78 @@ function calculer(eleves, evals, notesMap, matieresMap) {
   });
 
   const resultats = eleves.map(eleve => {
-    // Map<nomMatiere, { totalPondere, totalPoids, coeffMatiere }>
-    // On utilise un objet ordonné selon ordreMatiere
     const matieresData = new Map();
 
     ordreMatiere.forEach(matiere => {
       const evsDeLaMatiere = evalParMatiere.get(matiere) || [];
 
-      // ── Pré-vérification : au moins une note valide pour cet élève dans cette matière ?
+      // Pré-vérification : au moins une note valide pour cet élève dans cette matière ?
       const auMoinsUneNoteValide = evsDeLaMatiere.some(ev => {
         const notes   = notesMap[ev.id] || [];
-        const noteObj = notes.find(n =>
-          n.eleveId === eleve.id || n.eleveId === eleve.matricule
-        );
+        const noteObj = notes.find(n => n.eleveId === eleve.id || n.eleveId === eleve.matricule);
         return noteValide(noteObj);
       });
 
-      // Si aucune note valide → matière ignorée pour cet élève
+      // Aucune note valide → matière complètement ignorée pour cet élève
       if (!auMoinsUneNoteValide) return;
 
-      // Calcul de la moyenne pondérée de la matière (uniquement notes valides)
-      let totalPondere = 0;
-      let totalPoids   = 0;
+      // Calculs séparés par type + calcul global
+      let devoirPondere = 0, devoirPoids = 0;
+      let examenNote    = null;
+      let totalPondere  = 0, totalPoids  = 0;
 
       evsDeLaMatiere.forEach(ev => {
         const coeffEval = parseFloat(ev.coefficients || ev.coefficient) || 1;
+        const type      = (ev.type || '').trim(); // "Devoir" ou "Examen"
         const notes     = notesMap[ev.id] || [];
-        const noteObj   = notes.find(n =>
-          n.eleveId === eleve.id || n.eleveId === eleve.matricule
-        );
+        const noteObj   = notes.find(n => n.eleveId === eleve.id || n.eleveId === eleve.matricule);
 
         if (!noteValide(noteObj)) return; // ignorer absences
 
         const note = parseFloat(noteObj.note);
+
+        // Accumulation globale → Moy. Matière
         totalPondere += note * coeffEval;
         totalPoids   += coeffEval;
+
+        // Accumulation par type → affichage colonnes
+        if (type === 'Devoir') {
+          devoirPondere += note * coeffEval;
+          devoirPoids   += coeffEval;
+        } else if (type === 'Examen') {
+          examenNote = note; // dernière valeur si plusieurs examens
+        }
       });
 
       if (totalPoids === 0) return; // sécurité
 
-      const coeffMatiere = matieresMap.get(matiere) || 1;
-      matieresData.set(matiere, { totalPondere, totalPoids, coeffMatiere });
+      const coeffMatiere  = matieresMap.get(matiere) || 1;
+      const moyenneDevoir = devoirPoids > 0 ? devoirPondere / devoirPoids : null;
+
+      matieresData.set(matiere, {
+        totalPondere,
+        totalPoids,
+        coeffMatiere,
+        moyenneDevoir, // null si pas de devoir
+        examenNote     // null si pas d'examen
+      });
     });
 
-    // Calcul totaux
+    // Totaux généraux
     let totalPoints = 0;
     let totalCoefs  = 0;
-    const matieresDetail = {}; // garde l'ordre d'insertion de matieresData
+    const matieresDetail = {};
 
     for (const [matiere, data] of matieresData.entries()) {
       const moyenneMatiere = data.totalPondere / data.totalPoids;
       const points         = moyenneMatiere * data.coeffMatiere;
 
       matieresDetail[matiere] = {
-        moyenne: moyenneMatiere,
-        coeff:   data.coeffMatiere,
-        points
+        moyenne:       moyenneMatiere,
+        coeff:         data.coeffMatiere,
+        points,
+        moyenneDevoir: data.moyenneDevoir,
+        examenNote:    data.examenNote
       };
 
       totalPoints += points;
@@ -772,34 +548,22 @@ function calculer(eleves, evals, notesMap, matieresMap) {
 
     const moyenneGenerale = totalCoefs > 0 ? totalPoints / totalCoefs : null;
 
-    return {
-      eleve,
-      matieres: matieresDetail,
-      tc: totalCoefs,
-      tp: totalPoints,
-      mg: moyenneGenerale,
-      rang: null
-    };
+    return { eleve, matieres: matieresDetail, tc: totalCoefs, tp: totalPoints, mg: moyenneGenerale, rang: null };
   });
 
-  // Calcul des rangs — seuls les élèves avec une moyenne sont classés
-  const avecMoyenne    = resultats.filter(r => r.mg !== null);
-  const sansMoyenne    = resultats.filter(r => r.mg === null);
-
+  // Rangs — seuls les élèves avec une moyenne sont classés
+  const avecMoyenne = resultats.filter(r => r.mg !== null);
+  const sansMoyenne = resultats.filter(r => r.mg === null);
   avecMoyenne.sort((a, b) => b.mg - a.mg);
   avecMoyenne.forEach((r, idx) => r.rang = idx + 1);
-  sansMoyenne.forEach(r => r.rang = null); // pas de rang
-
-  const tous = [...avecMoyenne, ...sansMoyenne];
+  sansMoyenne.forEach(r => r.rang = null);
 
   // Moyenne de classe
   const notesValides  = avecMoyenne.map(r => r.mg);
-  const moyenneClasse = notesValides.length
-    ? notesValides.reduce((a, b) => a + b, 0) / notesValides.length
-    : null;
+  const moyenneClasse = notesValides.length ? notesValides.reduce((a, b) => a + b, 0) / notesValides.length : null;
   log(`Moy. classe : ${fmt(moyenneClasse)}`);
 
-  return { resultats: tous, mc: moyenneClasse };
+  return { resultats: [...avecMoyenne, ...sansMoyenne], mc: moyenneClasse };
 }
 
 function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole) {
@@ -811,18 +575,18 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
   const nomClasse = classe.nomClasse || classe.nom || '—';
   const effectif  = classe._effectif || '—';
 
-  // Rang affiché : "—" si pas de moyenne
   const rangAffiche = rang !== null
     ? `<span class="rang-val">${rang}<sup>${rang === 1 ? 'er' : 'ème'}</sup></span> / ${effectif}`
     : `<span class="rang-val">—</span>`;
 
+  // Lignes du tableau : affiche Moy. Devoirs et Note Examen séparément
   const lignes = Object.entries(matieres).map(([n, m]) => {
     const ap = getAppr(m.moyenne);
     return `
       <tr>
         <td>${n}</td>
-        <td>—</td>
-        <td>—</td>
+        <td>${fmt(m.moyenneDevoir)}</td>
+        <td>${fmt(m.examenNote)}</td>
         <td class="moy-cell">${fmt(m.moyenne)}</td>
         <td>${m.coeff}</td>
         <td>${fmt(m.points)}</td>
@@ -866,7 +630,17 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
       <div class="eleve-cell"><div class="ef-label">Statut</div><div class="ef-value">${eleve.redoublant ? 'Redoublant' : 'Nouveau'}</div></div>
     </div>
     <table class="notes-table">
-      <thead><tr><th style="width:22%">Matière</th><th>Moy. Devoirs</th><th>Moy. Compos.</th><th>Moy. Matière</th><th>Coeff.</th><th>Points</th><th>Appréciation</th></tr></thead>
+      <thead>
+        <tr>
+          <th style="width:22%">Matière</th>
+          <th>Moy. Devoirs</th>
+          <th>Note Examen</th>
+          <th>Moy. Matière</th>
+          <th>Coeff.</th>
+          <th>Points</th>
+          <th>Appréciation</th>
+        </tr>
+      </thead>
       <tbody>${lignes || '<tr><td colspan="7" style="text-align:center;color:#999;font-style:italic;padding:12px">Aucune note disponible</td></tr>'}</tbody>
     </table>
     <div class="recap-row">
@@ -934,21 +708,24 @@ async function lancerGeneration() {
         const coeff = parseFloat(m.coefficient) || 1;
         matieresMap.set(m.nom, coeff);
       });
-      log(`Coefficients des matières chargés : ${Array.from(matieresMap.entries()).map(([k,v]) => `${k} (${v})`).join(', ')}`, 'info');
+      log(`Coefficients chargés : ${Array.from(matieresMap.entries()).map(([k,v]) => `${k}(${v})`).join(', ')}`, 'info');
     } else {
-      log("Aucun coefficient de matière trouvé dans la classe. Utilisation de coefficient 1 par défaut.", 'warn');
+      log("Aucun coefficient trouvé. Utilisation de 1 par défaut.", 'warn');
     }
 
     const eleves = await fetchEleves(classeId);
     if (!eleves.length) { btn.disabled = false; btn.innerHTML = '<span class="material-icons" style="font-size:18px">play_arrow</span> Générer les Bulletins'; return; }
+
     const evals = await fetchEvals(classeId);
     if (!evals.length) log("Pas d'évaluations — les tableaux seront vides", 'warn');
+
     log(`Récupération des notes (${evals.length} éval.)…`, 'info');
     const notesMap = {};
     await Promise.all(evals.map(async ev => {
       notesMap[ev.id] = await fetchNotes(ev.id);
-      log(`  ${ev.matiere||ev.id} | coeff éval: ${ev.coefficients||ev.coefficient||'?'} | ${notesMap[ev.id].length} note(s)`);
+      log(`  ${ev.matiere||ev.id} | type: ${ev.type||'?'} | coeff: ${ev.coefficients||ev.coefficient||'?'} | ${notesMap[ev.id].length} note(s)`);
     }));
+
     const annee    = classe.annee    || `${new Date().getFullYear()}–${new Date().getFullYear()+1}`;
     const semestre = classe.semestre || '1er Semestre';
     classe._effectif = eleves.length;
