@@ -432,27 +432,31 @@ async function fetchNotes(evalId) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Vérifie si une note est valide (non absente, non nulle, numérique)
+// noteValide : retourne true SEULEMENT si la note est un nombre réel,
+// non absent, non vide — peu importe que noteObj.note soit aussi renseignée.
 // ─────────────────────────────────────────────────────────────────────────────
 function noteValide(noteObj) {
   if (!noteObj) return false;
+  // Si l'élève est marqué absent → note invalide, quelle que soit la valeur
   if (noteObj.absent === true) return false;
-  if (noteObj.note === null || noteObj.note === undefined || noteObj.note === '') return false;
-  return !isNaN(parseFloat(noteObj.note));
+  const v = noteObj.note;
+  if (v === null || v === undefined || v === '') return false;
+  const n = parseFloat(v);
+  return !isNaN(n);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FONCTION CALCULER
-// Pour chaque élève et chaque matière :
-//  - Moy. Devoirs  = moyenne pondérée des évals type "Devoir"
-//  - Note Examen   = note de l'éval type "Examen"
-//  - Moy. Matière  = moyenne pondérée globale (Devoirs + Examen via coefficients)
-//  - Matière ignorée si AUCUNE note valide pour cet élève
+// RÈGLE MÉTIER CENTRALE :
+//   Une matière N'EXISTE PAS pour un élève donné si et seulement si
+//   TOUTES ses évaluations sont absentes ou sans note pour cet élève.
+//   Dans ce cas :
+//     • La matière n'apparaît PAS dans le tableau du bulletin.
+//     • Son coefficient N'EST PAS compté dans la moyenne générale.
 // ─────────────────────────────────────────────────────────────────────────────
 function calculer(eleves, evals, notesMap, matieresMap) {
   log('Calcul des moyennes…', 'info');
 
-  // Ordre d'apparition des matières (pour préserver l'ordre du tableau)
+  // Conserver l'ordre d'apparition des matières
   const ordreMatiere = [];
   evals.forEach(ev => {
     const m = ev.matiere || 'Inconnue';
@@ -473,17 +477,29 @@ function calculer(eleves, evals, notesMap, matieresMap) {
     ordreMatiere.forEach(matiere => {
       const evsDeLaMatiere = evalParMatiere.get(matiere) || [];
 
-      // Pré-vérification : au moins une note valide pour cet élève dans cette matière ?
+      // ── VÉRIFICATION CLÉ ────────────────────────────────────────────────
+      // On cherche s'il existe AU MOINS UNE évaluation avec une note réelle
+      // (non absente, non vide) pour cet élève dans cette matière.
+      // Si aucune → la matière est complètement ignorée pour cet élève.
+      // ────────────────────────────────────────────────────────────────────
       const auMoinsUneNoteValide = evsDeLaMatiere.some(ev => {
         const notes   = notesMap[ev.id] || [];
-        const noteObj = notes.find(n => n.eleveId === eleve.id || n.eleveId === eleve.matricule);
+        const noteObj = notes.find(n =>
+          n.eleveId === eleve.id || n.eleveId === eleve.matricule
+        );
         return noteValide(noteObj);
       });
 
-      // Aucune note valide → matière complètement ignorée pour cet élève
-      if (!auMoinsUneNoteValide) return;
+      if (!auMoinsUneNoteValide) {
+        // Matière inexistante pour cet élève → on n'ajoute rien dans matieresData
+        return;
+      }
 
-      // Calculs séparés par type + calcul global
+      // ── CALCULS ─────────────────────────────────────────────────────────
+      // On ne traite que les évaluations ayant une note valide.
+      // Les évaluations absentes/sans note sont ignorées dans les calculs,
+      // mais elles ne font PAS disparaître la matière (déjà garanti ci-dessus).
+      // ────────────────────────────────────────────────────────────────────
       let devoirPondere = 0, devoirPoids = 0;
       let examenNote    = null;
       let totalPondere  = 0, totalPoids  = 0;
@@ -492,9 +508,12 @@ function calculer(eleves, evals, notesMap, matieresMap) {
         const coeffEval = parseFloat(ev.coefficients || ev.coefficient) || 1;
         const type      = (ev.type || '').trim(); // "Devoir" ou "Examen"
         const notes     = notesMap[ev.id] || [];
-        const noteObj   = notes.find(n => n.eleveId === eleve.id || n.eleveId === eleve.matricule);
+        const noteObj   = notes.find(n =>
+          n.eleveId === eleve.id || n.eleveId === eleve.matricule
+        );
 
-        if (!noteValide(noteObj)) return; // ignorer absences
+        // Ignorer silencieusement les absences individuelles
+        if (!noteValide(noteObj)) return;
 
         const note = parseFloat(noteObj.note);
 
@@ -502,7 +521,7 @@ function calculer(eleves, evals, notesMap, matieresMap) {
         totalPondere += note * coeffEval;
         totalPoids   += coeffEval;
 
-        // Accumulation par type → affichage colonnes
+        // Accumulation par type → colonnes Moy. Devoirs / Note Examen
         if (type === 'Devoir') {
           devoirPondere += note * coeffEval;
           devoirPoids   += coeffEval;
@@ -511,7 +530,8 @@ function calculer(eleves, evals, notesMap, matieresMap) {
         }
       });
 
-      if (totalPoids === 0) return; // sécurité
+      // Sécurité (ne devrait jamais arriver grâce au test ci-dessus)
+      if (totalPoids === 0) return;
 
       const coeffMatiere  = matieresMap.get(matiere) || 1;
       const moyenneDevoir = devoirPoids > 0 ? devoirPondere / devoirPoids : null;
@@ -520,12 +540,16 @@ function calculer(eleves, evals, notesMap, matieresMap) {
         totalPondere,
         totalPoids,
         coeffMatiere,
-        moyenneDevoir, // null si pas de devoir
-        examenNote     // null si pas d'examen
+        moyenneDevoir,
+        examenNote
       });
     });
 
-    // Totaux généraux
+    // ── TOTAUX GÉNÉRAUX ──────────────────────────────────────────────────
+    // Seules les matières présentes dans matieresData (= avec note valide)
+    // contribuent à la moyenne générale. Les matières ignorées n'entrent
+    // jamais ici → leur coefficient n'est pas utilisé.
+    // ────────────────────────────────────────────────────────────────────
     let totalPoints = 0;
     let totalCoefs  = 0;
     const matieresDetail = {};
@@ -548,19 +572,28 @@ function calculer(eleves, evals, notesMap, matieresMap) {
 
     const moyenneGenerale = totalCoefs > 0 ? totalPoints / totalCoefs : null;
 
-    return { eleve, matieres: matieresDetail, tc: totalCoefs, tp: totalPoints, mg: moyenneGenerale, rang: null };
+    return {
+      eleve,
+      matieres: matieresDetail,
+      tc: totalCoefs,
+      tp: totalPoints,
+      mg: moyenneGenerale,
+      rang: null
+    };
   });
 
-  // Rangs — seuls les élèves avec une moyenne sont classés
-  const avecMoyenne = resultats.filter(r => r.mg !== null);
-  const sansMoyenne = resultats.filter(r => r.mg === null);
+  // ── CLASSEMENT ───────────────────────────────────────────────────────────
+  const avecMoyenne = resultats.filter(r => r && r.mg !== null);
+  const sansMoyenne = resultats.filter(r => r && r.mg === null);
   avecMoyenne.sort((a, b) => b.mg - a.mg);
   avecMoyenne.forEach((r, idx) => r.rang = idx + 1);
   sansMoyenne.forEach(r => r.rang = null);
 
   // Moyenne de classe
   const notesValides  = avecMoyenne.map(r => r.mg);
-  const moyenneClasse = notesValides.length ? notesValides.reduce((a, b) => a + b, 0) / notesValides.length : null;
+  const moyenneClasse = notesValides.length
+    ? notesValides.reduce((a, b) => a + b, 0) / notesValides.length
+    : null;
   log(`Moy. classe : ${fmt(moyenneClasse)}`);
 
   return { resultats: [...avecMoyenne, ...sansMoyenne], mc: moyenneClasse };
@@ -579,7 +612,7 @@ function renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole
     ? `<span class="rang-val">${rang}<sup>${rang === 1 ? 'er' : 'ème'}</sup></span> / ${effectif}`
     : `<span class="rang-val">—</span>`;
 
-  // Lignes du tableau : affiche Moy. Devoirs et Note Examen séparément
+  // Lignes du tableau : seules les matières présentes dans `matieres` sont affichées
   const lignes = Object.entries(matieres).map(([n, m]) => {
     const ap = getAppr(m.moyenne);
     return `
@@ -734,6 +767,7 @@ async function lancerGeneration() {
     log('Rendu des bulletins…', 'info');
     const container = document.getElementById('bulletins-container');
     resultats.forEach(res => {
+      if (!res) return;
       const div = document.createElement('div');
       div.innerHTML = renderBulletin(res, classe, mc, annee, semestre, nomEcole, adresseEcole, telEcole);
       container.appendChild(div.firstElementChild);
