@@ -432,12 +432,12 @@ async function fetchNotes(evalId) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// noteValide : retourne true SEULEMENT si la note est un nombre réel,
-// non absent, non vide — peu importe que noteObj.note soit aussi renseignée.
+// noteValide : retourne true si la note est un nombre réel ET non absent.
+// Une note de 0 est acceptée ici — c'est plus loin qu'on décide si la matière
+// entière est à exclure (quand TOUT est 0 ou absent).
 // ─────────────────────────────────────────────────────────────────────────────
 function noteValide(noteObj) {
   if (!noteObj) return false;
-  // Si l'élève est marqué absent → note invalide, quelle que soit la valeur
   if (noteObj.absent === true) return false;
   const v = noteObj.note;
   if (v === null || v === undefined || v === '') return false;
@@ -446,9 +446,21 @@ function noteValide(noteObj) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// noteReallement Presente : retourne true si la note est valide ET > 0.
+// Utilisée pour détecter les "vrais zéros saisis au lieu d'absent".
+// ─────────────────────────────────────────────────────────────────────────────
+function noteReellementPresente(noteObj) {
+  if (!noteValide(noteObj)) return false;
+  return parseFloat(noteObj.note) > 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // RÈGLE MÉTIER CENTRALE :
 //   Une matière N'EXISTE PAS pour un élève donné si et seulement si
-//   TOUTES ses évaluations sont absentes ou sans note pour cet élève.
+//   TOUTES ses évaluations sont :
+//     - absentes (absent: true), OU
+//     - sans note (null/vide), OU
+//     - à 0 (zéro saisi à la place d'une absence)
 //   Dans ce cas :
 //     • La matière n'apparaît PAS dans le tableau du bulletin.
 //     • Son coefficient N'EST PAS compté dans la moyenne générale.
@@ -478,27 +490,36 @@ function calculer(eleves, evals, notesMap, matieresMap) {
       const evsDeLaMatiere = evalParMatiere.get(matiere) || [];
 
       // ── VÉRIFICATION CLÉ ────────────────────────────────────────────────
-      // On cherche s'il existe AU MOINS UNE évaluation avec une note réelle
-      // (non absente, non vide) pour cet élève dans cette matière.
-      // Si aucune → la matière est complètement ignorée pour cet élève.
+      // La matière est considérée comme "suivie" par l'élève uniquement si
+      // AU MOINS UNE évaluation a une note STRICTEMENT SUPÉRIEURE À 0.
+      //
+      // Cas exclus (matière supprimée du bulletin) :
+      //   ✗ Toutes les notes sont absentes (absent: true)
+      //   ✗ Toutes les notes sont vides/null
+      //   ✗ Toutes les notes sont à 0 (zéro saisi au lieu d'absent)
+      //   ✗ Mélange de tout ce qui précède
+      //
+      // Cas inclus (matière présente dans le bulletin) :
+      //   ✓ Au moins une note > 0, même si les autres sont à 0 ou absentes
       // ────────────────────────────────────────────────────────────────────
-      const auMoinsUneNoteValide = evsDeLaMatiere.some(ev => {
+      const matiereEstSuivie = evsDeLaMatiere.some(ev => {
         const notes   = notesMap[ev.id] || [];
         const noteObj = notes.find(n =>
           n.eleveId === eleve.id || n.eleveId === eleve.matricule
         );
-        return noteValide(noteObj);
+        return noteReellementPresente(noteObj); // > 0 ET non absent
       });
 
-      if (!auMoinsUneNoteValide) {
-        // Matière inexistante pour cet élève → on n'ajoute rien dans matieresData
+      if (!matiereEstSuivie) {
+        // Matière non suivie → ignorée complètement pour cet élève
+        log(`  [EXCLU] ${matiere} pour ${eleve.prenom||''} ${eleve.nom||''} — toutes notes à 0 ou absentes`, 'warn');
         return;
       }
 
       // ── CALCULS ─────────────────────────────────────────────────────────
-      // On ne traite que les évaluations ayant une note valide.
-      // Les évaluations absentes/sans note sont ignorées dans les calculs,
-      // mais elles ne font PAS disparaître la matière (déjà garanti ci-dessus).
+      // La matière est suivie. On calcule avec les notes valides (>= 0).
+      // Les évaluations absentes sont ignorées dans le calcul de moyenne
+      // mais ne font PAS disparaître la matière (déjà garanti ci-dessus).
       // ────────────────────────────────────────────────────────────────────
       let devoirPondere = 0, devoirPoids = 0;
       let examenNote    = null;
@@ -512,7 +533,7 @@ function calculer(eleves, evals, notesMap, matieresMap) {
           n.eleveId === eleve.id || n.eleveId === eleve.matricule
         );
 
-        // Ignorer silencieusement les absences individuelles
+        // Ignorer les absences individuelles dans le calcul
         if (!noteValide(noteObj)) return;
 
         const note = parseFloat(noteObj.note);
@@ -526,7 +547,7 @@ function calculer(eleves, evals, notesMap, matieresMap) {
           devoirPondere += note * coeffEval;
           devoirPoids   += coeffEval;
         } else if (type === 'Examen') {
-          examenNote = note; // dernière valeur si plusieurs examens
+          examenNote = note;
         }
       });
 
